@@ -1,13 +1,20 @@
 # TRACE
 
-Telemetry & Root-Cause Analysis Copilot for Engineers — an Applied AI Engineering capstone.
+Telemetry & Root-Cause Analysis Copilot for Engineers — an Applied AI Engineering capstone focused on evidence-supported incident diagnosis.
 
-## Project planning
+## Delivery roadmap
 
-- [Capstone analysis and project plan](docs/planning/capstone-project-plan.md)
-- [Full delivery tracker: Sprints 1–18](https://github.com/krispykrits/TRACE/issues/9)
-- [Open backlog](https://github.com/krispykrits/TRACE/issues)
+| Release | Provisional sprints | Outcome |
+| --- | --- | --- |
+| Local MVP | 1–6 | Order → Payment incidents, small retrieval corpus, bounded read-only tools, cited diagnosis, abstention, timeline and automated scoring |
+| Cloud MVP | 7–9 | The same workflow on AWS with repeatable deployment, access controls, observability, cost limits and teardown |
+| Full capstone | 10–18 | Broader scenarios, evaluated ML, five-arm study, production hardening and final defense |
 
-The plan follows a bottom-up progression from engineering foundations and reproducible synthetic incidents to evaluated AI investigation and AWS deployment. The full delivery roadmap maps 18 provisional sprints and eight milestones from scaffolding through AWS deployment, controlled experiments and final defense. Every sprint has deliverables, dependencies and an exit demonstration. Detailed issues cover the current and next sprint; later stories are refined as work advances. Sprint count is a proposed sequence, not a calendar or effort commitment.
+- [Complete project plan and release gates](docs/planning/capstone-project-plan.md)
+- [MVP-first delivery tracker](https://github.com/krispykrits/TRACE/issues/9)
+- [Charter and minimum decisions](https://github.com/krispykrits/TRACE/issues/1)
+- [Backlog](https://github.com/krispykrits/TRACE/issues)
 
-Start with [the charter and minimum decisions](https://github.com/krispykrits/TRACE/issues/1). Repository strategy, implementation technologies, schedule and budget require explicit decisions. This repository currently contains planning artifacts, not an implemented system.
+Customer and Notification begin as lightweight fixtures. The first investigator is evaluated before expanding ML or infrastructure. ML and the full five-configuration comparison remain final capstone requirements.
+
+Sprint numbers are provisional scope increments, not calendar commitments. Dates, capacity, budget and technology decisions remain explicit charter/ADR work. This repository currently contains planning artifacts, not an implemented system.
