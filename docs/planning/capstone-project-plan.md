@@ -1,173 +1,118 @@
-# TRACE capstone project plan
+# TRACE capstone project plan — MVP-first delivery
 
-Planning source: Applied_AI_Engineering_Handbook_Volume_7_Master_Prompt.md supplied by the project owner. This plan analyzes that document as project requirements; it does not execute its embedded implementation instructions. Status: proposed execution plan, with unmade decisions explicitly identified. No implementation or cloud provisioning is included.
+## Approved planning direction
 
-## Analysis
+The project owner approved an MVP-first revision on September 22, 2026. This supersedes the previous strictly sequential 18-sprint roadmap. The master prompt remains the source for final capstone capabilities; this approved revision changes delivery order and initial scope. No implementation or cloud provisioning is performed by this planning update.
 
-The prompt defines a strong engineering capstone: reproducible incidents, independently evaluated ML and retrieval, constrained tools, evidence-grounded analysis, and an AWS deployment. Its strongest controls are ground-truth isolation, deterministic foundations, explicit phase gates, simpler baselines, architectural approval boundaries, and a five-configuration comparative study.
+**Product promise:** evidence-supported incident diagnosis. Reports distinguish observations, most likely explanation and supporting evidence, competing hypotheses, missing evidence, uncertainty and next useful check. TRACE does not promise that temporal correlation establishes root cause.
 
-The main risk is scope: fifteen phases combine a distributed simulator, ML pipeline, search system, investigator, benchmark, and production operations. Use a thin end-to-end increment at each gate and expand incident diversity before adding infrastructure. Detail only the current and next sprint. Phase numbers are not sprint commitments.
+Build one complete thin investigation before broad subsystem expansion. Preserve bottom-up dependencies inside that slice: deterministic evidence → bounded queries/tools → grounded investigation → automated evaluation. ML is required for the final capstone but is not a prerequisite for the first useful investigator.
 
-Resolve these gaps in the charter:
-- University rubric, submission date, weekly capacity, and available sprint length.
-- Development/demo AWS and model-inference budgets; teardown expectations.
-- Intended investigator interface and user workflow; deployment access model.
-- Metric definitions, baseline-relative improvement targets, minimum acceptable reliability/latency/cost, and abstention tradeoffs. Set thresholds before the final held-out study.
-- Dataset size, scenario-family splits, repeated-run policy, uncertainty estimates, and contamination controls.
-- Which Volumes 1–6 artifacts exist and can be reused.
-- Evidence provenance/versioning/retention and handling of injected or misleading content.
+## Three releases and acceptance gates
 
-Resolve apparent sequencing tensions:
-- Charter is a planning prerequisite; scaffolding remains the first implementation task.
-- Design evaluation contracts and leakage controls with the incident framework, then build the full comparison harness in Phase 10.
-- Establish logging, validation, secrets boundaries, and safety tests early; Phase 12 deepens these controls.
-- Keep stable evidence IDs and normalized timestamps in early schemas; Phase 9 adds investigation and timeline behavior.
-- The existing TRACE repository hosts planning only; its existence does not decide monorepo versus multiple implementation repositories.
-
-## Scope and guardrails
-
-Required final capabilities: reproducible synthetic incidents; telemetry collection; ML anomaly detection; semantic retrieval; controlled tools; evidence-grounded incident analysis; citations and uncertainty; timelines; automated evaluation; AWS deployment; observability; tests/CI/CD; quantitative results; justified architecture; final technical demonstration.
-
-Initial enterprise scope comprises Order, Payment, Customer, and Notification service responsibilities. Runtime boundaries and synchronous/asynchronous communication require a decision. Start with the smallest explainable causal chain. Cover deployment regression, downstream degradation, resource exhaustion, load anomaly, configuration failure, and cascading failure as the benchmark grows; include ambiguous/noncausal distractors and insufficient-evidence cases.
-
-Defer deep learning, multi-agent orchestration, Kubernetes, Kafka, separate vector databases, caching, hybrid retrieval, and reranking unless evidence justifies them. No arbitrary shell, database, AWS, or infrastructure capability is exposed to the investigator. Consequential actions require enforcement outside the model; simulated actions are sufficient for the capstone.
-
-## Roadmap and phase exit gates
-
-| Phase | Capability and deliverables | Gate / demonstration |
+| Release | Target | Required scope and acceptance evidence |
 | --- | --- | --- |
-| 0 | Charter, constraints, success criteria, reuse inventory | Owner resolves minimum scaffolding decisions; unknowns have owners and decision gates |
-| 1 | Packaging, repository layout, local tasks, validated configuration, logs, tests, CI, documentation and IaC placeholders | Fresh checkout installs, checks, tests, and runs a skeleton; deliberate test failure blocks CI |
-| 2 | Minimal Order/Payment/Customer/Notification workflow | Happy path and controlled dependency failure demonstrated with correlation IDs |
-| 3 | Seeded scenarios, telemetry, benchmark manifests | Repeated seed reproduces causal events; investigator cannot access ground truth |
-| 4 | Evidence schema, persistence, migrations, bounded operational APIs | Known incident evidence is queried by time/service and cited by stable ID; invalid requests fail predictably |
-| 5 | Statistical baseline and classical ML anomaly pipeline | Leakage-resistant held-out results report precision/recall/F1, false positives and detection delay |
-| 6 | Versioned knowledge ingestion, embeddings and retrieval | Independent labeled-query evaluation reports Recall@K and MRR; storage/model ADRs supported by evidence |
-| 7 | Typed, bounded, read-only investigation tools | Contract, argument, authorization, timeout and audit tests pass; tool selection can be evaluated independently |
-| 8 | Model abstraction, RAG, structured investigator output | Observations/inferences/hypotheses are distinct; citations resolve; insufficient evidence triggers abstention; budgets/retries bounded |
-| 9 | Explicit workflow, hypothesis state and normalized timelines | Out-of-order/duplicate events and time normalization tested; ordering alone never establishes causation |
-| 10 | Automated five-configuration comparison harness | Same held-out incidents and recorded conditions run across all configurations; deterministic and judge metrics separated |
-| 11 | Justified AWS architecture, IaC, immutable deployment | Repeatable deployment, smoke test and teardown; IAM/network/secrets/cost controls documented |
-| 12 | Security, resilience, observability and promotion | Injection/poisoning, denial of consequential actions, failure recovery and traceability demonstrated |
-| 13 | Controlled study and results analysis | Repeated runs, variability, failures, cost, limitations and rejected alternatives reported reproducibly |
-| 14 | Defense and polished demonstration | Every final capability links to test, experiment, deployment or demo evidence |
+| **Local MVP** | End of S6 | Reproducible Order → Payment incidents; small semantic corpus; bounded read-only tools; explicit workflow; cited structured diagnosis; deterministic timeline; abstention; automated end-to-end development scoring; passing tests and documented setup. |
+| **Cloud MVP** | End of S9 | The same workflow deployed repeatably to AWS using IaC and intentional CI/CD promotion, with access controls, workload identities, secrets handling, observability, cost controls, failure recovery and verified teardown/recreation. |
+| **Full capstone** | End of S18 | Broader benchmark, evaluated ML and retrieval, all five comparison arms, hardened operations/security, frozen-protocol quantitative study, architectural justification and final defense; all 15 final capabilities retained. |
 
-Dependencies follow the phase sequence. Later planning may overlap; implementation gates cannot be bypassed. No dates or estimates are committed until capacity and the university deadline are known.
+Release thresholds for quality, reliability, latency and cost must be recorded before the relevant acceptance run. University rubric, deadline, weekly capacity, sprint duration and cloud/model budgets remain charter decisions; no dates or numerical quality targets are invented here. Local MVP acceptance is not evidence of full capstone completion.
+
+## MVP scope and deliberate deferrals
+
+| Area | Local/cloud MVP | Full capstone or conditional expansion |
+| --- | --- | --- |
+| Enterprise | Order → Payment runtime path; Customer/Notification lightweight fixtures | Expand service behavior or independent deployment only if scenario requirements justify it |
+| Incidents | Deployment regression, dependency degradation, insufficient evidence; include unrelated deployment distractor | Six families: regression, degradation, exhaustion, load anomaly, configuration failure, cascading failure; ambiguous and adversarial cases |
+| Evidence | Structured logs, latency/error metrics, deployments, stable IDs, provenance and UTC timestamps | Queue/resource signals and richer dependency graph as needed |
+| Retrieval | Small curated versioned corpus, labeled queries, embeddings and measured semantic search | Broader ingestion; hybrid/reranking only if measured benefit |
+| Tools | Bounded log, metric, deployment and knowledge queries | Dependency/version tools only for identified investigation gaps |
+| Investigator | Explicit bounded workflow, structured report, deterministic timeline, CLI default | Minimal web view only if necessary; richer state/hypotheses when justified |
+| ML | Deferred from MVP; statistical summaries may support evidence inspection | Anomaly-window/signal prioritization; statistical versus classical ML comparison and downstream ablation |
+| Actions | Read-only investigation and recommendations; no operational execution tool | Simulated consequential actions with approval enforced outside the model |
+| AWS | Minimal repeatable demo deployment, budget/access controls and teardown | Additional environments or services only if their value exceeds cost/complexity |
+
+Do not introduce deep learning, multi-agent orchestration, Kubernetes, Kafka, a separate vector database, caching or an elaborate dashboard without evidence. Repository/packaging, runtime boundaries, persistence, model/provider and cloud/IaC choices still require justified ADRs; the planning repository does not decide implementation repository strategy.
 
 ## Full delivery path — 18 provisional sprints
 
-This is the complete proposed delivery sequence, not a commitment to 18 fixed-duration sprints. Sprint 1 includes the Phase 0 charter prerequisite and Phase 1 scaffolding. Existing Sprint 1 and Sprint 2 issues remain valid. Sprints 3–18 are roadmap increments; expand their stories when they become current/next. All increments below are planned, not completed.
+These are scope increments, not time estimates. Only current/next sprint stories are detailed. Re-size and split increments using actual capacity; update dependencies and release gates together. All listed work is planned, not completed.
 
-Sprint duration, weekly capacity and university deadline are still unknown. Do not infer calendar dates from sprint numbers. At planning, split any increment that exceeds capacity; update subsequent numbering and dependencies together. A failed exit gate carries work forward before dependent implementation starts.
-
-| Sprint | Phase | Goal and principal deliverables | Demonstration and exit evidence | Depends on |
+| Sprint | Goal | Principal deliverables | Demo / exit gate | Dependencies |
 | --- | --- | --- | --- | --- |
-| **1 — Foundation** | 0–1 | Charter and minimum decisions; agreed repository/package structure; configuration/logging; local tasks/tests; CI; ADR/docs/IaC foundation. Issues #1–#6. | Clean checkout runs and tests; invalid config rejected; CI failure propagation shown; repository/packaging choices recorded. | Charter decisions before implementation |
-| **2 — Synthetic enterprise** | 2 | Minimal Order, Payment, Customer and Notification workflow; first seeded dependency failure; correlation and evidence contract. Issues #7–#8. | Explain complete happy-path/failure causal chain; reset and replay; ground truth excluded from investigator output. | S1 |
-| **3 — Incident and telemetry framework** | 3 | Reusable scenario runner; versioned manifests/seeds; logs, latency/errors/throughput and deployment events; initial regression/degradation scenarios; evaluation data contract and split policy. | Replay logical events from seed; validate telemetry schema and stable IDs; prove ground-truth isolation with negative tests. | S2 |
-| **4 — Operational evidence access** | 4 | Persistence ADR, migrations, bounded time/service queries, evidence lookup, provenance and UTC normalization; documented API contracts. | Ingest and retrieve known incident evidence by ID/window/service; test invalid bounds, empty results, migration and duplicate handling. | S3 |
-| **5 — Benchmark breadth and statistical baseline** | 3, 5 | Extend to all six incident families plus ambiguous/noncausal and insufficient-evidence cases; version datasets; implement threshold/statistical anomaly baseline. | Dataset validation and split-leakage checks pass; report precision/recall/F1, false positives and detection delay on development/validation data. | S4 |
-| **6 — ML telemetry intelligence** | 5 | Reproducible feature/training pipeline; classical ML comparator; versioned artifacts; anomaly output integration; algorithm ADR. | Reproduce baseline-versus-ML results on validation partitions; document selected approach and limitations; reserve final test set. | S5 |
-| **7 — Knowledge ingestion and retrieval** | 6 | Versioned runbooks/postmortems/service documentation; normalization/chunking/metadata; embeddings and search; vector-storage/embedding ADRs. | Retrieve evidence-linked chunks from known queries; verify provenance, ingestion repeatability and exclusion of held-out answers. | S4–S6 in baseline sequence |
-| **8 — Retrieval evaluation and context** | 6 | Labeled query set; independent Recall@K/MRR evaluation; bounded context construction; compare simple retrieval alternatives; add hybrid/reranking only if earned. | Reproduce retrieval report; test no-result and misleading-document cases; meet recorded pilot acceptance thresholds or document required remediation. | S7 |
-| **9 — Controlled investigation tools** | 7 | Typed log/metric/deployment/knowledge/dependency/version tools as justified; bounds, permissions, audit, timeout/error contracts; tool-selection evaluation fixtures. | Valid calls return evidence IDs; invalid/unauthorized/over-budget calls fail predictably; consequential actions cannot bypass approval enforcement. | S4, S6, S8 |
-| **10 — Grounded AI investigator** | 8 | Provider/model ADR; model abstraction; structured outputs; RAG/tool integration; citations, observations/inferences/hypotheses, abstention; retries/token/cost limits. | Investigate a known development incident and abstain on missing evidence; verify schema, citation checks, bounded failures and usage records. | S9; reliable evidence gate accepted |
-| **11 — Investigation workflow and timeline** | 9 | Explicit state machine, bounded evidence gathering, hypothesis tracking, deterministic timeline reconstruction and minimal investigator interface. | End-to-end investigation shows ordered cited events, uncertainty and next steps; duplicate/out-of-order/timezone fixtures pass; sequence alone is not labeled causation. | S10 |
-| **12 — Automated comparison platform** | 10 | Five configuration arms; common incident briefs; deterministic scoring plus calibrated human/judge rubric; run manifests; evaluation regression smoke suite. | One command runs all five arms on the same development suite; report root cause/service, grounding/citations, abstention, tools/timeline, latency/cost/failures; audit leakage controls. | S11; component evaluations from S5–S9 |
-| **13 — AWS architecture and IaC** | 11 | Workload-based compute/network/storage/inference/IaC ADRs; environment plan; IAM/secrets boundaries; cost estimate; budget/teardown plan; validated IaC. | Review architecture against measured local requirements; validate IaC and a deployment plan; every recurring resource has a purpose, cost assumption and removal path. | S12 baseline; research may begin earlier |
-| **14 — AWS deployment and promotion** | 11 | Immutable container artifacts; AWS environment; intentional CI/CD promotion; workload identities; deployment smoke checks; operations and teardown instructions. | Deploy the selected configuration, run an incident investigation, redeploy/recover and demonstrate teardown/recreation with retained artifact policy. | S13; budget/access decisions resolved |
-| **15 — Production hardening** | 12 | End-to-end traceability; dashboards/alerts; resilience tests; input/tool security; prompt-injection/retrieval-poisoning cases; approval-boundary tests; dependency/container checks. | Follow one investigation through logs/tools/model/cost; inject failures and hostile evidence; verify boundary enforcement, recovery and deployment health. | S14; controls established in earlier sprints |
-| **16 — Pilot study and protocol freeze** | 13 | Validate benchmark comparability and scoring; calibrate rubrics; choose repeat counts and uncertainty reporting; freeze configuration, thresholds and analysis plan. | Pilot uses development/validation data only; all five arms run; protocol, dataset/corpus/model/prompt versions and failure-accounting rules are signed off before final test access. | S12, S15 |
-| **17 — Controlled experimental study** | 13 | Run frozen five-arm experiments; retain artifacts; analyze paired results/variability, failure rate and quality/latency/cost tradeoffs; document negative results and limitations. | Reproduce tables from stored results; account for every run; separate deterministic and judge scores; explain ML/retrieval/tool contribution without overstating synthetic generalization. | S16 |
-| **18 — Final demonstration and defense** | 14 | Final report, architecture/ADR narrative, evidence index, operations guide, demo script/recording and defense rehearsal. | Demonstrate all 15 final completion capabilities; reproduce selected results; rehearse live and fallback demo; explain decisions, limitations, cost and teardown. | S17 and all final gates |
+| 1 | Foundation | Charter, reuse inventory, repository/package decisions, skeleton, configuration/logging, local tests and CI; #1–#6. | Clean checkout runs; checks fail correctly; decisions and setup documented. | Charter before implementation |
+| 2 | Minimal synthetic workflow | Order → Payment runtime path; Customer/Notification fixtures; first seeded degradation; evidence IDs and evaluator-only ground truth; #7–#8. | Replay happy/failure paths; validate contracts, correlation and ground-truth isolation. | S1 |
+| 3 | Reliable evidence and early scoring | Bounded log/metric/deployment queries and persistence; regression/degradation/insufficient-evidence fixtures; noncausal deployment distractor; UTC timeline; development scoring runner. | Query evidence by ID/window/service; reproducible manifests; deterministic timeline and scorer fixtures pass; reserve final-test data. | S2 |
+| 4 | Small retrieval corpus and controlled tools | Curated versioned knowledge, labeled retrieval queries and Recall@K/MRR; typed bounded log/metric/deployment/knowledge tools; timeout/audit/authorization contracts. | Known queries retrieve supporting documents; invalid tool calls rejected; no operational write capability. | S3 |
+| 5 | First complete investigator | Provider ADR, explicit bounded workflow, structured report, citations, alternatives, missing evidence, abstention, deterministic timeline; CLI by default; automated end-to-end scoring begins now. | Run an incident from evidence to scored report; validate citation IDs and sampled support; test timeout, malformed output and insufficient evidence; record usage/cost. | S4 |
+| 6 | Local MVP acceptance | Stabilize development suite, LLM-only reference versus integrated RAG/tools, scoring rubrics and failure accounting; document minimum release thresholds before acceptance runs. | One command reproduces suite and reports diagnosis, unsupported claims, citations, abstention, timeline, latency/cost/failures; meet documented thresholds; critical boundary tests pass. | S5 |
+| 7 | Minimal AWS design and IaC | Use measured MVP needs to select compute/storage/network/inference and IaC; budget, access, identity/secrets, retention and teardown decisions. | Validated deployment plan with justified resources and cost assumptions; no unnecessary environment duplication. | Local MVP gate |
+| 8 | Cloud deployment and CI/CD | Immutable artifacts, intentional promotion, workload identity, access controls, smoke tests, minimal end-to-end logs/metrics and cost tracking. | Deploy and run local-MVP scenarios on AWS; confirm access isolation, evidence traceability and CI/CD smoke checks. | S7 |
+| 9 | Cloud MVP acceptance | Failure recovery, prompt injection/poisoning checks, resource budgets, operational guide and teardown/recreation. | Demonstrate investigation, failed-request recovery, enforced read-only tools and resource removal/recreation; cloud release criteria evidenced. | S8 |
+| 10 | Benchmark breadth and statistical baseline | All six incident families, matched symptoms with different causes, noncausal distractors, missing telemetry; versioned splits; threshold/statistical detector. | Validate scenarios/leakage; report detection precision/recall/F1, false positives and delay on development/validation data. | Cloud MVP gate |
+| 11 | ML contribution | Classical ML pipeline to prioritize anomalous windows/signals; reproducible features/artifacts; compare against statistical baseline. | Measure whether ML improves diagnosis or reduces tool calls/latency/cost; retain negative results and justify selection; never treat anomaly as causal proof. | S10 |
+| 12 | Retrieval and tool refinement | Broader curated corpus and labeled queries; independent tool selection/argument evaluation; justify retrieval changes; expand tools only for measured gaps. | Reproduce retrieval and tool reports; regression suite passes; optional hybrid search/reranking earns inclusion experimentally. | S11 baseline; technical prerequisites S4–S6 |
+| 13 | Full five-arm comparison harness | LLM only; RAG; tools; RAG+tools; RAG+tools+ML. Shared incident briefs, budgets, recorded conditions, deterministic scoring and calibrated judge/human rubric. | Run all five arms on common development incidents; account for failed runs and reproduce scores from artifacts. | S11–S12 |
+| 14 | Capstone hardening and coverage | Broader resilience/observability/security regressions, operations docs; architectural action classes and simulated human-approval boundary; enrich workflow only where evidence warrants. | No simulated consequential action executes without approval; hostile evidence cannot grant permissions; trace and recover failed investigations. | S13 |
+| 15 | Pilot and protocol preparation | Validation-only pilot, rubric calibration, repeat-count/uncertainty method and cohort definitions; identify remaining completeness gaps. | Five-arm pilot is reproducible; sample scoring reviewed; final test set untouched; planned report tables and comparisons defined. | S14 |
+| 16 | Protocol freeze and readiness gate | Freeze datasets, corpus, model/prompt/tool/config versions, budgets, thresholds and statistical analysis; complete final capability evidence review. | Every required capability has evidence or a blocking remediation item; protocol approved before final test access; no unresolved critical blockers. | S15 |
+| 17 | Controlled experimental study | Run frozen five-arm study; analyze paired results/variability, failures, quality/latency/cost tradeoffs and ML benefit. | Reproduce tables from saved artifacts; separate unseen-variant and unseen-family results; disclose negative results and synthetic limitations. | S16 |
+| 18 | Final demonstration and defense | Report, architecture/ADRs, evidence index, operations guide, demo recording/fallback and defense rehearsal. | All 15 final capabilities evidenced; selected results reproduced; decisions, limitations and teardown explained. | S17 |
 
-### Delivery milestones
-
-These are roadmap checkpoints, not GitHub milestone objects.
-
-| Checkpoint | After | What can be demonstrated |
-| --- | --- | --- |
-| M1 — Runnable engineering foundation | S1 | Reproducible local setup and enforced quality checks |
-| M2 — Trustworthy incident evidence | S4 | Simulate, capture, persist and query an explainable incident |
-| M3 — Independently evaluated intelligence | S8 | Statistical/ML results and measured semantic retrieval |
-| M4 — Complete local investigation | S11 | Bounded tools, grounded conclusions, abstention and timeline |
-| M5 — Reproducible comparison harness | S12 | All five experimental configurations on common incidents |
-| M6 — Operable AWS demonstration | S15 | Repeatable cloud deployment with security, resilience and observability evidence |
-| M7 — Defensible experimental results | S17 | Frozen-protocol study with measured tradeoffs and limitations |
-| M8 — Capstone complete | S18 | All final requirements evidenced and defense rehearsed |
-
-### Dependency path
+### Delivery path
 
 ```mermaid
 flowchart LR
-  A["S1 Foundation"] --> B["S2–4 Synthetic incidents and evidence"]
-  B --> C["S5–6 Benchmark and ML"]
-  C --> D["S7–8 Retrieval"]
-  D --> E["S9–11 Tools and investigator"]
-  E --> F["S12 Comparison harness"]
-  F --> G["S13–15 AWS and hardening"]
-  G --> H["S16–17 Experimental study"]
-  H --> I["S18 Defense"]
+ A["S1–3 Foundation and evidence"] --> B["S4–6 Local MVP"]
+ B --> C["S7–9 Cloud MVP"]
+ C --> D["S10–14 Benchmark, ML and full evaluation"]
+ D --> E["S15–17 Pilot, freeze and study"]
+ E --> F["S18 Full capstone"]
 ```
 
-This is the baseline delivery order for one project owner. Retrieval can be developed independently of ML after the evidence contract stabilizes; cloud research and documentation can occur earlier. Those overlaps do not waive the reliable-evidence, deployment, safety or experimental freeze gates.
+The earlier master-prompt phases are capability categories rather than mandatory implementation order under this approved revision. Reliable evidence is still mandatory before LLM integration. The complete ML subsystem and five-arm study are deferred beyond the MVP, not removed.
 
-### Planning assumptions, decisions and scope control
+## Current and next sprint plans
 
-- **Capacity:** choose sprint duration and available hours in #1, then size only the current/next backlog. Eighteen increments are a decomposition of scope, not an effort estimate.
-- **Architecture:** repository and packaging decisions precede S1 implementation; service/communication choices precede S2; persistence precedes S4; ML selection is evidenced in S6; retrieval choices in S7–S8; model/provider in S10; workflow in S11; cloud/IaC in S13.
-- **Evaluation:** schema/split design begins in S3, baselines in S5, retrieval evaluation in S8, tool evaluation in S9, the full harness in S12, protocol freeze in S16 and final held-out testing in S17. Do not tune on the final test set.
-- **Cross-cutting work:** tests, documentation, ADRs, security and observability accompany every increment. S15 verifies and strengthens existing controls.
-- **Interface:** decide CLI/API/minimal UI expectations in the charter; S11 delivers the chosen investigation workflow. A polished web frontend is not assumed.
-- **Scope pressure:** first reduce optional model complexity, reranking, additional services, elaborate UI and unnecessary cloud environments. Retain required capabilities and the five-arm study; escalate conflicts with university requirements through a documented scope decision.
-- **Risks:** unknown schedule/budget, unrealistic synthetic incidents, leakage, unreliable model behavior, cloud cost and study variance. Review at every milestone; assign mitigations in the next sprint backlog.
-- **Readiness:** before a sprint starts, refine its goal into sized stories with measurable acceptance criteria, tests, documentation, decisions, dependencies, risks and a demo. Exit requires linked evidence and the shared Definition of Done.
-- **Replanning:** after each sprint, record actual capacity, incomplete work, new findings and downstream impact. Update this sequence before committing the next sprint. Do not mark a milestone complete solely because code exists.
+### Sprint 1 — Foundation
+Goal: clean runnable/testable foundation, with scaffolding the first implementation task.
+Backlog: charter/minimum decisions (#1), repository/environment skeleton (#2), configuration/logging (#3), local tasks/integration foundation (#4), CI (#5), ADR/docs/IaC foundations (#6).
+Dependencies: resolve minimum charter/repository/package decisions before skeleton implementation.
+Tests: clean setup, meaningful smoke/integration checks, invalid configuration/redaction checks and deliberate CI failure evidence.
+Docs/decisions: charter, reuse inventory, repository/package ADRs, setup, local commands, review and IaC templates.
+Risks: excessive scaffolding and speculative infrastructure.
+Demo/gate: fresh checkout runs/checks/tests; CI and docs prove repeatability; no AWS provisioning or domain behavior before the foundation.
 
-## Current sprint: Sprint 1 — Project scaffolding
+### Sprint 2 — Minimal synthetic workflow
+Goal: explain the causal chain in an Order → Payment request and reproduce one downstream failure.
+Backlog: narrowed happy path (#7), seeded dependency failure/evidence contract (#8).
+Customer and Notification are fixtures, not required independently running services.
+Dependencies: S1 accepted; owner records service/communication choices.
+Tests: request contracts, correlation propagation, happy/failure integration, replay/reset, evidence schema, deterministic timestamps and ground-truth exclusion.
+Docs/decisions: workflow diagram, service ADR, fixture limitations, scenario/evidence schema.
+Risks: artificial causal shortcuts, uncontrolled clocks/randomness and ground-truth leakage.
+Demo/gate: reset and replay both paths with stable logical events; inspect evaluator-only cause separately from investigator-visible evidence.
+Next refinement: S3 adds regression, missing-evidence and noncausal distractor cases plus evidence query/scoring foundations.
 
-Goal: provide a clean, runnable, testable foundation before implementing domain behavior.
-Prerequisite: Phase 0 minimum decisions, especially repository strategy and packaging conventions.
-Capability: engineering foundation for deterministic services and later AI subsystems.
+## Evaluation from the first investigator
 
-Backlog:
-1. Charter and minimum decision gate (planning enabler).
-2. Repository and Python environment skeleton (first implementation task).
-3. Validated configuration and structured logging.
-4. Reproducible local development and integration-test entry point.
-5. GitHub Actions quality gates.
-6. Documentation, ADR, sprint and IaC foundations.
+- S3 defines the result/ground-truth contract, scorer fixtures and split policy; S5 scores the first end-to-end investigator automatically. Do not postpone evaluation until the full comparison harness.
+- S6 compares an LLM-only reference with integrated RAG/tools on the development suite. This is an MVP diagnostic comparison, not the final ablation study.
+- S13 runs all five required arms: LLM only; LLM + RAG; LLM + tools; LLM + RAG + tools; LLM + RAG + tools + ML.
+- Give each arm the same common incident brief. Document allowed evidence channels, model/version, prompt policy, budgets and unavoidable differences. Record tool calls, tokens, latency, cost and failed runs; do not silently drop failures.
+- Use separate train/development/validation/final-test artifacts. Group related templates and near-duplicate causal variants to prevent leakage. Report **unseen variants of known families** separately from **entirely unseen families**; decide cohort allocations before the study rather than forcing one split to answer both questions.
+- Keep held-out ground truth, answer-bearing postmortems and labels out of investigator tools, retrieval, prompts and training. Version corpus, data, seeds, model, prompt, configuration and run artifacts.
+- Score root-cause/service identification, groundedness, supporting citations, unsupported claims, abstention, timeline correctness, tool selection/arguments, reliability, latency and cost. Use independent retrieval Recall@K/MRR and anomaly precision/recall/F1, false-positive rate and delay.
+- Citation ID existence is not citation support: validate IDs deterministically and review evidentiary support with a documented rubric. Calibrate any LLM judge against human-reviewed samples; never use it as the sole evaluator of critical claims.
+- ML's initial responsibility is to prioritize anomalous windows/signals. Measure downstream diagnosis quality and tool-call/latency/cost changes relative to statistical thresholds; anomaly scores are not causal proof. Negative results and choosing simpler methods are valid outcomes.
+- Include successful/unrelated deployments near incidents, similar symptoms with different causes, and incomplete telemetry. Reward justified uncertainty instead of forcing one root-cause answer.
+- Pilot on development/validation data, freeze thresholds/configurations/analysis in S16, then access final test data in S17. Repeat stochastic runs and report uncertainty. Document synthetic-to-real generalization limitations.
 
-Required decisions: repository strategy; Python/package/environment strategy; initial runtime boundaries; configuration conventions; local orchestration needs. IaC tool and AWS topology remain proposed until requirements justify selection.
-Risks: excessive scaffolding, platform-specific setup, speculative dependencies, accidental technology commitments.
-Demonstration: fresh checkout → documented setup → runnable skeleton → configuration failure example → passing unit/integration checks → passing CI; show intentional failing-check evidence and the unresolved decision register.
-Exit: acceptance criteria evidenced, relevant docs/ADRs current, no secrets, no unexplained dependencies, and owner can explain the foundation.
+## Risks and replanning
 
-## Next sprint: Sprint 2 — Minimal synthetic enterprise (provisional)
+Unknown capacity/deadline/budget may change sprint count. Synthetic shortcuts may overstate usefulness; use distractors, alternative causes and isolated test cohorts. Model failures require bounded execution and deterministic schema/tool safeguards. AWS cost requires budget limits and teardown from the first cloud release.
 
-Goal: demonstrate an understandable business request across the initial service responsibilities, with a reproducible downstream failure.
-Capability: synthetic environment for future incident evidence.
-Dependencies: Sprint 1 accepted; owner decides runtime and communication boundaries.
-Backlog:
-1. Minimal Order/Payment/Customer/Notification happy path with contract and integration tests.
-2. Seeded dependency-failure fixture and correlated telemetry, including a private benchmark manifest.
-
-Do not commit sprint capacity until Sprint 1 review. If either story is too large, split by demonstrable vertical slice during refinement. Avoid adding queues or databases solely to resemble an enterprise.
-ADRs: service boundaries, communication pattern, and persistence only where needed.
-Risks: artificial causal chains, uncontrolled clocks/randomness, and exposing benchmark labels to the investigator.
-Demonstration: reset, run happy path, inject Payment degradation, observe effects across a correlated request, replay with the same seed.
-Exit: contracts and failure behavior tested; causal chain documented; investigator-visible output excludes ground truth.
-
-## Evaluation plan
-
-Compare: (1) LLM only, (2) LLM + RAG, (3) LLM + tools, (4) LLM + RAG + tools, (5) LLM + RAG + tools + ML.
-Define the common incident brief for all arms; document permitted evidence channels in each arm. Hold scenarios, model/version, prompt policy and resource budgets constant where appropriate; record unavoidable differences. Run on the same held-out incidents, randomize run order where practical, repeat stochastic runs and report variability.
-
-Split by scenario family/template and causal variation, not just randomly generated rows. Prevent held-out postmortems, labels and ground-truth manifests from leaking into training, retrieval corpora, tool outputs or prompts. Version seeds, data, corpus, prompts, model/provider, tools and configuration.
-
-Metrics: anomaly precision/recall/F1 and delay; retrieval Recall@K/MRR; tool selection and argument correctness; root cause and affected service accuracy; groundedness, valid/supporting citations and unsupported claims; abstention on insufficient evidence; timeline event/order correctness; latency, tokens, estimated cost and failure rate. Define denominators and treatment of failed runs. Score citation existence deterministically and evidentiary support with a rubric; do not equate a valid ID with a supported claim. Human-reviewed samples calibrate any LLM judge.
-
-Freeze thresholds and analysis rules after pilot baselines and before final test use. Report negative results and synthetic-to-real generalization limitations. A simpler model winning is a valid result.
+Tests, security, observability, documentation and ADRs accompany every sprint; hardening is not their first appearance. If scope must shrink, cut optional infrastructure, UI polish and model complexity first. Preserve final required capabilities unless the owner explicitly approves a revised capstone scope. At each release, compare actual progress with the university rubric and replan remaining increments.
 
 ## Operating rules and definition of done
 
