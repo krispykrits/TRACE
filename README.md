@@ -2,6 +2,13 @@
 
 Telemetry & Root-Cause Analysis Copilot for Engineers — an Applied AI Engineering capstone focused on evidence-supported incident diagnosis.
 
+## Project organization
+
+- [TRACE Project](https://github.com/users/krispykrits/projects/2) — status and release grouping
+- [Sprint milestones](https://github.com/krispykrits/TRACE/milestones) — all 18 planned increments
+
+Individual issues are stories/tasks; milestones are sprints. Project Status is the authoritative work status. Future milestones remain undated pending capacity planning.
+
 ## Delivery roadmap
 
 | Release | Provisional sprints | Outcome |
