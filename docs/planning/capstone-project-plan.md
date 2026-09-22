@@ -114,6 +114,12 @@ Unknown capacity/deadline/budget may change sprint count. Synthetic shortcuts ma
 
 Tests, security, observability, documentation and ADRs accompany every sprint; hardening is not their first appearance. If scope must shrink, cut optional infrastructure, UI polish and model complexity first. Preserve final required capabilities unless the owner explicitly approves a revised capstone scope. At each release, compare actual progress with the university rubric and replan remaining increments.
 
+## GitHub organization
+
+[TRACE Project](https://github.com/users/krispykrits/projects/2) tracks work status and Release. [Native milestones](https://github.com/krispykrits/TRACE/milestones) represent all 18 provisional sprints. Issues #1–#6 belong to Sprint 01; #7–#8 belong to Sprint 02. The roadmap issue #9 spans releases and has no sprint milestone.
+
+Project Status is authoritative; redundant status labels are removed. Sprint/type/release labels remain repository filters. Preserve existing iteration assignments; milestones do not imply committed dates. Empty future milestones require story refinement and do not imply completion.
+
 ## Operating rules and definition of done
 
 Use issues for actionable backlog and sprint tracking. Keep future phases at roadmap level until refinement. Each story records acceptance criteria, tests, documentation, dependencies, decisions, risk, and demonstration. Board-ready status convention: Backlog → Ready → In progress → Review → Done; blocked work states its blocker explicitly.
