@@ -24,6 +24,17 @@ TRACE is an incident intelligence and controlled-response platform. The initial 
 - Read detailed planning/review documents when they apply to the task, rather than loading every project document for unrelated edits.
 
 
+## Coding and design practices
+
+- Start from the scoped issue, acceptance criteria, and existing decisions. Prefer the smallest complete change that fits them; do not add speculative features, abstractions, services, or dependencies.
+- Keep TRACE a modular application. Organize code around responsibilities and stable boundaries; separate domain rules from I/O when those rules exist. Use explicit adapters for external systems and test seams. Avoid empty layers, generic frameworks, and premature microservices.
+- Keep functions and modules cohesive, name concepts clearly, and make control flow and failure behavior explicit. Use Python 3.12 type annotations for public interfaces. Prefer standard-library or already-approved components; justify each new dependency and update `pyproject.toml` and `uv.lock` together.
+- Validate untrusted input at boundaries. Return actionable errors and propagate dependency failures; do not hide failures with silent fallbacks or claim confidence unsupported by evidence. Keep secrets out of source, logs, errors, and test fixtures.
+- Preserve least privilege, provenance, timestamps, authorization scope, and redaction. Investigation paths remain read-only. Keep any production mutation in the separate approved executor boundary.
+- Add deterministic tests for changed behavior and important failure cases. Keep tests independent of live services, credentials, time, and network unless the issue explicitly requires an isolated integration check. Run the relevant documented checks when the environment permits and report checks that could not run.
+- Add structured, correlated logging at meaningful boundaries without logging secrets or unnecessary sensitive content. Document configuration, setup, and operational behavior where contributors need it.
+- Record consequential architecture or dependency decisions in an ADR with context, alternatives, tradeoffs, and revisit conditions. Do not create an ADR for routine implementation details; keep existing decisions and source-of-truth documents aligned when a decision changes.
+
 ## Local command execution and recovery
 
 The TRACE repository is the primary source folder for this project. New Codex tasks should start with the repository root as their working directory; use that root directly for commands and `AGENTS.md` discovery. Confirm the actual Git root before editing.
