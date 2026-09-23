@@ -1,0 +1,18 @@
+# ADR 0002: Terraform and EC2 for the Cloud MVP
+
+- **Status:** Accepted direction; topology and release mechanism remain to be designed
+- **Date:** 2026-09-23
+- **Decision owner:** Project owner
+- **Context:** The Cloud MVP needs a repeatable AWS deployment of the accepted local workflow. The owner selected Terraform to automate infrastructure and EC2 as the initial compute target while TRACE is still in planning. This decision does not authorize AWS provisioning or commit a cost, instance size, region, deadline, or production environment.
+- **Decision:** Use Terraform as the infrastructure-as-code tool and an EC2-hosted Linux application as the first Cloud MVP deployment shape. Start with the smallest single-environment topology that satisfies measured demo workload and access requirements. Preserve intentional promotion, workload identity, access controls, observability, cost limits, recovery, and teardown as release criteria.
+- **Boundary:** Terraform owns declarative infrastructure lifecycle. The app artifact build and release/rollback mechanism for the EC2 host will be chosen in S8 after S7 validates the target design. Prefer a reproducible machine image or supported instance bootstrap mechanism and a deployment pipeline; do not make Terraform remote provisioners the routine application release mechanism. HashiCorp describes Terraform as primarily for immutable infrastructure and recommends purpose-built mechanisms for post-apply operations; EC2 also supports boot-time user data/cloud-init for initialization ([provisioners guidance](https://developer.hashicorp.com/terraform/language/provisioners), [post-apply operations](https://developer.hashicorp.com/terraform/language/post-apply-operations)).
+- **Alternatives considered:**
+  - Terraform plus EC2: selected because it matches the owner's desired IaC workflow and gives the capstone a concrete, inspectable VM deployment target.
+  - Terraform plus a managed container service: deferred; adds a different runtime and service surface before a measured need.
+  - Manual console provisioning: rejected because it is not repeatable or reviewable as code.
+  - Terraform provisioners for each app update: rejected as the default release path because infrastructure state and application lifecycle would be coupled.
+- **Deferred S7 design choices:** AWS account/region and quotas; VPC/subnet/ingress model; AMI selection and patching; instance family/size and storage; state backend, locking and access; identity and secrets; log/metric path; cost cap and alerts; backup/retention; and teardown/recreation procedure.
+- **Deferred S8 choices:** artifact format and immutable versioning; image build or boot-time install; workload identity on EC2; deployment promotion/rollback; health check and smoke test; and how to avoid broad inbound SSH or long-lived instance credentials.
+- **Consequences:** Terraform configurations, plans and changes must be reviewed and reproducible; credentials and sensitive values must not be committed. S7 and S8 require the AWS budget and account/access constraints before any apply. Local MVP remains local and credential-free. No EC2 instance, network, or state backend is created by accepting this ADR.
+- **Revisit conditions:** Revisit EC2 only if measured workload, security/access requirements, operational burden, course constraints or budget show it is unsuitable; record evidence and alternatives before changing. Keep Terraform unless a documented constraint justifies another tool.
+- **References:** [Charter](../charter.md); [capstone plan](../planning/capstone-project-plan.md); [production-usefulness review](../planning/production-usefulness-review.md).

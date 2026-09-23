@@ -16,7 +16,7 @@ TRACE is an incident intelligence and controlled-response platform. The initial 
 ## Working rules
 
 - Keep Local MVP, Cloud MVP, Full Capstone and the independent Operational Pilot gates separate; real production remediation is an additional final-capstone acceptance requirement. Synthetic evaluation or cloud deployment does not prove operational usefulness.
-- Work in the TRACE repository as one modular Python application. Current scaffold decisions are Python 3.12/Linux-first, `pyproject.toml`, `uv.lock`, and an empty runtime dependency set until needed; see ADR 0001.
+- Work in the TRACE repository as one modular Python application. Current scaffold decisions are Python 3.12/Linux-first, `pyproject.toml`, `uv.lock`, and an empty runtime dependency set until needed; see ADR 0001. Terraform and EC2 are the approved Cloud MVP deployment direction; see ADR 0002 for deferred design choices.
 - Treat Volumes 1–4 as educational references to adapt behind TRACE-owned contracts. Volumes 5–6 are designs to implement within TRACE. Never add sibling-directory runtime dependencies.
 - Keep operational evidence and interfaces separate from evaluator-only labels. Preserve provenance and access scope. Investigation tools stay read-only; production mutations belong to the separate executor with concrete target/action approval, state revalidation, bounded execution, outcome verification and recovery/escalation. Scope approval is not standing execution authorization.
 - Do not invent course deadlines, capacity, budgets, pilot permissions, performance thresholds or completion evidence. Record owner-dependent inputs as open gates until supplied.
