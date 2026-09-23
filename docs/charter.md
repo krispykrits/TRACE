@@ -5,7 +5,7 @@ Repository: [krispykrits/TRACE](https://github.com/krispykrits/TRACE)
 
 ## Purpose
 
-TRACE helps an investigating engineer collect and assess incident evidence. Its first useful workflow accepts a service and incident window, builds an auditable timeline, presents supported and competing hypotheses, identifies missing evidence, and suggests the next useful check. It remains read-only. Temporal correlation alone is not root-cause proof; unsupported or insufficient evidence must produce uncertainty or abstention.
+TRACE is an incident intelligence and controlled-response platform that helps an engineer investigate incidents and carry out explicitly approved remediation. Its first useful workflow accepts a service and incident window, builds an auditable timeline, presents supported and competing hypotheses, identifies missing evidence, and suggests the next useful check. The initial Local/Cloud MVP investigation workflow remains read-only. Final capstone completion also requires at least one real, explicitly approved and verified production remediation through a separate deterministic executor. Temporal correlation alone is not root-cause proof; unsupported or insufficient evidence must produce uncertainty or abstention.
 
 ## Users and workflow
 
@@ -20,10 +20,10 @@ TRACE helps an investigating engineer collect and assess incident evidence. Its 
 | --- | --- |
 | **Local MVP (S1–S6)** | Reproducible synthetic incidents, small measured retrieval corpus, bounded read-only tools, explicit investigator workflow, cited structured assessment, deterministic timeline, abstention, automated development scoring and documented setup. |
 | **Cloud MVP (S7–S9)** | The same workflow deployed repeatably on AWS with justified IaC, access controls, workload identity/secrets, observability, cost controls, recovery and verified teardown/recreation. |
-| **Full capstone (S10–S18)** | All 15 master-prompt capabilities, broader scenario coverage, evaluated classical ML and retrieval, five comparison arms, hardened operations/security, frozen-protocol study and final defense. |
+| **Full capstone (S10–S18)** | All 15 master-prompt capabilities, broader scenario coverage, evaluated classical ML and retrieval, five comparison arms, hardened operations/security, frozen-protocol study, final defense, and verified authorized production remediation after staging validation. |
 | **Operational Pilot (independent)** | Authorized historical replay and read-only shadow use with a named operator/team; comparison to their current workflow and a deterministic evidence bundle; operator-reviewed utility, quality, reliability, latency and cost evidence; access isolation, recovery, support ownership and feedback. |
 
-Passing a synthetic evaluation, deploying to AWS or finishing the capstone does not itself satisfy the Operational Pilot gate.
+Passing a synthetic evaluation, deploying to AWS or finishing the capstone does not itself satisfy the Operational Pilot gate. The [production remediation scope](planning/production-remediation-scope.md) separately requires execution on an authorized workload serving a real operational purpose; simulation or staging-only execution does not satisfy that requirement. A missing production target/access remains a final acceptance blocker, not a reason to invent or force a production incident.
 
 ## Approved product and architecture constraints
 
@@ -33,6 +33,9 @@ Passing a synthetic evaluation, deploying to AWS or finishing the capstone does 
 - Volumes 5 and 6 are design inputs. Their capabilities will be implemented within TRACE; they are not existing dependencies.
 - Preserve source provenance, event/collection times, authorization scope, stable identifiers, redaction, bounded read-only operations, and separation between investigator-visible evidence and evaluator-only labels.
 - Keep ML and the full five-arm study as final requirements, but outside the Local MVP critical path.
+- Keep investigation read-only and isolate remediation authority in a deterministic executor. Bind approval to the exact resource/environment, versioned action, parameters, expected state, expiry and recovery plan; revalidate before execution, reconcile uncertain outcomes before retries, verify health and retain audit evidence. Scope approval never authorizes an unspecified mutation.
+- Validate a real action in staging before owner-supervised production promotion. S14-S18 incorporate implementation, readiness and production evidence under the approved scope; resize increments against actual capacity.
+- Use feature branches and PRs for repository changes; no direct commits/pushes to main or automatic merges. Owner review precedes merging.
 - Do not add Kubernetes, Kafka, a separate vector database, multi-agent orchestration, a dashboard, or cloud resources without measured need and an ADR.
 
 ## Minimum scaffold decisions
@@ -52,6 +55,7 @@ Definitions are agreed now; numeric targets are set with the relevant reviewer/o
 
 - **Evidence usefulness:** time to first useful evidence and time to a defensible next check, compared with the current workflow and a deterministic evidence bundle.
 - **Diagnostic quality:** correct identification where answerable, supporting-citation quality, unsupported-claim rate, disclosure of missing evidence, and justified abstention.
+- **Remediation quality:** evidence of actual resource change and intended health outcome; unauthorized/stale approval rejection, duplicate/crash reconciliation, failure/recovery handling and complete proposal-to-verification audit trail. Set numeric limits for the chosen action before acceptance.
 - **Operational quality:** successful/recoverable investigations, access-boundary regressions, latency and cost per investigation.
 - **Retrieval and ML:** retrieval Recall@K/MRR; detector precision/recall/F1, false alerts per service-day and detection delay; downstream diagnostic or tool-use benefit over simpler baselines.
 - **Study quality:** paired results, explicit failed-run accounting, uncertainty/repeatability, separate unseen variants and unseen-family cohorts, and untouched final-test data until protocol freeze.
@@ -69,6 +73,7 @@ These values cannot be inferred from the repository and are deliberately not inv
 | AWS/model spending limit and any account restrictions | Project owner | Before provider selection, paid evaluation or AWS provisioning | Sprint 1 and offline work remain credential-free; no cloud is provisioned |
 | Pilot team/service, source owner and permitted/sanitized data | Project owner plus pilot data owner | Before operational replay; before shadow use obtain the source owner's approval | Operational usefulness remains unvalidated until access is authorized |
 | Measured workload and numeric acceptance thresholds | Project team with course reviewer; pilot owner for operational gate | Before each acceptance run, with final study thresholds frozen before final-test access | Do not state numeric performance promises yet |
+| Production workload/action, service owner, approver and change/access policy | Project owner with production service owner | Before action-specific design is finalized; staging validation and explicit execution approval before production rollout | Track candidates during S1; no selected target or standing mutation permission is implied; unavailable access blocks final production-remediation acceptance |
 | Packaging/runtime exception request | Project team | Revisit only if CI, selected dependencies or deployment demonstrate incompatibility | CPython 3.12 and `uv` remain the working default |
 
 ## Sprint 1 exit gate
