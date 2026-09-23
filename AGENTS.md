@@ -23,6 +23,22 @@ TRACE is an incident intelligence and controlled-response platform. The initial 
 - Use the roadmap and scoped issue acceptance criteria for work. Update [current status](docs/current-status.md) when a material decision, blocker, milestone or acceptance result changes; keep it brief and dated. Update the source-of-truth plan/ADR/issue as well when a decision itself changes.
 - Read detailed planning/review documents when they apply to the task, rather than loading every project document for unrelated edits.
 
+
+## Local command execution and recovery
+
+The desktop workspace uses WSL Ubuntu 24.04. The TRACE checkout is normally at `~/projects/applied-ai/TRACE` inside WSL. A task may start in the parent workspace instead of the repository, so verify the checkout and set the working directory before running project commands.
+
+- The configured command shell may be Windows PowerShell. Run Linux project commands through WSL, for example:
+  ```powershell
+  wsl.exe -d Ubuntu-24.04 -- bash -lc 'cd ~/projects/applied-ai/TRACE && git status --short && git branch --show-current'
+  ```
+  If the active shell is already Linux, use the repository as the command working directory and run the command directly.
+- Before editing, confirm the repository root, current branch and `git status --short`. Preserve existing branch and uncommitted changes. Never clean, reset, stash, or overwrite user changes just to make a command work.
+- If command startup returns `helper_unknown_error: setup refresh had errors` or fails during process creation, the command did not run. Do not report it as a failing project command or test. Try one simple command using an explicit shell and WSL invocation. Avoid repeating the same failed launch.
+- If the local shell bridge remains unavailable, continue useful work that does not require it. Check repository files, issues and PR state through available GitHub tools; make any remote edits on a feature branch with a PR, using current file versions. Do not assume the local checkout is clean or synchronized with GitHub.
+- For code changes made without local execution, state that tests/builds could not be run; do not claim the implementation is verified. If a required check depends on the local checkout, finish other useful review/preparation first, then tell the owner exactly which check is blocked and why.
+- Do not ask the owner to restore the shell after one launch error. Ask only when the remaining required work truly depends on local execution and no available route can complete it.
+
 ## Git and pull-request workflow
 
 - Use feature branches and pull requests for every repository change. Never commit directly to or push directly to main.
