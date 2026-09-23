@@ -1,0 +1,24 @@
+[build-system]
+requires = ["uv_build>=0.12.18,<0.13"]
+build-backend = "uv_build"
+
+[project]
+name = "trace-capstone"
+version = "0.1.0"
+description = "Evidence-supported incident diagnosis capstone scaffold"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+trace-app = "trace_app.cli:main"
+
+[dependency-groups]
+dev = []
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.uv.build-backend]
+module-name = "trace_app"
+module-root = "src"
