@@ -8,6 +8,18 @@ The project owner approved an MVP-first revision on September 22, 2026. This sup
 
 Build one complete thin investigation before broad subsystem expansion. Preserve bottom-up dependencies inside that slice: deterministic evidence → bounded queries/tools → grounded investigation → automated evaluation. ML is required for the final capstone but is not a prerequisite for the first useful investigator.
 
+## Approved production-usefulness amendment — September 23, 2026
+
+The owner approved the [implementation review](production-usefulness-review.md) and [production roadmap amendment](production-roadmap-amendment.md), including all recommendations. The amendment is part of this plan: its sprint additions and stronger acceptance gates apply to the delivery table below. The MVP-first order and five-arm capstone requirements remain. Resize affected increments against actual capacity; no additional calendar commitments are implied.
+
+Use this TRACE repository for a modular Python application with TRACE-owned contracts and reproducibly versioned reuse. Preserve the educational projects as references. Volume 5 and Volume 6 are design-only inputs whose capabilities will be implemented within TRACE, not prerequisites that already exist. Reuse Volume 4 retrieval through adapters, retain the Volume 2 classical pipeline as an evaluated candidate, and keep Volume 3 deep learning optional pending measured benefit. Replace simulated investigation, heuristic causal confidence and development fallback behavior before production reuse.
+
+**Independent Operational Pilot gate:** authorized real or sanitized historical incident replay followed by read-only shadow use with a named operator/team; comparison with their current workflow and a deterministic evidence bundle; predeclared quality, latency and cost criteria; access isolation, recoverability, support ownership and operator feedback. Local MVP, Cloud MVP and Full Capstone acceptance do not substitute for this gate. Access unavailable means operational usefulness remains unvalidated. The operational pilot is distinct from S15's validation-only experimental pilot and may overlap releases once its prerequisites are met.
+
+Bring source-neutral provenance and time/access semantics into S2; durable investigation state and failure-aware scoring into S3; real-source retrieval contracts, freshness/revocation and authorization across evidence reads/citations into S4; bounded model/tool execution and usage telemetry into S5. S6 adds human-reviewed support cases and the deterministic evidence-bundle reference. Before hosted investigations, prove recoverable dispatch, worker crash/duplicate handling, restore, retention/deletion and rollout rollback. ML evaluation must measure real-base-rate alert burden, detection delay and downstream benefit; detector failure must preserve the evidence-only workflow.
+
+Repository strategy is approved; packaging/runtime specifics, pilot user and authorized sources, workload/budget thresholds, capacity and university constraints still need recorded decisions. Offline contract/replay work can proceed without credentials; live-provider and operational-pilot acceptance cannot be satisfied by stubs. Existing backlog acceptance criteria are amended in place, and no story is completed by this planning approval.
+
 ## Three releases and acceptance gates
 
 | Release | Target | Required scope and acceptance evidence |
@@ -32,7 +44,7 @@ Release thresholds for quality, reliability, latency and cost must be recorded b
 | Actions | Read-only investigation and recommendations; no operational execution tool | Simulated consequential actions with approval enforced outside the model |
 | AWS | Minimal repeatable demo deployment, budget/access controls and teardown | Additional environments or services only if their value exceeds cost/complexity |
 
-Do not introduce deep learning, multi-agent orchestration, Kubernetes, Kafka, a separate vector database, caching or an elaborate dashboard without evidence. Repository/packaging, runtime boundaries, persistence, model/provider and cloud/IaC choices still require justified ADRs; the planning repository does not decide implementation repository strategy.
+Do not introduce deep learning, multi-agent orchestration, Kubernetes, Kafka, a separate vector database, caching or an elaborate dashboard without evidence. Implementation uses the TRACE repository and a modular Python application. Packaging/runtime details, persistence, model/provider and cloud/IaC choices require justified ADRs. Existing lexical/semantic/hybrid retrieval is reused as a measured baseline; new reranking or infrastructure still needs evidence.
 
 ## Full delivery path — 18 provisional sprints
 
@@ -40,7 +52,7 @@ These are scope increments, not time estimates. Only current/next sprint stories
 
 | Sprint | Goal | Principal deliverables | Demo / exit gate | Dependencies |
 | --- | --- | --- | --- | --- |
-| 1 | Foundation | Charter, reuse inventory, repository/package decisions, skeleton, configuration/logging, local tests and CI; #1–#6. | Clean checkout runs; checks fail correctly; decisions and setup documented. | Charter before implementation |
+| 1 | Foundation | Charter, reuse inventory, package/runtime decisions, skeleton, configuration/logging, local tests and CI; #1–#6. | Clean checkout runs; checks fail correctly; decisions and setup documented. | Charter before implementation |
 | 2 | Minimal synthetic workflow | Order → Payment runtime path; Customer/Notification fixtures; first seeded degradation; evidence IDs and evaluator-only ground truth; #7–#8. | Replay happy/failure paths; validate contracts, correlation and ground-truth isolation. | S1 |
 | 3 | Reliable evidence and early scoring | Bounded log/metric/deployment queries and persistence; regression/degradation/insufficient-evidence fixtures; noncausal deployment distractor; UTC timeline; development scoring runner. | Query evidence by ID/window/service; reproducible manifests; deterministic timeline and scorer fixtures pass; reserve final-test data. | S2 |
 | 4 | Small retrieval corpus and controlled tools | Curated versioned knowledge, labeled retrieval queries and Recall@K/MRR; typed bounded log/metric/deployment/knowledge tools; timeout/audit/authorization contracts. | Known queries retrieve supporting documents; invalid tool calls rejected; no operational write capability. | S3 |
@@ -77,7 +89,7 @@ The earlier master-prompt phases are capability categories rather than mandatory
 ### Sprint 1 — Foundation
 Goal: clean runnable/testable foundation, with scaffolding the first implementation task.
 Backlog: charter/minimum decisions (#1), repository/environment skeleton (#2), configuration/logging (#3), local tasks/integration foundation (#4), CI (#5), ADR/docs/IaC foundations (#6).
-Dependencies: resolve minimum charter/repository/package decisions before skeleton implementation.
+Dependencies: record minimum charter and package/runtime decisions for the approved TRACE repository before skeleton implementation.
 Tests: clean setup, meaningful smoke/integration checks, invalid configuration/redaction checks and deliberate CI failure evidence.
 Docs/decisions: charter, reuse inventory, repository/package ADRs, setup, local commands, review and IaC templates.
 Risks: excessive scaffolding and speculative infrastructure.
@@ -145,3 +157,13 @@ Sprint review records completed/incomplete items, test evidence, architecture ch
 - [ ] ADRs and rejected alternatives
 - [ ] Operations/security documentation
 - [ ] Rehearsed final demonstration and defense
+
+## Independent operational-usefulness evidence
+
+- [ ] Named pilot operator/team and authorized source access
+- [ ] Historical replay and read-only shadow-use evidence
+- [ ] Comparison with existing operator workflow and deterministic evidence bundle
+- [ ] Predeclared utility, quality, reliability, latency and cost thresholds met
+- [ ] Access isolation, recovery/restore and support ownership demonstrated
+
+These items gate production-usefulness claims independently of academic completion.
