@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from collections.abc import Sequence
 
 from trace_app import __version__
@@ -24,7 +25,7 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     """Print help by default; reserve application behavior for later increments."""
     parser = _parser()
-    arguments = list(argv) if argv is not None else None
+    arguments = list(argv) if argv is not None else sys.argv[1:]
     if arguments:
         parser.parse_args(arguments)
     else:
