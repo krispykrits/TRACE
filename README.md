@@ -26,7 +26,11 @@ Individual issues are stories/tasks; milestones are sprints. Project Status is t
 
 Customer and Notification begin as lightweight fixtures. The first investigator is evaluated before expanding ML or infrastructure. ML and the full five-configuration comparison remain final capstone requirements.
 
-Sprint numbers are provisional scope increments, not calendar commitments. Dates, capacity, budget and technology decisions remain explicit charter/ADR work. This repository currently contains planning artifacts, not an implemented system.
+Sprint numbers are provisional scope increments, not calendar commitments. Dates, capacity, budget and technology decisions remain explicit charter/ADR work. This repository contains project planning artifacts and an initial Python CLI scaffold.
+
+## Local development
+
+See [the development guide](docs/development.md) for the Python 3.12/uv setup and scaffold commands.
 
 ## Production usefulness
 
