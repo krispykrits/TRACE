@@ -26,13 +26,13 @@ TRACE is an incident intelligence and controlled-response platform. The initial 
 
 ## Local command execution and recovery
 
-The desktop workspace uses WSL Ubuntu 24.04. The TRACE checkout is normally at `~/projects/applied-ai/TRACE` inside WSL. A task may start in the parent workspace instead of the repository, so verify the checkout and set the working directory before running project commands.
+The TRACE repository is the primary source folder for this project. New Codex tasks should start with the repository root as their working directory; use that root directly for commands and `AGENTS.md` discovery. Confirm the actual Git root before editing.
 
-- The configured command shell may be Windows PowerShell. Run Linux project commands through WSL, for example:
+The local environment uses WSL Ubuntu 24.04. If a task starts in Windows PowerShell outside the repo, run Linux project commands through WSL and navigate to the checkout only as a fallback:
   ```powershell
   wsl.exe -d Ubuntu-24.04 -- bash -lc 'cd ~/projects/applied-ai/TRACE && git status --short && git branch --show-current'
   ```
-  If the active shell is already Linux, use the repository as the command working directory and run the command directly.
+If the active shell is already Linux and starts at the repo root, do not add another `cd`; run the command directly.
 - Before editing, confirm the repository root, current branch and `git status --short`. Preserve existing branch and uncommitted changes. Never clean, reset, stash, or overwrite user changes just to make a command work.
 - If command startup returns `helper_unknown_error: setup refresh had errors` or fails during process creation, the command did not run. Do not report it as a failing project command or test. Try one simple command using an explicit shell and WSL invocation. Avoid repeating the same failed launch.
 - If the local shell bridge remains unavailable, continue useful work that does not require it. Check repository files, issues and PR state through available GitHub tools; make any remote edits on a feature branch with a PR, using current file versions. Do not assume the local checkout is clean or synchronized with GitHub.
