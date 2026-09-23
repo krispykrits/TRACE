@@ -33,7 +33,7 @@ Do not present existing 18 provisional increments as unchanged capacity estimate
 - Scope initial access to one organization/team, with least-privilege source credentials and server-derived access decisions. A caller-selected service filter is not authorization.
 - Decide source retention, redaction, deletion, evidence snapshot access and prompt/log data handling before accepting real operational data.
 - Choose one model-provider adapter and one operational source integration first. Implement deterministic fixtures and recorded replay while waiting for credentials. Fake-provider success never satisfies live-provider or operational-pilot acceptance.
-- Defer autonomous investigation loops, real remediation, deep learning, a broad connector catalog and large UI work until measured need. The existing capstone's simulated approval boundary remains in scope.
+- Defer autonomous investigation loops, deep learning, a broad connector catalog and large UI work until measured need. Real approval-gated production remediation is now required for final completion under the [approved scope extension](production-remediation-scope.md); the initial investigator stays read-only.
 
 ## Backlog changes
 
@@ -50,3 +50,6 @@ The existing S1-S4 issues (#1-#8 and #10-#19) were reviewed during adoption. The
 Deliver an accepted charter/reuse record, a supported and locked environment, a runnable/testable skeleton, configuration/redaction/logging foundation, and CI. Include concrete schemas/adapter examples in design artifacts where they resolve contract decisions; implement domain behavior in its planned increments. Reuse inspection reduces uncertainty but does not mean the educational components are production-approved.
 
 Open decisions: pilot operator/team, accessible operational sources and permissions, workload/latency budget, cloud/model budget, package/runtime details, weekly capacity and university constraints. Assign an owner and deadline/gate for each. Credentials can remain pending for later integration while foundation work proceeds.
+## Subsequent approved scope extension
+
+The owner explicitly requested real production remediation. Apply the [production remediation gates](production-remediation-scope.md) to S14-S18 and charter/access planning. This supersedes simulated-only completion; the operational investigation pilot remains a separate gate.

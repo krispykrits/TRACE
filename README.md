@@ -33,3 +33,7 @@ Sprint numbers are provisional scope increments, not calendar commitments. Dates
 The September 23 amendment is owner-approved. An independent Operational Pilot gate requires authorized historical replay and read-only shadow use, measured against an engineer's current workflow and a deterministic evidence bundle. Synthetic evaluations, cloud deployment and capstone completion alone do not satisfy this gate.
 
 TRACE will use this repository for a modular Python application. Volume 5/6 capabilities will be implemented within TRACE; they are currently designs. Selected educational components are reused through versioned contracts, with reliability, authorization, provenance and evaluation introduced in the first useful workflow.
+
+## Controlled production response
+
+TRACE is an incident intelligence and controlled-response platform. The first investigation releases are read-only; the final capstone includes at least one real, explicitly approved production remediation. See the [approved remediation scope](docs/planning/production-remediation-scope.md) for staging-to-production promotion, approval binding, execution limits and outcome verification. Production access and an appropriate target are required; a simulated or staging-only action does not satisfy the final production gate.
