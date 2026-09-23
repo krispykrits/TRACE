@@ -14,7 +14,7 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 
 ## Next checks
 
-1. [PR #20](https://github.com/krispykrits/TRACE/pull/20) merged the persistent project context. Review the follow-up Terraform/EC2 planning PR for consistency.
+1. [PR #20](https://github.com/krispykrits/TRACE/pull/20) merged the persistent project context. Review [PR #21](https://github.com/krispykrits/TRACE/pull/21), which records the Terraform/EC2 direction.
 2. Supply or explicitly defer the owner-dependent charter inputs; keep schedule and spending commitments unassigned until then.
 3. Start the skeleton from ADR 0001 and issue #2 once Sprint 1 implementation is authorized; keep issue status aligned with actual evidence.
 
@@ -29,4 +29,4 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 
 ## Repository workflow
 
-The owner requires feature branches and PRs for repository changes. No direct commits or pushes to main, and no automatic merging. Terraform and EC2 are planning selections only. No AWS provisioning is authorized. The follow-up planning update will use a feature branch and PR.
+The owner requires feature branches and PRs for repository changes. No direct commits or pushes to main, and no automatic merging. Terraform and EC2 are planning selections only. No AWS provisioning is authorized. This planning update is on branch `terraform-ec2-cloud-mvp` in [PR #21](https://github.com/krispykrits/TRACE/pull/21).
