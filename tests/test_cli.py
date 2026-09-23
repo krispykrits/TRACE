@@ -5,6 +5,7 @@ from __future__ import annotations
 import contextlib
 import io
 import unittest
+from unittest.mock import patch
 
 from trace_app.cli import main
 
@@ -19,10 +20,14 @@ class CliSmokeTests(unittest.TestCase):
         self.assertIn("TRACE incident investigation scaffold.", output.getvalue())
         self.assertIn("--version", output.getvalue())
 
-    def test_version_option_prints_package_version(self) -> None:
+    def test_console_entry_point_reads_version_option(self) -> None:
         output = io.StringIO()
-        with contextlib.redirect_stdout(output), self.assertRaises(SystemExit) as raised:
-            main(["--version"])
+        with (
+            patch("sys.argv", ["trace-app", "--version"]),
+            contextlib.redirect_stdout(output),
+            self.assertRaises(SystemExit) as raised,
+        ):
+            main()
 
         self.assertEqual(raised.exception.code, 0)
         self.assertIn("trace-app 0.1.0", output.getvalue())
