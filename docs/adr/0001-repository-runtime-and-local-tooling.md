@@ -1,0 +1,16 @@
+# ADR 0001: Repository, runtime and local tooling
+
+- **Status:** Accepted for the Sprint 1 foundation
+- **Date:** 2026-09-23
+- **Context:** TRACE needs a reproducible base for the Local MVP without turning an educational capstone into speculative infrastructure. The approved plan selects the TRACE repository and a modular Python application. The reference implementations vary in packaging and are not clean-install dependencies.
+- **Decision:** Develop TRACE in the existing `krispykrits/TRACE` repository as one installable modular application. Target CPython 3.12 on Linux first. Define package metadata and entry points in `pyproject.toml`; put application code in `src/trace`; use `uv` and commit `uv.lock`. Keep runtime dependencies empty in the initial scaffold; add a dependency only when a concrete capability needs it. Keep development tools in a development dependency group. Use a small Makefile or equivalent for documented local commands and GitHub Actions for credential-free Linux checks. Do not add containers, AWS, services, databases, model providers or domain behavior during the skeleton task.
+- **Constraints for later integration:** Repackage or adapt educational code behind TRACE-owned, versioned interfaces. Do not install sibling directories as editable dependencies or merge generic `src` packages. Operational evidence and access contracts remain separate from evaluator-only labels.
+- **Alternatives considered:**
+  - Separate repositories/services: rejected because the MVP needs one coherent workflow and would add deployment and interface costs before there is a measured need.
+  - Copy/compose educational projects unchanged: rejected because their assumptions, development environments and runtime boundaries differ.
+  - Python 3.13 or multiple supported versions: deferred because the reviewed candidate dependencies and existing project environments were validated around Python 3.12; add another version only if CI or deployment requires it.
+  - Plain `venv` plus manually maintained pinned requirements: rejected for the new package because a declared project plus generated lock gives a reproducible install without hand-editing transitive constraints.
+  - Docker/Compose at project start: deferred; there is no external dependency to orchestrate in the skeleton.
+- **Consequences:** Contributors need `uv` and CPython 3.12 for the shortest documented workflow. CI and local setup share a single lock. The project avoids a runtime dependency budget until there is a concrete use. This decision does not select the eventual web framework, persistence, embedding/model provider, AWS services or IaC tool.
+- **Evidence and revisit conditions:** Revisit if a required library, GitHub runner, university environment or chosen deployment cannot support Python 3.12/`uv`; if a real external dependency justifies Compose; or if workload/evaluation evidence justifies separate process or service boundaries. Record compatibility evidence and migration cost before changing.
+- **References:** [Approved project plan](../planning/capstone-project-plan.md); [production-usefulness review](../planning/production-usefulness-review.md); [Sprint 1 charter](../charter.md).
