@@ -40,12 +40,20 @@ class ConfigurationTests(unittest.TestCase):
                 encoding="utf-8",
             )
             settings = load_settings(
-                environ={"TRACE_ENVIRONMENT": "test"},
+                environ={"TRACE_ENVIRONMENT": "test", "TRACE_LOG_LEVEL": "DEBUG"},
                 dotenv_path=env_file,
             )
 
         self.assertEqual(settings.environment, "test")
-        self.assertEqual(settings.log_level, "WARNING")
+        self.assertEqual(settings.log_level, "DEBUG")
+
+    def test_log_level_defaults_to_info(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            env_file = Path(directory) / ".env"
+            env_file.write_text("TRACE_ENVIRONMENT=development\\n", encoding="utf-8")
+            settings = load_settings(environ={}, dotenv_path=env_file)
+
+        self.assertEqual(settings.log_level, "INFO")
 
     def test_missing_required_environment_is_actionable(self) -> None:
         with self.assertRaisesRegex(
