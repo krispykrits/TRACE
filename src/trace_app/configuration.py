@@ -82,7 +82,9 @@ def load_settings(
     dotenv_path or TRACE_ENV_FILE must exist and be readable.
     """
     process_environment = dict(os.environ if environ is None else environ)
-    explicit_path = (\n        dotenv_path is not None or bool(process_environment.get("TRACE_ENV_FILE"))\n    )
+    explicit_path = (
+        dotenv_path is not None or bool(process_environment.get("TRACE_ENV_FILE"))
+    )
     selected_path = (
         Path(dotenv_path)
         if dotenv_path is not None

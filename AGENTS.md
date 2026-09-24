@@ -56,3 +56,7 @@ If the active shell is already Linux and starts at the repo root, do not add ano
 - Update the existing task PR when one exists; merge/rebase main into the feature branch as needed and validate the resulting diff.
 - Leave PRs open for the owner's review. Do not merge a PR or enable automatic merging unless the owner explicitly asks.
 - Record scope/status accurately: a documentation approval or green check does not mark implementation complete.
+
+## Hosted logging
+
+Amazon CloudWatch Logs is the owner-selected platform for TRACE application logs; see [ADR 0003](docs/adr/0003-cloudwatch-hosted-logging.md). Keep application JSON/redaction separate from agent-based delivery. Issue #3 requires hosted acceptance; local console output alone is insufficient. Account/region, target host, retention and spending inputs must be settled before provisioning.

@@ -58,7 +58,7 @@ The package uses the specific trace_app module name to avoid colliding with Pyth
 
 The TRACE logging module uses Python's standard logging framework to emit structured JSON to stderr. It provides correlation fields and redaction for the application's own operational records. It does not store, index, or query telemetry.
 
-For the Cloud MVP's approved EC2 direction, CloudWatch Logs is a sensible first sink to evaluate. The CloudWatch agent can collect application and system logs from EC2 and send them to CloudWatch Logs. Choose retention and estimate ingestion and query costs before provisioning; AWS has a limited free usage allowance, with charges depending on region and volume. This repository does not configure CloudWatch or provision AWS resources.
+Amazon CloudWatch Logs is the selected hosted platform (owner decision, 2026-09-24). See [ADR 0003](adr/0003-cloudwatch-hosted-logging.md) and the [collection example and hosted acceptance procedure](../deploy/cloudwatch/README.md). The existing JSON stderr output remains the application boundary; deployment captures it to a file collected by the EC2 CloudWatch agent. CloudWatch delivery is not yet deployed or verified, and issue #3 remains open until its hosted acceptance passes.
 
 TRACE's incident investigation still needs read-only adapters to query the operator's actual log and metric sources. The roadmap places bounded evidence queries in S3 and real-source contracts and controlled tools in S4. Sending TRACE's own runtime logs to CloudWatch does not satisfy those incident evidence integrations. If the authorized pilot source already uses Elastic, TRACE should query that source through an adapter rather than creating a second log store.
 
