@@ -86,7 +86,7 @@ def load_settings(
     selected_path = (
         Path(dotenv_path)
         if dotenv_path is not None
-        else Path(process_environment.get("TRACE_ENV_FILE", ".env"))
+        else Path(process_environment.get("TRACE_ENV_FILE") or ".env")
     )
     file_values = _read_env_file(selected_path, required=explicit_path)
     command_overrides = dict(overrides or {})
