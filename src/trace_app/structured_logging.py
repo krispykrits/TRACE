@@ -125,3 +125,12 @@ def set_correlation_id(correlation_id: str | None) -> contextvars.Token[str | No
 def reset_correlation_id(token: contextvars.Token[str | None]) -> None:
     """Restore the correlation ID that was active before a scoped operation."""
     _CORRELATION_ID.reset(token)
+
+def collect_secret_values(*sources: Mapping[str, str]) -> tuple[str, ...]:
+    """Collect values from mappings whose names identify secrets or credentials."""
+    return tuple(
+        value
+        for source in sources
+        for key, value in source.items()
+        if _SENSITIVE_NAME.search(key) and value
+    )
