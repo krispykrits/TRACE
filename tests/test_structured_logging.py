@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
 import io
 import json
 import logging
@@ -46,8 +45,6 @@ class StructuredLoggingTests(unittest.TestCase):
 
     def test_redacts_secret_fields_values_and_exception_text(self) -> None:
         logger = logging.getLogger("trace_app.provider")
-        with contextlib.suppress(Exception):
-            raise RuntimeError("provider rejected fixture-secret-123")
         try:
             raise RuntimeError("provider rejected fixture-secret-123")
         except RuntimeError:
