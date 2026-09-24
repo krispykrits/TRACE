@@ -52,3 +52,14 @@ The formatter redacts values under fields named for passwords, secrets, tokens, 
 - uv.lock — locked project dependency resolution
 
 The package uses the specific trace_app module name to avoid colliding with Python's standard-library trace module. Educational projects remain references; no sibling-directory dependency is installed.
+
+
+## Log output and incident evidence
+
+The TRACE logging module uses Python's standard logging framework to emit structured JSON to stderr. It provides correlation fields and redaction for the application's own operational records. It does not store, index, or query telemetry.
+
+For the Cloud MVP's approved EC2 direction, CloudWatch Logs is a sensible first sink to evaluate. The CloudWatch agent can collect application and system logs from EC2 and send them to CloudWatch Logs. Choose retention and estimate ingestion and query costs before provisioning; AWS has a limited free usage allowance, with charges depending on region and volume. This repository does not configure CloudWatch or provision AWS resources.
+
+TRACE's incident investigation still needs read-only adapters to query the operator's actual log and metric sources. The roadmap places bounded evidence queries in S3 and real-source contracts and controlled tools in S4. Sending TRACE's own runtime logs to CloudWatch does not satisfy those incident evidence integrations. If the authorized pilot source already uses Elastic, TRACE should query that source through an adapter rather than creating a second log store.
+
+References: [CloudWatch agent collection](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html), [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/), [Elastic pricing](https://www.elastic.co/pricing), [Elastic licensing](https://www.elastic.co/pricing/faq/licensing).
