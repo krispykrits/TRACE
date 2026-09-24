@@ -82,7 +82,7 @@ def load_settings(
     dotenv_path or TRACE_ENV_FILE must exist and be readable.
     """
     process_environment = dict(os.environ if environ is None else environ)
-    explicit_path = dotenv_path is not None or bool(process_environment.get("TRACE_ENV_FILE"))
+    explicit_path = (\n        dotenv_path is not None or bool(process_environment.get("TRACE_ENV_FILE"))\n    )
     selected_path = (
         Path(dotenv_path)
         if dotenv_path is not None
@@ -125,7 +125,7 @@ def load_settings(
     environment = merged.get("TRACE_ENVIRONMENT", "").strip().lower()
     if not environment:
         raise ConfigurationError(
-            "Missing required TRACE_ENVIRONMENT. Set it in .env or the process environment."
+            "Missing required TRACE_ENVIRONMENT. Set it in .env, the process environment, or pass --environment."
         )
     if environment not in _ENVIRONMENT_NAMES:
         raise ConfigurationError(
