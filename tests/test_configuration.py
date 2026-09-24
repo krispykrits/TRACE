@@ -32,7 +32,7 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(settings.environment, "development")
         self.assertEqual(settings.log_level, "ERROR")
 
-    def test_process_environment_overrides_file_and_log_level_has_default(self) -> None:
+    def test_process_environment_overrides_file(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             env_file = Path(directory) / ".env"
             env_file.write_text(
