@@ -50,7 +50,7 @@ class ConfigurationTests(unittest.TestCase):
     def test_log_level_defaults_to_info(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             env_file = Path(directory) / ".env"
-            env_file.write_text("TRACE_ENVIRONMENT=development\\n", encoding="utf-8")
+            env_file.write_text("TRACE_ENVIRONMENT=development\n", encoding="utf-8")
             settings = load_settings(environ={}, dotenv_path=env_file)
 
         self.assertEqual(settings.log_level, "INFO")
