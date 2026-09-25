@@ -19,11 +19,16 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 
 ## Sprint 2
 
-- Issue [#7](https://github.com/krispykrits/TRACE/issues/7) is In review on [PR #28](https://github.com/krispykrits/TRACE/pull/28): the synthetic Order → Payment path, typed fixture boundaries, correlated CLI trace, contract/error tests and [ADR 0004](adr/0004-synchronous-synthetic-order-workflow.md) are ready for owner review. Customer and Notification remain in-process fixtures; no real payment, notification, source adapter or incident evidence is implemented. Issue [#8](https://github.com/krispykrits/TRACE/issues/8) owns seeded dependency failure, replay/reset, evidence envelope and evaluator-only ground truth.
+- Issue [#7](https://github.com/krispykrits/TRACE/issues/7) is Done and [PR #28](https://github.com/krispykrits/TRACE/pull/28) is merged: the synthetic Order → Payment path, typed fixture boundaries, correlated CLI trace, contract/error tests and [ADR 0004](adr/0004-synchronous-synthetic-order-workflow.md) are recorded. Customer and Notification remain in-process fixtures; no real payment, notification, source adapter or incident evidence is implemented. Issue [#8](https://github.com/krispykrits/TRACE/issues/8) owns seeded dependency failure, replay/reset, evidence envelope and evaluator-only ground truth.
+
+## Storage direction — 2026-09-25
+
+- [Issue #29](https://github.com/krispykrits/TRACE/issues/29) tracks this documentation decision. The owner selected SQLite for Local MVP investigation/evidence state in S3 [#10](https://github.com/krispykrits/TRACE/issues/10), after #8 defines the evidence contract, and PostgreSQL on Amazon RDS for Cloud MVP migration. [ADR 0005](adr/0005-sqlite-local-postgresql-rds-cloud.md) records the direction; no schema, migration or database has been implemented/provisioned. Cloud budget, identity, sizing, backup/restore, retention and migration acceptance remain S7–S9 gates.
+- The owner requested a vector database. [ADR 0006](adr/0006-pgvector-cloud-retrieval-storage.md) proposes pgvector on the planned RDS database, pending owner review of that product choice and #16 retrieval evidence. The small exact-search Local MVP baseline remains; no vector service or extension has been deployed.
 
 ## Next checks
 
-1. Review issue #7’s synthetic Order–Payment workflow and [ADR 0004](adr/0004-synchronous-synthetic-order-workflow.md); issue #8 adds seeded failures and incident evidence.
+1. Implement issue #8’s seeded failures and evidence contract before #10 SQLite persistence; review the proposed vector choice at #16.
 2. Configure CloudWatch Logs during S8 Cloud MVP deployment and verify hosted delivery, retention, rotation and collector recovery at S9; reconcile #3's closed state with its still-unverified hosted acceptance.
 3. Keep owner-dependent charter inputs as open gates until supplied or explicitly deferred; do not assign dates, budgets, pilot permissions, or thresholds.
 
@@ -39,7 +44,7 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 
 ## Repository workflow
 
-The owner requires feature branches and PRs for repository changes. No direct commits or pushes to main, and no automatic merging. Planning updates were merged via [PR #21](https://github.com/krispykrits/TRACE/pull/21), and scaffold work was merged via [PR #23](https://github.com/krispykrits/TRACE/pull/23). Configuration/logging work is merged via [PR #24](https://github.com/krispykrits/TRACE/pull/24); issue #4 implementation is merged via [PR #25](https://github.com/krispykrits/TRACE/pull/25); issue #5 implementation is merged via [PR #26](https://github.com/krispykrits/TRACE/pull/26). Issue #6 foundation artifacts are merged via [PR #27](https://github.com/krispykrits/TRACE/pull/27); issue #7 is under review on [PR #28](https://github.com/krispykrits/TRACE/pull/28). No AWS resources are authorized by the planning selections.
+The owner requires feature branches and PRs for repository changes. No direct commits or pushes to main, and no automatic merging. Planning updates were merged via [PR #21](https://github.com/krispykrits/TRACE/pull/21), and scaffold work was merged via [PR #23](https://github.com/krispykrits/TRACE/pull/23). Configuration/logging work is merged via [PR #24](https://github.com/krispykrits/TRACE/pull/24); issue #4 implementation is merged via [PR #25](https://github.com/krispykrits/TRACE/pull/25); issue #5 implementation is merged via [PR #26](https://github.com/krispykrits/TRACE/pull/26). Issue #6 foundation artifacts are merged via [PR #27](https://github.com/krispykrits/TRACE/pull/27); issue #7 is merged via [PR #28](https://github.com/krispykrits/TRACE/pull/28). No AWS resources are authorized by the planning selections.
 
 ## Hosted logging decision — 2026-09-24
 
