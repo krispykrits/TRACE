@@ -1,6 +1,6 @@
 # TRACE current status
 
-Last refreshed: 2026-09-24
+Last refreshed: 2026-09-25
 
 ## Direction
 
@@ -10,15 +10,16 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 
 - Sprint 1 charter and scaffold decisions are recorded in [the charter](charter.md), [ADR 0001](adr/0001-repository-runtime-and-local-tooling.md), and [ADR 0002](adr/0002-terraform-and-ec2-cloud-deployment.md). Terraform and EC2 remain the approved Cloud MVP direction; deployment details belong to S7/S8.
 - Issue [#1](https://github.com/krispykrits/TRACE/issues/1) is closed. University rubric/deadline, weekly capacity/sprint duration, spending limits, pilot/data-access ownership, and production remediation target/action/approval authority remain open gates.
-- Issue [#2](https://github.com/krispykrits/TRACE/issues/2) is closed and its scaffold PR [#23](https://github.com/krispykrits/TRACE/pull/23) is merged. The PR reports that clean-checkout install, build, and smoke checks were not run; no new verification evidence is recorded here.
-- Implementation for issue [#3](https://github.com/krispykrits/TRACE/issues/3) is proposed on draft [PR #24](https://github.com/krispykrits/TRACE/pull/24): validated configuration, JSON logs with correlation and redaction, a check-config CLI path, documentation, and deterministic tests. On September 24 the shell recovered. All 14 unittest tests pass under Python 3.12 with PYTHONPATH=src after correcting an existing literal-newline syntax error in configuration.py. uv is not installed, so locked install and package build remain unverified. Keep #3 open pending verification and review.
+- Issue [#2](https://github.com/krispykrits/TRACE/issues/2) is closed and scaffold PR [#23](https://github.com/krispykrits/TRACE/pull/23) is merged. Its PR reports that clean-checkout install, build, and smoke checks were not run; no later verification evidence is recorded here.
+- Issue [#3](https://github.com/krispykrits/TRACE/issues/3) is closed on GitHub and PR [#24](https://github.com/krispykrits/TRACE/pull/24) is merged. The issue body and deployment notes still lack hosted acceptance evidence: no CloudWatch deployment/delivery is recorded. Issue state does not prove hosted acceptance.
+- Issue [#4](https://github.com/krispykrits/TRACE/issues/4) is proposed on draft [PR #25](https://github.com/krispykrits/TRACE/pull/25): documented Makefile tasks, an offline real-process CLI integration test for repeat runs and cleanup after failure, and the reviewed environment-gap notes. The local shell bridge failed during process startup, so the documented workflow has not been run. Keep #4 open pending two clean-checkout runs and linked acceptance evidence.
 - No model provider or model artifact is implemented in the scaffold. check-config validates only the current environment/log settings; it does not claim provider readiness. The development guide records the required no-fallback behavior for future production capabilities.
 
 ## Next checks
 
-1. From a clean checkout, run `uv sync --locked`, the unittest suite, package build, and `trace-app check-config` for valid and invalid settings; address any failures before closing #3.
-2. Keep owner-dependent charter inputs as open gates until supplied or explicitly deferred; do not assign dates, budgets, pilot permissions, or thresholds.
-3. Keep GitHub issue and Project status aligned with verified evidence.
+1. From a clean CPython 3.12/uv checkout, run the documented setup, check, test, and integration workflow twice; verify fixture cleanup after failure, then link evidence and update issue/Project status.
+2. Resolve the hosted logging acceptance discrepancy for #3 using real verification evidence; do not infer delivery from the issue's closed state.
+3. Keep owner-dependent charter inputs as open gates until supplied or explicitly deferred; do not assign dates, budgets, pilot permissions, or thresholds.
 
 ## Sources of truth
 
@@ -32,8 +33,8 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 
 ## Repository workflow
 
-The owner requires feature branches and PRs for repository changes. No direct commits or pushes to main, and no automatic merging. Planning updates were merged via [PR #21](https://github.com/krispykrits/TRACE/pull/21), and scaffold work was merged via [PR #23](https://github.com/krispykrits/TRACE/pull/23). Issue #3 remains open on draft [PR #24](https://github.com/krispykrits/TRACE/pull/24). No AWS resources are authorized by the planning selections.
+The owner requires feature branches and PRs for repository changes. No direct commits or pushes to main, and no automatic merging. Planning updates were merged via [PR #21](https://github.com/krispykrits/TRACE/pull/21), and scaffold work was merged via [PR #23](https://github.com/krispykrits/TRACE/pull/23). Configuration/logging work is merged via [PR #24](https://github.com/krispykrits/TRACE/pull/24); issue #4 changes remain in draft [PR #25](https://github.com/krispykrits/TRACE/pull/25). No AWS resources are authorized by the planning selections.
 
 ## Hosted logging decision — 2026-09-24
 
-The owner selected Amazon CloudWatch Logs. PR #24 now includes [ADR 0003](adr/0003-cloudwatch-hosted-logging.md), an agent collection example and a hosted verification procedure. Account 267653922622, us-east-2, seven-day retention and a $5/month alert are selected. Alert email and target host/environment remain pending. The current aws-app-local identity lacks logs:DescribeLogGroups; an authorized deployment profile/role is required. No CloudWatch deployment or hosted delivery is verified; issue #3 must remain open until hosted acceptance passes.
+The owner selected Amazon CloudWatch Logs. PR #24 includes [ADR 0003](adr/0003-cloudwatch-hosted-logging.md), an agent collection example and a hosted verification procedure. Account 267653922622, us-east-2, seven-day retention and a $5/month alert are selected. Alert email and target host/environment remain pending. The current aws-app-local identity lacks logs:DescribeLogGroups; an authorized deployment profile/role is required. No CloudWatch deployment or hosted delivery is verified; the issue's closed state does not satisfy hosted acceptance.
