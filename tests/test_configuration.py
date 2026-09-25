@@ -84,9 +84,7 @@ class ConfigurationTests(unittest.TestCase):
     def test_invalid_log_level_fails_validation(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             env_file = self._empty_env_file(directory)
-            with self.assertRaisesRegex(
-                ConfigurationError, "Invalid TRACE_LOG_LEVEL"
-            ):
+            with self.assertRaisesRegex(ConfigurationError, "Invalid TRACE_LOG_LEVEL"):
                 load_settings(
                     environ={
                         "TRACE_ENVIRONMENT": "development",

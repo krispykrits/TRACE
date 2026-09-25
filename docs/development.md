@@ -4,15 +4,19 @@ TRACE currently provides an importable CLI scaffold and configuration check. It 
 
 ## Supported setup
 
-The declared development target is CPython 3.12 on Linux. Install Python 3.12, uv and GNU make, then run these commands from the repository root:
+The supported development and CI runtime is CPython 3.12 on Linux. Install Python 3.12, uv 0.12.17 and GNU make, then run these commands from the repository root. The project rejects other Python minor versions and other uv versions so local setup and CI use the same toolchain:
 
 | Goal | Command |
 | --- | --- |
 | Create or update the locked environment | `make sync` |
 | Run the CLI scaffold | `make run` |
 | Run the syntax check | `make check` |
+| Run lint checks | `make lint` |
+| Check formatting | `make format-check` |
+| Run static type checks | `make type-check` |
 | Run the deterministic test suite | `make test` |
 | Run the process-boundary integration test | `make integration` |
+| Run the opt-in provider gate | `make integration-live` |
 | Remove generated local build state | `make clean` |
 
 The equivalent setup and first validation sequence is:
@@ -21,6 +25,9 @@ The equivalent setup and first validation sequence is:
 make clean
 make sync
 make check
+make lint
+make format-check
+make type-check
 make test
 make integration
 ```
@@ -28,6 +35,12 @@ make integration
 Run that sequence twice from the repository root to check a fresh setup and repeatability. The integration fixture uses temporary directories, passes a deliberately minimal environment to a real Python CLI subprocess, and removes its files on both success and failure. It makes no provider calls and needs no production credentials or AWS resources. The tests are offline fixtures; they do not count as live-provider or Operational Pilot evidence. Use `make clean` to remove the local virtual environment and build outputs.
 
 The checked-in example contains no credentials. The .env file is ignored by Git. The default trace-app invocation still prints help, and --version does not require configuration.
+
+## GitHub Actions quality gate
+
+Pull requests and pushes to `main` run the `Quality checks` workflow on `ubuntu-24.04`. It uses CPython 3.12, uv 0.12.17 and the committed `uv.lock`; `uv sync --locked` fails if dependency metadata and the lock disagree. The job records the Python and uv versions and the resolved dependency tree in its log. It runs the same syntax, lint, format, type, unit and process-integration commands listed above. Any failed command fails the job. These checks are deterministic and require no credentials, network-backed application service, AWS access or paid model call; model benchmarks are not part of this workflow.
+
+The manual workflow has a separate **Run live provider integration checks** input, off by default. Enabling it runs a distinct job and cannot change or skip the fast quality job. That job fails with an explicit message until real checks are added under `tests/live_provider`; a missing or empty suite cannot pass as verified. No provider checks currently exist and no credentials are configured for the job, so it is not live-provider acceptance evidence. Record an enabled, passing run before describing such checks as verified.
 
 ## Configuration
 

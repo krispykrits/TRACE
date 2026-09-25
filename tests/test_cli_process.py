@@ -20,7 +20,9 @@ def _minimal_environment() -> dict[str, str]:
     return environment
 
 
-def _run_check_config(env_file: Path, working_directory: Path) -> subprocess.CompletedProcess[str]:
+def _run_check_config(
+    env_file: Path, working_directory: Path
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [
             sys.executable,
@@ -43,7 +45,9 @@ class CliProcessIntegrationTests(unittest.TestCase):
     def test_two_consecutive_runs_are_isolated_and_successful(self) -> None:
         for expected_environment in ("development", "test"):
             with self.subTest(environment=expected_environment):
-                with tempfile.TemporaryDirectory(prefix="trace-integration-") as directory:
+                with tempfile.TemporaryDirectory(
+                    prefix="trace-integration-"
+                ) as directory:
                     working_directory = Path(directory)
                     env_file = working_directory / "settings.env"
                     env_file.write_text(

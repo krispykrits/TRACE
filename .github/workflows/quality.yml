@@ -1,0 +1,76 @@
+name: Quality checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_live_provider_integration:
+        description: Run the opt-in live provider integration gate
+        required: false
+        default: false
+        type: boolean
+
+permissions: {}
+
+jobs:
+  quality:
+    name: Fast, credential-free checks
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+      - name: Set up CPython
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: "0.12.17"
+          enable-cache: false
+      - name: Install locked environment
+        run: make sync
+      - name: Record runtime and dependency versions
+        run: |
+          python --version
+          uv --version
+          uv tree --locked
+      - name: Syntax check
+        run: make check
+      - name: Lint
+        run: make lint
+      - name: Format check
+        run: make format-check
+      - name: Type check
+        run: make type-check
+      - name: Unit tests
+        run: make test
+      - name: CLI process integration tests
+        run: make integration
+
+  live-provider-integration:
+    name: Opt-in live provider integration
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_live_provider_integration }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+      - name: Set up CPython
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: "0.12.17"
+          enable-cache: false
+      - name: Install locked environment
+        run: make sync
+      - name: Run live provider checks, requiring a non-empty suite
+        run: make integration-live

@@ -73,7 +73,9 @@ class CliSmokeTests(unittest.TestCase):
             env_file.write_text("", encoding="utf-8")
             output = io.StringIO()
             with (
-                patch.dict(os.environ, {"TRACE_PROVIDER_API_KEY": secret_fixture}, clear=True),
+                patch.dict(
+                    os.environ, {"TRACE_PROVIDER_API_KEY": secret_fixture}, clear=True
+                ),
                 contextlib.redirect_stderr(output),
             ):
                 result = main(
