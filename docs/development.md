@@ -65,7 +65,7 @@ The formatter redacts values under fields named for passwords, secrets, tokens, 
 - pyproject.toml — package metadata, script entry point, and dependency groups
 - uv.lock — locked project dependency resolution
 
-The package uses the specific trace_app module name to avoid colliding with Python's standard-library trace module. Educational projects remain references; no sibling-directory dependency is installed. The reuse review records why their distinct environments and incomplete clean-install evidence cannot be used as TRACE's runtime. TRACE's declared environment is tested from the locked Python 3.12 project setup instead.
+The package uses the specific trace_app module name to avoid colliding with Python's standard-library trace module. Educational projects remain references; no sibling-directory dependency is installed. The approved [reuse review](planning/production-usefulness-review.md) records these environment gaps: ai-incident-triage's native environment lacked FastAPI and its 37 tests passed only with the ML project's existing environment and PYTHONPATH; ml-incident-anomaly-detector's 111 tests used its existing virtual environment; incident-search's 56 tests used its existing virtual environment and cached model with offline mode; and the DL project could not be dynamically validated because its environment lacked the needed pandas/PyTorch combination. These results are not clean-install evidence and must not be inherited as TRACE runtime requirements. TRACE uses its own locked Python 3.12 environment and must pass from a clean checkout without educational-project environments.
 
 ## Log output and incident evidence
 
