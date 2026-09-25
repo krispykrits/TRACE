@@ -1,6 +1,6 @@
 # Local development
 
-TRACE currently provides an importable CLI scaffold and configuration check. It has no incident workflow, provider integration, retrieval, model call, or cloud code.
+TRACE currently provides an importable CLI, configuration check and synthetic Order–Payment demo. It has no incident investigator, real provider integration, retrieval, model call or deployed cloud runtime.
 
 ## Supported setup
 
@@ -35,6 +35,16 @@ make integration
 Run that sequence twice from the repository root to check a fresh setup and repeatability. The integration fixture uses temporary directories, passes a deliberately minimal environment to a real Python CLI subprocess, and removes its files on both success and failure. It makes no provider calls and needs no production credentials or AWS resources. The tests are offline fixtures; they do not count as live-provider or Operational Pilot evidence. Use `make clean` to remove the local virtual environment and build outputs.
 
 The checked-in example contains no credentials. The .env file is ignored by Git. The default trace-app invocation still prints help, and --version does not require configuration.
+
+## Synthetic Order demo
+
+Run one Order → Payment request with the in-process Customer, Payment and Notification fixtures:
+
+```sh
+uv run --locked trace-app demo-order --environment test --order-id order-001 --customer-id customer-001 --amount-cents 1250
+```
+
+The command prints one JSON business outcome to stdout and correlated JSON operational logs to stderr. It needs no credentials, network service or AWS resource. The fixture recognizes only `customer-001`; an unknown customer yields a rejected outcome without Payment or Notification calls. Invalid input/configuration exits 2; an adapter dependency error exits 3 without an accepted receipt. The demo refuses the `production` environment. See the [workflow contract and fixture limits](architecture/order-payment-workflow.md) and [ADR 0004](adr/0004-synchronous-synthetic-order-workflow.md). These logs are not incident evidence or Operational Pilot data.
 
 ## GitHub Actions quality gate
 

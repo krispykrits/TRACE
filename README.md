@@ -26,11 +26,11 @@ Individual issues are stories/tasks; milestones are sprints. Project Status is t
 
 Customer and Notification begin as lightweight fixtures. The first investigator is evaluated before expanding ML or infrastructure. ML and the full five-configuration comparison remain final capstone requirements.
 
-Sprint numbers are provisional scope increments, not calendar commitments. Dates, capacity, budget and technology decisions remain explicit charter/ADR work. This repository contains project planning artifacts and an initial Python CLI scaffold.
+Sprint numbers are provisional scope increments, not calendar commitments. Dates, capacity, budget and technology decisions remain explicit charter/ADR work. This repository contains project planning artifacts, a Python CLI and a synthetic Order–Payment workflow.
 
 ## Local development
 
-See [the development guide](docs/development.md) for the Python 3.12/uv setup, safe local environment example, configuration precedence and structured logging conventions. The [architecture view](docs/architecture/README.md), [ADR index](docs/adr/README.md), [infrastructure responsibilities](deploy/README.md) and [Sprint 1 evidence review](docs/sprints/sprint-01-review.md) describe current boundaries and open gates.
+See [the development guide](docs/development.md) for the Python 3.12/uv setup, safe local environment example, configuration precedence and structured logging conventions. The [synthetic Order–Payment workflow](docs/architecture/order-payment-workflow.md) has a runnable CLI request and explicit fixture limits. The [architecture view](docs/architecture/README.md), [ADR index](docs/adr/README.md), [infrastructure responsibilities](deploy/README.md) and [Sprint 1 evidence review](docs/sprints/sprint-01-review.md) describe current boundaries and open gates.
 
 ## Production usefulness
 
