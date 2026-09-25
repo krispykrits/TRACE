@@ -19,7 +19,7 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 
 ## Sprint 2
 
-- Issue [#7](https://github.com/krispykrits/TRACE/issues/7) is In progress: the synthetic Order → Payment path, typed fixture boundaries, correlated CLI trace, contract/error tests and [ADR 0004](adr/0004-synchronous-synthetic-order-workflow.md) are on a feature branch. Customer and Notification remain in-process fixtures; no real payment, notification, source adapter or incident evidence is implemented. Issue [#8](https://github.com/krispykrits/TRACE/issues/8) owns seeded dependency failure, replay/reset, evidence envelope and evaluator-only ground truth.
+- Issue [#7](https://github.com/krispykrits/TRACE/issues/7) is In review on [PR #28](https://github.com/krispykrits/TRACE/pull/28): the synthetic Order → Payment path, typed fixture boundaries, correlated CLI trace, contract/error tests and [ADR 0004](adr/0004-synchronous-synthetic-order-workflow.md) are ready for owner review. Customer and Notification remain in-process fixtures; no real payment, notification, source adapter or incident evidence is implemented. Issue [#8](https://github.com/krispykrits/TRACE/issues/8) owns seeded dependency failure, replay/reset, evidence envelope and evaluator-only ground truth.
 
 ## Next checks
 
@@ -39,7 +39,7 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 
 ## Repository workflow
 
-The owner requires feature branches and PRs for repository changes. No direct commits or pushes to main, and no automatic merging. Planning updates were merged via [PR #21](https://github.com/krispykrits/TRACE/pull/21), and scaffold work was merged via [PR #23](https://github.com/krispykrits/TRACE/pull/23). Configuration/logging work is merged via [PR #24](https://github.com/krispykrits/TRACE/pull/24); issue #4 implementation is merged via [PR #25](https://github.com/krispykrits/TRACE/pull/25); issue #5 implementation is merged via [PR #26](https://github.com/krispykrits/TRACE/pull/26). Issue #6 foundation artifacts are merged via [PR #27](https://github.com/krispykrits/TRACE/pull/27). No AWS resources are authorized by the planning selections.
+The owner requires feature branches and PRs for repository changes. No direct commits or pushes to main, and no automatic merging. Planning updates were merged via [PR #21](https://github.com/krispykrits/TRACE/pull/21), and scaffold work was merged via [PR #23](https://github.com/krispykrits/TRACE/pull/23). Configuration/logging work is merged via [PR #24](https://github.com/krispykrits/TRACE/pull/24); issue #4 implementation is merged via [PR #25](https://github.com/krispykrits/TRACE/pull/25); issue #5 implementation is merged via [PR #26](https://github.com/krispykrits/TRACE/pull/26). Issue #6 foundation artifacts are merged via [PR #27](https://github.com/krispykrits/TRACE/pull/27); issue #7 is under review on [PR #28](https://github.com/krispykrits/TRACE/pull/28). No AWS resources are authorized by the planning selections.
 
 ## Hosted logging decision — 2026-09-24
 
