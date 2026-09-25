@@ -12,7 +12,8 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 - Issue [#1](https://github.com/krispykrits/TRACE/issues/1) is closed. University rubric/deadline, weekly capacity/sprint duration, spending limits, pilot/data-access ownership, and production remediation target/action/approval authority remain open gates.
 - Issue [#2](https://github.com/krispykrits/TRACE/issues/2) is closed and scaffold PR [#23](https://github.com/krispykrits/TRACE/pull/23) is merged. Its PR reports that clean-checkout install, build, and smoke checks were not run; no later verification evidence is recorded here.
 - Issue [#3](https://github.com/krispykrits/TRACE/issues/3) is closed on GitHub and PR [#24](https://github.com/krispykrits/TRACE/pull/24) is merged. The issue body and deployment notes still lack hosted acceptance evidence: no CloudWatch deployment/delivery is recorded. Issue state does not prove hosted acceptance.
-- Issue [#4](https://github.com/krispykrits/TRACE/issues/4) is proposed on draft [PR #25](https://github.com/krispykrits/TRACE/pull/25): documented Makefile tasks, an offline real-process CLI integration test for repeat runs and cleanup after failure, and the reviewed environment-gap notes. The local shell bridge failed during process startup, so the documented workflow has not been run. Keep #4 open pending two clean-checkout runs and linked acceptance evidence.
+- Issue [#4](https://github.com/krispykrits/TRACE/issues/4) implementation is merged in [PR #25](https://github.com/krispykrits/TRACE/pull/25): documented Makefile tasks, an offline real-process CLI integration test for repeat runs and cleanup after failure, and reviewed environment-gap notes. Its documented clean-checkout workflow still lacks two-run acceptance evidence.
+- Issue [#5](https://github.com/krispykrits/TRACE/issues/5) is being implemented on `codex/issue-5-github-actions-quality-gates`. The feature branch now defines the fast workflow for syntax, lint, formatting, types, unit tests and CLI integration. Local fast checks pass on Python 3.12.3/uv 0.12.17; GitHub Actions acceptance and intentional-failure evidence are pending.
 - No model provider or model artifact is implemented in the scaffold. check-config validates only the current environment/log settings; it does not claim provider readiness. The development guide records the required no-fallback behavior for future production capabilities.
 
 ## Next checks
@@ -33,7 +34,7 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 
 ## Repository workflow
 
-The owner requires feature branches and PRs for repository changes. No direct commits or pushes to main, and no automatic merging. Planning updates were merged via [PR #21](https://github.com/krispykrits/TRACE/pull/21), and scaffold work was merged via [PR #23](https://github.com/krispykrits/TRACE/pull/23). Configuration/logging work is merged via [PR #24](https://github.com/krispykrits/TRACE/pull/24); issue #4 changes remain in draft [PR #25](https://github.com/krispykrits/TRACE/pull/25). No AWS resources are authorized by the planning selections.
+The owner requires feature branches and PRs for repository changes. No direct commits or pushes to main, and no automatic merging. Planning updates were merged via [PR #21](https://github.com/krispykrits/TRACE/pull/21), and scaffold work was merged via [PR #23](https://github.com/krispykrits/TRACE/pull/23). Configuration/logging work is merged via [PR #24](https://github.com/krispykrits/TRACE/pull/24); issue #4 implementation is merged via [PR #25](https://github.com/krispykrits/TRACE/pull/25). No AWS resources are authorized by the planning selections.
 
 ## Hosted logging decision — 2026-09-24
 

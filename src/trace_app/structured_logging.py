@@ -61,7 +61,9 @@ class JsonFormatter(logging.Formatter):
         self._redactor = redactor or SecretRedactor()
 
     def format(self, record: logging.LogRecord) -> str:
-        correlation_id = getattr(record, "correlation_id", None) or _CORRELATION_ID.get()
+        correlation_id = (
+            getattr(record, "correlation_id", None) or _CORRELATION_ID.get()
+        )
         component = getattr(record, "component", None) or record.name.removeprefix(
             "trace_app."
         )
@@ -125,6 +127,7 @@ def set_correlation_id(correlation_id: str | None) -> contextvars.Token[str | No
 def reset_correlation_id(token: contextvars.Token[str | None]) -> None:
     """Restore the correlation ID that was active before a scoped operation."""
     _CORRELATION_ID.reset(token)
+
 
 def collect_secret_values(*sources: Mapping[str, str]) -> tuple[str, ...]:
     """Collect values from mappings whose names identify secrets or credentials."""

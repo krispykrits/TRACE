@@ -82,8 +82,8 @@ def load_settings(
     dotenv_path or TRACE_ENV_FILE must exist and be readable.
     """
     process_environment = dict(os.environ if environ is None else environ)
-    explicit_path = (
-        dotenv_path is not None or bool(process_environment.get("TRACE_ENV_FILE"))
+    explicit_path = dotenv_path is not None or bool(
+        process_environment.get("TRACE_ENV_FILE")
     )
     selected_path = (
         Path(dotenv_path)
@@ -105,7 +105,9 @@ def load_settings(
         )
     for key in command_overrides:
         if key not in {"TRACE_ENVIRONMENT", "TRACE_LOG_LEVEL"}:
-            raise ConfigurationError(f"Unsupported command-line configuration key {key}.")
+            raise ConfigurationError(
+                f"Unsupported command-line configuration key {key}."
+            )
 
     merged = {"TRACE_LOG_LEVEL": "INFO"}
     merged.update(
