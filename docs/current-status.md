@@ -24,11 +24,11 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 ## Storage direction — 2026-09-25
 
 - [Issue #29](https://github.com/krispykrits/TRACE/issues/29) is In review on [PR #30](https://github.com/krispykrits/TRACE/pull/30) for this documentation decision. The owner selected SQLite for Local MVP investigation/evidence state in S3 [#10](https://github.com/krispykrits/TRACE/issues/10), after #8 defines the evidence contract, and PostgreSQL on Amazon RDS for Cloud MVP migration. [ADR 0005](adr/0005-sqlite-local-postgresql-rds-cloud.md) records the direction; no schema, migration or database has been implemented/provisioned. Cloud budget, identity, sizing, backup/restore, retention and migration acceptance remain S7–S9 gates.
-- The owner requested a vector database. [ADR 0006](adr/0006-pgvector-cloud-retrieval-storage.md) proposes pgvector on the planned RDS database, pending owner review of that product choice and #16 retrieval evidence. The small exact-search Local MVP baseline remains; no vector service or extension has been deployed.
+- The owner selected PostgreSQL with pgvector on the planned RDS database for cloud vector retrieval. [ADR 0006](adr/0006-pgvector-cloud-retrieval-storage.md) records the choice; #16 retrieval evaluation and embedding/index details remain open. The small exact-search Local MVP baseline remains; no vector service or extension has been deployed.
 
 ## Next checks
 
-1. Implement issue #8’s seeded failures and evidence contract before #10 SQLite persistence; review the proposed vector choice at #16.
+1. Implement issue #8’s seeded failures and evidence contract before #10 SQLite persistence; design and evaluate retrieval under #16 using the selected pgvector direction.
 2. Configure CloudWatch Logs during S8 Cloud MVP deployment and verify hosted delivery, retention, rotation and collector recovery at S9; reconcile #3's closed state with its still-unverified hosted acceptance.
 3. Keep owner-dependent charter inputs as open gates until supplied or explicitly deferred; do not assign dates, budgets, pilot permissions, or thresholds.
 
