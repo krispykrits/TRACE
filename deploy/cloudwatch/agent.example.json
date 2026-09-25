@@ -1,0 +1,17 @@
+{
+  "agent": { "debug": false },
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/trace/application.jsonl",
+            "log_group_name": "/trace/REPLACE_ENVIRONMENT/application",
+            "log_stream_name": "{instance_id}",
+            "encoding": "utf-8"
+          }
+        ]
+      }
+    }
+  }
+}

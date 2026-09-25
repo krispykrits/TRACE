@@ -30,7 +30,7 @@ Sprint numbers are provisional scope increments, not calendar commitments. Dates
 
 ## Local development
 
-See [the development guide](docs/development.md) for the Python 3.12/uv setup and scaffold commands.
+See [the development guide](docs/development.md) for the Python 3.12/uv setup, safe local environment example, configuration precedence and structured logging conventions.
 
 ## Production usefulness
 
