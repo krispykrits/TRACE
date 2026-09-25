@@ -4,14 +4,28 @@ TRACE currently provides an importable CLI scaffold and configuration check. It 
 
 ## Supported setup
 
-The initial development target is CPython 3.12 on Linux. Install uv and Python 3.12, then from the repository root:
+The declared development target is CPython 3.12 on Linux. Install Python 3.12, uv and GNU make, then run these commands from the repository root:
+
+| Goal | Command |
+| --- | --- |
+| Create or update the locked environment | `make sync` |
+| Run the CLI scaffold | `make run` |
+| Run the syntax check | `make check` |
+| Run the deterministic test suite | `make test` |
+| Run the process-boundary integration test | `make integration` |
+| Remove generated local build state | `make clean` |
+
+The equivalent setup and first validation sequence is:
 
 ```sh
-uv sync --locked
-cp .env.example .env
-uv run --locked trace-app check-config
-uv run --locked python -m unittest discover -s tests -v
+make clean
+make sync
+make check
+make test
+make integration
 ```
+
+Run that sequence twice from the repository root to check a fresh setup and repeatability. The integration fixture uses temporary directories, passes a deliberately minimal environment to a real Python CLI subprocess, and removes its files on both success and failure. It makes no provider calls and needs no production credentials or AWS resources. The tests are offline fixtures; they do not count as live-provider or Operational Pilot evidence. Use `make clean` to remove the local virtual environment and build outputs.
 
 The checked-in example contains no credentials. The .env file is ignored by Git. The default trace-app invocation still prints help, and --version does not require configuration.
 
@@ -46,19 +60,18 @@ The formatter redacts values under fields named for passwords, secrets, tokens, 
 ## Repository map
 
 - src/trace_app/ — TRACE-owned application package and CLI entry point
-- tests/ — deterministic, credential-free tests
+- tests/ — deterministic, credential-free unit and process-boundary tests
 - docs/ — project decisions, plans, and development notes
 - pyproject.toml — package metadata, script entry point, and dependency groups
 - uv.lock — locked project dependency resolution
 
-The package uses the specific trace_app module name to avoid colliding with Python's standard-library trace module. Educational projects remain references; no sibling-directory dependency is installed.
-
+The package uses the specific trace_app module name to avoid colliding with Python's standard-library trace module. Educational projects remain references; no sibling-directory dependency is installed. The reuse review records why their distinct environments and incomplete clean-install evidence cannot be used as TRACE's runtime. TRACE's declared environment is tested from the locked Python 3.12 project setup instead.
 
 ## Log output and incident evidence
 
 The TRACE logging module uses Python's standard logging framework to emit structured JSON to stderr. It provides correlation fields and redaction for the application's own operational records. It does not store, index, or query telemetry.
 
-Amazon CloudWatch Logs is the selected hosted platform (owner decision, 2026-09-24). See [ADR 0003](adr/0003-cloudwatch-hosted-logging.md) and the [collection example and hosted acceptance procedure](../deploy/cloudwatch/README.md). The existing JSON stderr output remains the application boundary; deployment captures it to a file collected by the EC2 CloudWatch agent. CloudWatch delivery is not yet deployed or verified, and issue #3 remains open until its hosted acceptance passes.
+Amazon CloudWatch Logs is the selected hosted platform (owner decision, 2026-09-24). See [ADR 0003](adr/0003-cloudwatch-hosted-logging.md) and the [collection example and hosted acceptance procedure](../deploy/cloudwatch/README.md). The existing JSON stderr output remains the application boundary; deployment captures it to a file collected by the EC2 CloudWatch agent. CloudWatch delivery is not yet deployed or verified. Although issue #3 is closed on GitHub, its hosted acceptance evidence remains unverified and is not implied by local tests.
 
 TRACE's incident investigation still needs read-only adapters to query the operator's actual log and metric sources. The roadmap places bounded evidence queries in S3 and real-source contracts and controlled tools in S4. Sending TRACE's own runtime logs to CloudWatch does not satisfy those incident evidence integrations. If the authorized pilot source already uses Elastic, TRACE should query that source through an adapter rather than creating a second log store.
 
