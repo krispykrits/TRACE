@@ -30,7 +30,7 @@ Sprint numbers are provisional scope increments, not calendar commitments. Dates
 
 ## Local development
 
-See [the development guide](docs/development.md) for the Python 3.12/uv setup, safe local environment example, configuration precedence and structured logging conventions.
+See [the development guide](docs/development.md) for the Python 3.12/uv setup, safe local environment example, configuration precedence and structured logging conventions. The [architecture view](docs/architecture/README.md), [ADR index](docs/adr/README.md), [infrastructure responsibilities](deploy/README.md) and [Sprint 1 evidence review](docs/sprints/sprint-01-review.md) describe current boundaries and open gates.
 
 ## Production usefulness
 
