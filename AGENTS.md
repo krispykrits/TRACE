@@ -54,6 +54,7 @@ If the active shell is already Linux and starts at the repo root, do not add ano
 
 - Use feature branches and pull requests for every repository change. Never commit directly to or push directly to main.
 - Update the existing task PR when one exists; merge/rebase main into the feature branch as needed and validate the resulting diff.
+- Attach every task PR to its scoped GitHub user story or issue in GitHub’s Development/Linked pull requests relationship, and verify the link before handoff. Use a closing keyword in the PR description when merging should close the issue; otherwise link it without automatic closure. A branch name or plain issue mention alone is insufficient.
 - Leave PRs open for the owner's review. Do not merge a PR or enable automatic merging unless the owner explicitly asks.
 - Record scope/status accurately: a documentation approval or green check does not mark implementation complete.
 

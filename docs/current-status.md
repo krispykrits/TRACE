@@ -20,7 +20,7 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 ## Next checks
 
 1. Review the [Sprint 1 evidence draft](sprints/sprint-01-review.md) and issue #6 foundation artifacts; local two-cycle verification is recorded there.
-2. Resolve the hosted logging acceptance discrepancy for #3 using real verification evidence; do not infer delivery from the issue's closed state.
+2. Configure CloudWatch Logs during S8 Cloud MVP deployment and verify hosted delivery, retention, rotation and collector recovery at S9; reconcile #3's closed state with its still-unverified hosted acceptance.
 3. Keep owner-dependent charter inputs as open gates until supplied or explicitly deferred; do not assign dates, budgets, pilot permissions, or thresholds.
 
 ## Sources of truth
