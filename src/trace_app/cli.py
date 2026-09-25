@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import logging
-import math
 import os
 import sys
 from collections.abc import Sequence
