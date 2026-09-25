@@ -23,7 +23,7 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 
 ## Storage direction — 2026-09-25
 
-- [Issue #29](https://github.com/krispykrits/TRACE/issues/29) tracks this documentation decision. The owner selected SQLite for Local MVP investigation/evidence state in S3 [#10](https://github.com/krispykrits/TRACE/issues/10), after #8 defines the evidence contract, and PostgreSQL on Amazon RDS for Cloud MVP migration. [ADR 0005](adr/0005-sqlite-local-postgresql-rds-cloud.md) records the direction; no schema, migration or database has been implemented/provisioned. Cloud budget, identity, sizing, backup/restore, retention and migration acceptance remain S7–S9 gates.
+- [Issue #29](https://github.com/krispykrits/TRACE/issues/29) is In review on [PR #30](https://github.com/krispykrits/TRACE/pull/30) for this documentation decision. The owner selected SQLite for Local MVP investigation/evidence state in S3 [#10](https://github.com/krispykrits/TRACE/issues/10), after #8 defines the evidence contract, and PostgreSQL on Amazon RDS for Cloud MVP migration. [ADR 0005](adr/0005-sqlite-local-postgresql-rds-cloud.md) records the direction; no schema, migration or database has been implemented/provisioned. Cloud budget, identity, sizing, backup/restore, retention and migration acceptance remain S7–S9 gates.
 - The owner requested a vector database. [ADR 0006](adr/0006-pgvector-cloud-retrieval-storage.md) proposes pgvector on the planned RDS database, pending owner review of that product choice and #16 retrieval evidence. The small exact-search Local MVP baseline remains; no vector service or extension has been deployed.
 
 ## Next checks
