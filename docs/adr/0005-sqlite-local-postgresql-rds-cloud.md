@@ -1,6 +1,6 @@
 # ADR 0005: SQLite for Local MVP and PostgreSQL on RDS for Cloud MVP
 
-- **Status:** Accepted direction by the owner, 2026-09-25; implementation and migration pending
+- **Status:** Accepted direction by the owner, 2026-09-25; Local SQLite implementation proposed in issue #10, Cloud migration pending
 - **Decision owner:** Project owner
 - **Scope:** Investigation execution state and bounded evidence snapshots; this does not select an incident log source or a retrieval index.
 
@@ -13,6 +13,12 @@ The Local MVP needs durable evidence and investigation state in Sprint 3 [issue 
 Implement the Local MVP's durable investigation/evidence store with Python's standard-library `sqlite3` in issue #10. Store operational evidence snapshots, provenance and source revisions, stable IDs, investigation execution state, attempt records and assessment/review status under explicit schema versions. Keep evaluator-only labels and ground truth in separate paths and credentials. Define transactional ingestion/idempotency and migration behavior in #10; prove restart, duplicate handling and failure behavior before claiming acceptance. Do not copy whole operational log sources into this store by default.
 
 During S7 design and S8 deployment, migrate the Cloud MVP's shared state to PostgreSQL on Amazon RDS. Keep storage access behind the narrow TRACE-owned contract exercised by #10/#11 so the migration can be tested without changing investigator-facing evidence identities. Define compatible RDS engine and pgvector extension versions, instance/storage/backup configuration, network and database roles, secrets, retention/deletion, migration/rollback and spending estimate before provisioning. S9 acceptance must demonstrate data migration, recovery/restore, access boundaries and teardown/recreation. This decision selects the database product direction, not an AWS apply, a cost commitment or an authorization to ingest real operational data.
+
+## Local implementation in issue #10
+
+The proposed [SQLite store contract](../architecture/sqlite-investigation-store.md) implements schema version 1 with investigation, attempt, snapshot, evidence and deletion-audit tables. It uses Python `sqlite3` without a new dependency or external queue. One immediate transaction handles snapshot ingestion and one handles claim/recovery transitions. Submissions are idempotent by access scope and submission key; snapshots preserve the first collected time when logical evidence is replayed. The store validates typed log, metric and deployment payloads, rejects conflicting stable IDs, bounds snapshot size and exposes scoped application reads. The local file is private to its OS owner; no evaluator label or ground-truth table exists. The schema is initialized on a clean file and refuses a newer version.
+
+Transactional polling and attempt leases are sufficient for this Local MVP slice. An external queue would require a recoverable dispatch/outbox design and is deferred until workload evidence justifies it. The local adapter does not establish real-source authorization, automatic retention, database backup/restore, multi-worker operations or PostgreSQL migration acceptance. Those remain explicit later gates.
 
 ## Alternatives
 
@@ -29,8 +35,8 @@ SQLite keeps Local MVP setup within the existing Python runtime and works well f
 
 ## Evidence and limits
 
-The owner's 2026-09-25 selection sets the direction. [Issue #10](https://github.com/krispykrits/TRACE/issues/10), the [capstone plan](../planning/capstone-project-plan.md) and the [production-usefulness amendment](../planning/production-roadmap-amendment.md) supply the acceptance and migration gates. [SQLite's usage guidance](https://www.sqlite.org/whentouse.html) describes its local-storage and single-writer fit; [Amazon RDS resilience guidance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/disaster-recovery-resiliency.html) describes backup and restore options. No TRACE schema, SQLite store, RDS database, migration or measured workload exists yet.
+The owner's 2026-09-25 selection sets the direction. [Issue #10](https://github.com/krispykrits/TRACE/issues/10), the [capstone plan](../planning/capstone-project-plan.md) and the [production-usefulness amendment](../planning/production-roadmap-amendment.md) supply the acceptance and migration gates. [SQLite's usage guidance](https://www.sqlite.org/whentouse.html) describes its local-storage and single-writer fit; [Amazon RDS resilience guidance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/disaster-recovery-resiliency.html) describes backup and restore options. The issue #10 PR proposes a tested Local SQLite schema and store. No RDS database, cross-database migration or measured production workload exists yet.
 
 ## Revisit conditions
 
-Revisit implementation details when #8 fixes the evidence envelope, #10 measures local write/restart behavior, and S7 establishes workload, budget, authorized AWS identity and recovery requirements. If the selected RDS shape cannot meet those gates, record the constraint and obtain a new owner decision before changing the product direction. Do not claim migration success until a tested export/import or equivalent repeatable path preserves evidence IDs, provenance, access scope and job state.
+Revisit schema and adapter behavior after issue #10 review and when S7 establishes workload, budget, authorized AWS identity and recovery requirements. If the selected RDS shape cannot meet those gates, record the constraint and obtain a new owner decision before changing the product direction. Do not claim migration success until a tested export/import or equivalent repeatable path preserves evidence IDs, provenance, access scope and job state.

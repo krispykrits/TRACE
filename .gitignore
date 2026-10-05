@@ -5,6 +5,7 @@ __pycache__/
 .venv/
 build/
 dist/
+*.sqlite3*
 
 # Local configuration and secrets
 .env

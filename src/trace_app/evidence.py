@@ -6,7 +6,7 @@ import json
 import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Literal
+from typing import Literal, Mapping, cast
 
 EVIDENCE_SCHEMA_VERSION = "1"
 
@@ -50,25 +50,56 @@ class EvidenceRecord:
     integrity_sha256: str
 
     def __post_init__(self) -> None:
-        for field in (
-            self.evidence_id,
-            self.service,
-            self.environment,
-            self.source_record_id,
-            self.source_revision,
-            self.access_classification,
-            self.redaction_status,
-            self.correlation_id,
-            self.event,
+        for name in (
+            "evidence_id",
+            "service",
+            "environment",
+            "source_record_id",
+            "source_revision",
+            "access_classification",
+            "redaction_status",
+            "correlation_id",
+            "event",
         ):
-            if not isinstance(field, str) or not field:
-                raise ValueError(
-                    "Evidence identity and provenance fields are required."
-                )
-        _parse_utc(self.observed_at)
-        _parse_utc(self.collected_at)
-        if not re.fullmatch(r"[0-9a-f]{64}", self.integrity_sha256):
-            raise ValueError("Evidence integrity_sha256 must be a SHA-256 hex digest.")
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value:
+                raise ValueError(f"{name} is required.")
+        for name in ("observed_at", "collected_at"):
+            try:
+                _parse_utc(getattr(self, name))
+            except ValueError as error:
+                raise ValueError(f"{name}: {error}") from error
+        if not isinstance(self.integrity_sha256, str) or not re.fullmatch(
+            r"[0-9a-f]{64}", self.integrity_sha256
+        ):
+            raise ValueError("integrity_sha256 must be a SHA-256 hex digest.")
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, object]) -> EvidenceRecord:
+        """Reject unknown fields, especially evaluator labels, at ingestion."""
+        names = (
+            "evidence_id",
+            "service",
+            "environment",
+            "observed_at",
+            "collected_at",
+            "source_record_id",
+            "source_revision",
+            "access_classification",
+            "redaction_status",
+            "correlation_id",
+            "event",
+            "integrity_sha256",
+        )
+        if data.get("schema_version") != EVIDENCE_SCHEMA_VERSION:
+            raise ValueError("schema_version is unsupported.")
+        for name in names:
+            if name not in data:
+                raise ValueError(f"{name} is required.")
+        extra = set(data) - set(names) - {"schema_version"}
+        if extra:
+            raise ValueError(f"{sorted(extra)[0]} is not allowed.")
+        return cls(**{name: cast(str, data[name]) for name in names})
 
     def to_dict(self) -> dict[str, str]:
         return {
@@ -110,7 +141,7 @@ class SourceAvailability:
 
 @dataclass(frozen=True, slots=True)
 class EvidenceBundle:
-    """The only export surface for this replay's investigator-facing evidence."""
+    """Investigator-facing operational evidence bundle."""
 
     records: tuple[EvidenceRecord, ...]
     window_start: str

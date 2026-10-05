@@ -87,6 +87,21 @@ def _run_replay(*arguments: str) -> subprocess.CompletedProcess[str]:
         )
 
 
+def _run_persistence_demo(
+    *arguments: str, working_directory: Path
+) -> subprocess.CompletedProcess[str]:
+    script = Path(__file__).resolve().parents[1] / "scripts" / "demo_persistence.py"
+    return subprocess.run(
+        [sys.executable, str(script), *arguments],
+        cwd=working_directory,
+        env=_minimal_environment(),
+        capture_output=True,
+        check=False,
+        text=True,
+        timeout=15,
+    )
+
+
 class CliProcessIntegrationTests(unittest.TestCase):
     def test_two_consecutive_runs_are_isolated_and_successful(self) -> None:
         for expected_environment in ("development", "test"):
@@ -254,6 +269,76 @@ class CliProcessIntegrationTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertEqual(result.stdout, "")
         self.assertEqual(json.loads(result.stderr)["event"], "replay.invalid")
+
+    def test_persistence_demo_restarts_and_rejects_invalid_input(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="trace-store-process-") as directory:
+            working_directory = Path(directory)
+            database = working_directory / "state.sqlite3"
+            invalid = _run_persistence_demo(
+                "ingest",
+                "--db",
+                str(database),
+                "--seed",
+                "-1",
+                "--mode",
+                "failure",
+                "--submission-key",
+                "case-17",
+                working_directory=working_directory,
+            )
+            self.assertEqual(invalid.returncode, 2)
+            self.assertEqual(invalid.stdout, "")
+            self.assertIn("seed", invalid.stderr)
+            self.assertFalse(database.exists())
+
+            arguments = (
+                "ingest",
+                "--db",
+                str(database),
+                "--seed",
+                "17",
+                "--mode",
+                "failure",
+                "--submission-key",
+                "case-17",
+            )
+            first = _run_persistence_demo(
+                *arguments, working_directory=working_directory
+            )
+            self.assertEqual(first.returncode, 0, first.stderr)
+            ingested = json.loads(first.stdout)
+            self.assertEqual(ingested["ingested"], 4)
+            second = _run_persistence_demo(
+                *arguments, working_directory=working_directory
+            )
+            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertEqual(json.loads(second.stdout)["ingested"], 0)
+            shown = _run_persistence_demo(
+                "show",
+                "--db",
+                str(database),
+                "--investigation-id",
+                ingested["investigation_id"],
+                working_directory=working_directory,
+            )
+            self.assertEqual(shown.returncode, 0, shown.stderr)
+            result = json.loads(shown.stdout)
+            self.assertEqual(result["status"], "queued")
+            self.assertEqual(
+                [entry["record"]["evidence_id"] for entry in result["evidence"]],
+                ingested["evidence_ids"],
+            )
+            self.assertEqual(
+                [entry["record"]["event"] for entry in result["evidence"]],
+                [
+                    "order.requested",
+                    "customer.found",
+                    "payment.timeout",
+                    "order.dependency_failed",
+                ],
+            )
+            self.assertNotIn("ground_truth", shown.stdout)
+            self.assertNotIn("cause_service", shown.stdout)
 
     def test_fixture_is_removed_after_cli_failure(self) -> None:
         with tempfile.TemporaryDirectory(prefix="trace-integration-") as directory:

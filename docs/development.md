@@ -1,6 +1,6 @@
 # Local development
 
-TRACE currently provides an importable CLI, configuration check and synthetic Order–Payment demo. It has no incident investigator, real provider integration, retrieval, model call or deployed cloud runtime.
+TRACE currently provides an importable CLI, configuration check, synthetic Order–Payment demo and a local SQLite evidence-store demo. It has no incident investigator, real provider integration, retrieval, model call or deployed cloud runtime.
 
 ## Supported setup
 
@@ -45,6 +45,17 @@ uv run --locked trace-app demo-order --environment test --order-id order-001 --c
 ```
 
 The command prints one JSON business outcome to stdout and correlated JSON operational logs to stderr. It needs no credentials, network service or AWS resource. The fixture recognizes only `customer-001`; an unknown customer yields a rejected outcome without Payment or Notification calls. Invalid input/configuration exits 2; an adapter dependency error exits 3 without an accepted receipt. The demo refuses the `production` environment. See the [workflow contract and fixture limits](architecture/order-payment-workflow.md) and [ADR 0004](adr/0004-synchronous-synthetic-order-workflow.md). These logs are not incident evidence or Operational Pilot data.
+
+## Local SQLite evidence demo
+
+The developer-only store demo persists seeded synthetic evidence and reads it after a process restart. Use a path outside the repository and copy the ID printed by the first command:
+
+```sh
+uv run --locked python scripts/demo_persistence.py ingest --db /tmp/trace-story-10.sqlite3 --seed 17 --mode failure --submission-key case-17
+uv run --locked python scripts/demo_persistence.py show --db /tmp/trace-story-10.sqlite3 --investigation-id <id-from-ingest>
+```
+
+Re-running `ingest` with the same submission key and scenario returns zero new records; malformed input exits without creating the database. The file is mode 0600 and accepts only synthetic development/test evidence through a fixed demo scope. The [store contract](architecture/sqlite-investigation-store.md) defines schema setup, duplicate handling, attempt recovery and deletion. It does not ingest authorized operational data or satisfy the Operational Pilot gate.
 
 ## GitHub Actions quality gate
 
@@ -92,7 +103,7 @@ The package uses the specific trace_app module name to avoid colliding with Pyth
 
 ## Log output and incident evidence
 
-The TRACE logging module uses Python's standard logging framework to emit structured JSON to stderr. It provides correlation fields and redaction for the application's own operational records. It does not store, index, or query telemetry.
+The TRACE logging module uses Python's standard logging framework to emit structured JSON to stderr. It provides correlation fields and redaction for the application's own operational records. It does not store, index, or query telemetry. The local SQLite adapter stores bounded synthetic evidence snapshots and job state; it is separate from CloudWatch application logging.
 
 Amazon CloudWatch Logs is the selected hosted platform (owner decision, 2026-09-24). See [ADR 0003](adr/0003-cloudwatch-hosted-logging.md) and the [collection example and hosted acceptance procedure](../deploy/cloudwatch/README.md). The existing JSON stderr output remains the application boundary; deployment captures it to a file collected by the EC2 CloudWatch agent. CloudWatch delivery is not yet deployed or verified. Although issue #3 is closed on GitHub, its hosted acceptance evidence remains unverified and is not implied by local tests.
 
