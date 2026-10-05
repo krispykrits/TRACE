@@ -1,4 +1,4 @@
-"""Developer-only process demonstration of issue #10 SQLite evidence persistence."""
+"""Developer-only synthetic evidence persistence and bounded-query demo."""
 
 from __future__ import annotations
 
@@ -10,6 +10,11 @@ from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
 
+from trace_app.evidence_queries import (
+    EvidenceQuery,
+    EvidenceQueryService,
+    TrustedQueryContext,
+)
 from trace_app.investigation_state import (
     EvidenceEntry,
     EvidenceSnapshot,
@@ -17,6 +22,7 @@ from trace_app.investigation_state import (
     LogPayload,
     StoreAccessError,
     StoreConflictError,
+    StoreDependencyError,
     StoreInputError,
     StoreSchemaError,
     StoreStateError,
@@ -25,6 +31,9 @@ from trace_app.replay import ReplayConfig, ReplaySession
 from trace_app.sqlite_store import SQLiteInvestigationStore
 
 _SCOPE = "local:synthetic"
+_CONTEXT = TrustedQueryContext(
+    _SCOPE, "test", ("order", "customer", "payment", "notification")
+)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -40,6 +49,16 @@ def _parser() -> argparse.ArgumentParser:
     show = commands.add_parser("show", help="read persisted evidence in a new process")
     show.add_argument("--db", required=True, type=Path)
     show.add_argument("--investigation-id", required=True)
+    query = commands.add_parser(
+        "query", help="read a bounded synthetic incident window"
+    )
+    query.add_argument("--db", required=True, type=Path)
+    query.add_argument("--investigation-id", required=True)
+    query.add_argument("--window-start")
+    query.add_argument("--window-end")
+    query.add_argument("--service")
+    query.add_argument("--kind", choices=("log", "metric", "deployment"))
+    query.add_argument("--limit", type=int, default=100)
     return parser
 
 
@@ -50,7 +69,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "ingest":
             config = ReplayConfig(seed=args.seed, mode=args.mode)
         elif not args.db.is_file():
-            raise StoreInputError("db must exist for show.")
+            raise StoreInputError("db must exist for show or query.")
         with SQLiteInvestigationStore(args.db) as store:
             if config is not None:
                 replay = ReplaySession(config).replay()
@@ -87,6 +106,41 @@ def main(argv: list[str] | None = None) -> int:
                         entry.record.evidence_id for entry in snapshot.entries
                     ],
                 }
+            elif args.command == "query":
+                investigation = store.get_investigation(
+                    args.investigation_id, access_scope=_SCOPE
+                )
+                query = EvidenceQuery(
+                    window_start=args.window_start
+                    or investigation.request.window_start,
+                    window_end=args.window_end or investigation.request.window_end,
+                    service=args.service,
+                    kind=args.kind,
+                    limit=args.limit,
+                )
+                response = EvidenceQueryService(store).query(
+                    args.investigation_id, query, context=_CONTEXT
+                )
+                result = {
+                    "investigation_id": args.investigation_id,
+                    "status": response.status,
+                    "query_window": {
+                        "start": query.window_start,
+                        "end": query.window_end,
+                    },
+                    "matching_count": response.matching_count,
+                    "truncated": response.truncated,
+                    "failure_code": response.failure_code,
+                    "evidence": [
+                        {
+                            "kind": entry.kind,
+                            "record": entry.record.to_dict(),
+                            "payload": asdict(entry.payload),
+                        }
+                        for entry in response.entries
+                    ],
+                    "sources": [source.to_dict() for source in response.sources],
+                }
             else:
                 investigation = store.get_investigation(
                     args.investigation_id, access_scope=_SCOPE
@@ -113,6 +167,7 @@ def main(argv: list[str] | None = None) -> int:
         ValueError,
         StoreAccessError,
         StoreConflictError,
+        StoreDependencyError,
         StoreInputError,
         StoreSchemaError,
         StoreStateError,

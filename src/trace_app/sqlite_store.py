@@ -33,6 +33,7 @@ from trace_app.investigation_state import (
     MetricPayload,
     StoreAccessError,
     StoreConflictError,
+    StoreDependencyError,
     StoreInputError,
     StoreSchemaError,
     StoreStateError,
@@ -249,10 +250,13 @@ class SQLiteInvestigationStore:
     def _scoped_row(self, investigation_id: str, access_scope: str) -> sqlite3.Row:
         _identifier("investigation_id", investigation_id)
         _identifier("access_scope", access_scope)
-        row = self._db.execute(
-            "SELECT * FROM investigations WHERE investigation_id = ? AND access_scope = ?",
-            (investigation_id, access_scope),
-        ).fetchone()
+        try:
+            row = self._db.execute(
+                "SELECT * FROM investigations WHERE investigation_id = ? AND access_scope = ?",
+                (investigation_id, access_scope),
+            ).fetchone()
+        except sqlite3.Error as error:
+            raise StoreDependencyError("Evidence storage is unavailable.") from error
         if row is None:
             raise StoreAccessError(
                 "Investigation is absent or outside the access scope."
@@ -262,7 +266,11 @@ class SQLiteInvestigationStore:
     def get_investigation(
         self, investigation_id: str, *, access_scope: str
     ) -> Investigation:
-        return self._investigation(self._scoped_row(investigation_id, access_scope))
+        row = self._scoped_row(investigation_id, access_scope)
+        try:
+            return self._investigation(row)
+        except (ValueError, KeyError, TypeError) as error:
+            raise StoreDependencyError("Stored investigation is invalid.") from error
 
     def submit(self, request: InvestigationRequest, *, at: datetime) -> Investigation:
         timestamp = _at(at)
@@ -444,40 +452,56 @@ class SQLiteInvestigationStore:
         self, investigation_id: str, *, access_scope: str
     ) -> EvidenceSnapshot:
         self._scoped_row(investigation_id, access_scope)
-        row = self._db.execute(
-            "SELECT * FROM snapshots WHERE investigation_id = ?", (investigation_id,)
-        ).fetchone()
-        if row is None:
-            raise StoreAccessError(
-                "Evidence snapshot is absent or outside the access scope."
-            )
-        if row["schema_version"] != EVIDENCE_SCHEMA_VERSION:
-            raise StoreSchemaError("Evidence schema version is unsupported.")
-        sources = tuple(
-            SourceAvailability(
-                source=value["source"],
-                status=value["status"],
-                reason=value["reason"],
-            )
-            for value in json.loads(row["sources_json"])
-        )
-        entries = tuple(
-            EvidenceEntry(
-                kind=value["kind"],
-                record=EvidenceRecord.from_dict(json.loads(value["record_json"])),
-                payload=_payload(value["kind"], value["payload_json"]),
-            )
-            for value in self._db.execute(
+        try:
+            row = self._db.execute(
+                "SELECT * FROM snapshots WHERE investigation_id = ?",
+                (investigation_id,),
+            ).fetchone()
+            if row is None:
+                raise StoreAccessError(
+                    "Evidence snapshot is absent or outside the access scope."
+                )
+            if row["schema_version"] != EVIDENCE_SCHEMA_VERSION:
+                raise StoreSchemaError("Evidence schema version is unsupported.")
+            count = self._db.execute(
+                "SELECT COUNT(*) FROM evidence WHERE investigation_id = ?",
+                (investigation_id,),
+            ).fetchone()[0]
+            if count > self.max_records:
+                raise StoreDependencyError(
+                    "Stored evidence exceeds the configured read bound."
+                )
+            rows = self._db.execute(
                 "SELECT * FROM evidence WHERE investigation_id = ? ORDER BY ordinal",
                 (investigation_id,),
+            ).fetchall()
+        except sqlite3.Error as error:
+            raise StoreDependencyError("Evidence storage is unavailable.") from error
+        try:
+            sources = tuple(
+                SourceAvailability(
+                    source=value["source"],
+                    status=value["status"],
+                    reason=value["reason"],
+                )
+                for value in json.loads(row["sources_json"])
             )
-        )
-        return EvidenceSnapshot(
-            entries=entries,
-            window_start=row["window_start"],
-            window_end=row["window_end"],
-            sources=sources,
-        )
+            entries = tuple(
+                EvidenceEntry(
+                    kind=value["kind"],
+                    record=EvidenceRecord.from_dict(json.loads(value["record_json"])),
+                    payload=_payload(value["kind"], value["payload_json"]),
+                )
+                for value in rows
+            )
+            return EvidenceSnapshot(
+                entries=entries,
+                window_start=row["window_start"],
+                window_end=row["window_end"],
+                sources=sources,
+            )
+        except (ValueError, KeyError, TypeError, AttributeError) as error:
+            raise StoreDependencyError("Stored evidence is invalid.") from error
 
     def get_evidence(
         self, investigation_id: str, evidence_id: str, *, access_scope: str

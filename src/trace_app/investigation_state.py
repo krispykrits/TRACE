@@ -45,6 +45,10 @@ class StoreSchemaError(RuntimeError):
     """The on-disk schema is newer or incompatible with this application."""
 
 
+class StoreDependencyError(RuntimeError):
+    """Evidence storage failed; callers may report a structured failure."""
+
+
 def _identifier(name: str, value: str) -> None:
     if not isinstance(value, str) or not re.fullmatch(
         r"[A-Za-z0-9][A-Za-z0-9_:/.-]{0,127}", value

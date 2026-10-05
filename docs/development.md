@@ -55,7 +55,7 @@ uv run --locked python scripts/demo_persistence.py ingest --db /tmp/trace-story-
 uv run --locked python scripts/demo_persistence.py show --db /tmp/trace-story-10.sqlite3 --investigation-id <id-from-ingest>
 ```
 
-Re-running `ingest` with the same submission key and scenario returns zero new records; malformed input exits without creating the database. The file is mode 0600 and accepts only synthetic development/test evidence through a fixed demo scope. The [store contract](architecture/sqlite-investigation-store.md) defines schema setup, duplicate handling, attempt recovery and deletion. It does not ingest authorized operational data or satisfy the Operational Pilot gate.
+Re-running `ingest` with the same submission key and scenario returns zero new records; malformed input exits without creating the database. The file is mode 0600 and accepts only synthetic development/test evidence through a fixed demo scope. The [store contract](architecture/sqlite-investigation-store.md) defines schema setup, duplicate handling, attempt recovery and deletion. After copying the printed investigation_id, use scripts/demo_persistence.py query with the same database path, investigation ID and an optional service/time filter; the [query contract](architecture/bounded-evidence-queries.md) shows exact commands and empty/limit cases. The demo does not ingest authorized operational data or satisfy the Operational Pilot gate.
 
 ## GitHub Actions quality gate
 

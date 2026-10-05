@@ -1,6 +1,6 @@
 # Local SQLite investigation and evidence store
 
-Status: Sprint 3 issue [#10](https://github.com/krispykrits/TRACE/issues/10), implementation proposed 2026-10-05. [ADR 0005](../adr/0005-sqlite-local-postgresql-rds-cloud.md) selects SQLite locally and PostgreSQL on RDS later. This store accepts synthetic development/test evidence only.
+Status: Sprint 3 issue [#10](https://github.com/krispykrits/TRACE/issues/10), implementation merged in [PR #32](https://github.com/krispykrits/TRACE/pull/32) on 2026-10-05. [ADR 0005](../adr/0005-sqlite-local-postgresql-rds-cloud.md) selects SQLite locally and PostgreSQL on RDS later. This store accepts synthetic development/test evidence only.
 
 ## Reproduce the restart demonstration
 
