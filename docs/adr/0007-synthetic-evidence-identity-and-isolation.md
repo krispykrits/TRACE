@@ -1,6 +1,6 @@
 # ADR 0007: Stable synthetic evidence identity and evaluator isolation
 
-Status: Proposed for Sprint 2 issue #8 review, 2026-10-05. Revisit when S3 persistence or an authorized real source tests the contract.
+Status: Accepted with merged issue #8 PR #31, 2026-10-05. Revisit when S3 persistence or an authorized real source tests the contract.
 
 ## Context
 

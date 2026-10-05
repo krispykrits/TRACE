@@ -1,6 +1,6 @@
 # Dependency replay and evidence contract
 
-Status: Sprint 2 issue [#8](https://github.com/krispykrits/TRACE/issues/8), implementation proposed 2026-10-05. [ADR 0007](../adr/0007-synthetic-evidence-identity-and-isolation.md) records the identity and isolation decision.
+Status: Sprint 2 issue [#8](https://github.com/krispykrits/TRACE/issues/8), implementation merged 2026-10-05. [ADR 0007](../adr/0007-synthetic-evidence-identity-and-isolation.md) records the identity and isolation decision.
 
 ## Run and reset
 
