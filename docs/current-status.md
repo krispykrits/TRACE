@@ -1,6 +1,6 @@
 # TRACE current status
 
-Last refreshed: 2026-09-25
+Last refreshed: 2026-10-05
 
 ## Direction
 
@@ -19,16 +19,16 @@ The owner-approved MVP-first plan and production-usefulness amendment are record
 
 ## Sprint 2
 
-- Issue [#7](https://github.com/krispykrits/TRACE/issues/7) is Done and [PR #28](https://github.com/krispykrits/TRACE/pull/28) is merged: the synthetic Order → Payment path, typed fixture boundaries, correlated CLI trace, contract/error tests and [ADR 0004](adr/0004-synchronous-synthetic-order-workflow.md) are recorded. Customer and Notification remain in-process fixtures; no real payment, notification, source adapter or incident evidence is implemented. Issue [#8](https://github.com/krispykrits/TRACE/issues/8) owns seeded dependency failure, replay/reset, evidence envelope and evaluator-only ground truth.
+- Issue [#7](https://github.com/krispykrits/TRACE/issues/7) is Done and [PR #28](https://github.com/krispykrits/TRACE/pull/28) is merged: the synthetic Order → Payment path, typed fixture boundaries, correlated CLI trace, contract/error tests and [ADR 0004](adr/0004-synchronous-synthetic-order-workflow.md) are recorded. Customer and Notification remain in-process fixtures; no real payment, notification or operational source adapter is implemented. Issue [#8](https://github.com/krispykrits/TRACE/issues/8) now has a proposed seeded Payment failure replay, version 1 synthetic evidence envelope, deterministic timeline and evaluator-only manifest on a feature branch. Local lint, format, typing, unit and process checks pass; owner review and CI remain pending. No authorized sanitized export is available, so the source is explicitly unavailable in the bundle.
 
 ## Storage direction — 2026-09-25
 
-- [Issue #29](https://github.com/krispykrits/TRACE/issues/29) is In review on [PR #30](https://github.com/krispykrits/TRACE/pull/30) for this documentation decision. The owner selected SQLite for Local MVP investigation/evidence state in S3 [#10](https://github.com/krispykrits/TRACE/issues/10), after #8 defines the evidence contract, and PostgreSQL on Amazon RDS for Cloud MVP migration. [ADR 0005](adr/0005-sqlite-local-postgresql-rds-cloud.md) records the direction; no schema, migration or database has been implemented/provisioned. Cloud budget, identity, sizing, backup/restore, retention and migration acceptance remain S7–S9 gates.
+- [Issue #29](https://github.com/krispykrits/TRACE/issues/29) is Done and [PR #30](https://github.com/krispykrits/TRACE/pull/30) is merged for this documentation decision. The owner selected SQLite for Local MVP investigation/evidence state in S3 [#10](https://github.com/krispykrits/TRACE/issues/10), after #8 defines the evidence contract, and PostgreSQL on Amazon RDS for Cloud MVP migration. [ADR 0005](adr/0005-sqlite-local-postgresql-rds-cloud.md) records the direction; no schema, migration or database has been implemented/provisioned. Cloud budget, identity, sizing, backup/restore, retention and migration acceptance remain S7–S9 gates.
 - The owner selected PostgreSQL with pgvector on the planned RDS database for cloud vector retrieval. [ADR 0006](adr/0006-pgvector-cloud-retrieval-storage.md) records the choice; #16 retrieval evaluation and embedding/index details remain open. The small exact-search Local MVP baseline remains; no vector service or extension has been deployed.
 
 ## Next checks
 
-1. Implement issue #8’s seeded failures and evidence contract before #10 SQLite persistence; design and evaluate retrieval under #16 using the selected pgvector direction.
+1. Review issue #8’s seeded failure and evidence-contract PR, then start #10 SQLite persistence after acceptance; design and evaluate retrieval under #16 using the selected pgvector direction.
 2. Configure CloudWatch Logs during S8 Cloud MVP deployment and verify hosted delivery, retention, rotation and collector recovery at S9; reconcile #3's closed state with its still-unverified hosted acceptance.
 3. Keep owner-dependent charter inputs as open gates until supplied or explicitly deferred; do not assign dates, budgets, pilot permissions, or thresholds.
 
