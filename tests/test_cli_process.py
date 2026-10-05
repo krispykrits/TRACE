@@ -340,6 +340,53 @@ class CliProcessIntegrationTests(unittest.TestCase):
             self.assertNotIn("ground_truth", shown.stdout)
             self.assertNotIn("cause_service", shown.stdout)
 
+            query_arguments = (
+                "query",
+                "--db",
+                str(database),
+                "--investigation-id",
+                ingested["investigation_id"],
+            )
+            queried = _run_persistence_demo(
+                *query_arguments,
+                "--service",
+                "payment",
+                "--window-start",
+                "2026-01-01T00:00:19Z",
+                "--window-end",
+                "2026-01-01T00:00:19Z",
+                working_directory=working_directory,
+            )
+            self.assertEqual(queried.returncode, 0, queried.stderr)
+            query_result = json.loads(queried.stdout)
+            self.assertEqual(query_result["status"], "incomplete")
+            self.assertEqual(query_result["matching_count"], 1)
+            self.assertFalse(query_result["truncated"])
+            self.assertEqual(
+                query_result["evidence"][0]["record"]["event"], "payment.timeout"
+            )
+            self.assertEqual(query_result["sources"][1]["status"], "unavailable")
+            self.assertNotIn("ground_truth", queried.stdout)
+
+            bounded = _run_persistence_demo(
+                *query_arguments, "--limit", "1", working_directory=working_directory
+            )
+            self.assertEqual(bounded.returncode, 0, bounded.stderr)
+            self.assertTrue(json.loads(bounded.stdout)["truncated"])
+            self.assertEqual(json.loads(bounded.stdout)["matching_count"], 4)
+
+            invalid_query = _run_persistence_demo(
+                *query_arguments,
+                "--window-start",
+                "2026-01-01T00:00:20Z",
+                "--window-end",
+                "2026-01-01T00:00:17Z",
+                working_directory=working_directory,
+            )
+            self.assertEqual(invalid_query.returncode, 2)
+            self.assertEqual(invalid_query.stdout, "")
+            self.assertIn("window_start", invalid_query.stderr)
+
     def test_fixture_is_removed_after_cli_failure(self) -> None:
         with tempfile.TemporaryDirectory(prefix="trace-integration-") as directory:
             working_directory = Path(directory)
