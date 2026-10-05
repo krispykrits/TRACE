@@ -2,7 +2,7 @@
   "scenario_version": "payment-dependency.v1",
   "mode": "failure",
   "cause_service": "payment",
-  "mechanism": "The synthetic Payment authorizer raises a bounded dependency failure before returning an authorization.",
+  "mechanism": "The synthetic Payment authorizer raises a dependency failure before returning an authorization.",
   "symptoms": [
     "Order request does not produce an accepted outcome.",
     "No notification is recorded.",
