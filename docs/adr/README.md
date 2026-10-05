@@ -10,6 +10,7 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0004](0004-synchronous-synthetic-order-workflow.md) | Synchronous in-process Order–Payment demo with fixture boundaries | Accepted for scoped synthetic Sprint 2 path |
 | [0005](0005-sqlite-local-postgresql-rds-cloud.md) | SQLite Local MVP state, then PostgreSQL on RDS for Cloud MVP | Accepted direction; implementation/migration pending |
 | [0006](0006-pgvector-cloud-retrieval-storage.md) | pgvector on RDS for cloud vector storage | Accepted direction; implementation and retrieval evidence pending |
+| [0007](0007-synthetic-evidence-identity-and-isolation.md) | Stable synthetic evidence identity and evaluator isolation | Proposed with issue #8 implementation |
 
 ## Open decision register
 

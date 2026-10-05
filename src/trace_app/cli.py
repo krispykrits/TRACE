@@ -9,6 +9,7 @@ import os
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Literal
 
 from trace_app import __version__
 from trace_app.configuration import ConfigurationError, load_settings
@@ -21,6 +22,7 @@ from trace_app.order_workflow import (
     OrderRequest,
     OrderWorkflow,
 )
+from trace_app.replay import ReplayConfig, ReplaySession
 from trace_app.structured_logging import collect_secret_values, configure_logging
 
 
@@ -71,6 +73,13 @@ def _parser() -> argparse.ArgumentParser:
     demo_parser.add_argument(
         "--amount-cents", required=True, type=int, help="positive integer amount"
     )
+    replay_parser = commands.add_parser(
+        "replay-dependency",
+        help="export synthetic Order → Payment evidence for one seeded replay",
+    )
+    _settings_arguments(replay_parser)
+    replay_parser.add_argument("--seed", required=True, type=int)
+    replay_parser.add_argument("--mode", required=True, choices=("normal", "failure"))
     return parser
 
 
@@ -82,7 +91,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.print_help()
         return 0
     parsed = parser.parse_args(arguments)
-    if parsed.command not in {"check-config", "demo-order"}:
+    if parsed.command not in {"check-config", "demo-order", "replay-dependency"}:
         return 0
 
     process_environment = dict(os.environ)
@@ -119,6 +128,53 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "environment": settings.environment,
                 "application_version": __version__,
             },
+        )
+        return 0
+
+    if parsed.command == "replay-dependency":
+        replay_environment: Literal["development", "test"]
+        if settings.environment == "development":
+            replay_environment = "development"
+        elif settings.environment == "test":
+            replay_environment = "test"
+        else:
+            logging.getLogger("trace_app.replay").error(
+                "Synthetic replay is restricted to development and test.",
+                extra={
+                    "event": "replay.invalid",
+                    "environment": settings.environment,
+                },
+            )
+            return 2
+        try:
+            config = ReplayConfig(
+                seed=parsed.seed,
+                mode=parsed.mode,
+                environment=replay_environment,
+            )
+        except ValueError as error:
+            logging.getLogger("trace_app.replay").error(
+                str(error),
+                extra={"event": "replay.invalid", "environment": settings.environment},
+            )
+            return 2
+        result = ReplaySession(config).replay()
+        logging.getLogger("trace_app.replay").info(
+            "Synthetic dependency replay completed.",
+            extra={
+                "event": "replay.completed",
+                "environment": replay_environment,
+                "correlation_id": result.evidence.records[0].correlation_id,
+                "status": result.status,
+                "evidence_count": len(result.evidence.records),
+            },
+        )
+        print(
+            json.dumps(
+                {"status": result.status, "evidence": result.evidence.to_dict()},
+                sort_keys=True,
+                separators=(",", ":"),
+            )
         )
         return 0
 

@@ -1,0 +1,22 @@
+{
+  "scenario_version": "payment-dependency.v1",
+  "mode": "failure",
+  "cause_service": "payment",
+  "mechanism": "The synthetic Payment authorizer raises a dependency failure before returning an authorization.",
+  "symptoms": [
+    "Order request does not produce an accepted outcome.",
+    "No notification is recorded.",
+    "Payment attempt emits a timeout event."
+  ],
+  "expected_evidence": [
+    "order.requested",
+    "customer.found",
+    "payment.timeout",
+    "order.dependency_failed"
+  ],
+  "causal_chain": [
+    "The known Customer fixture accepts the lookup.",
+    "The Payment fixture fails its authorization attempt.",
+    "Order propagates the dependency failure and does not call Notification."
+  ]
+}

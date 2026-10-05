@@ -64,6 +64,29 @@ def _run_demo_order(*arguments: str) -> subprocess.CompletedProcess[str]:
         )
 
 
+def _run_replay(*arguments: str) -> subprocess.CompletedProcess[str]:
+    with tempfile.TemporaryDirectory(prefix="trace-replay-") as directory:
+        env_file = Path(directory) / "settings.env"
+        env_file.write_text("", encoding="utf-8")
+        return subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "trace_app.cli",
+                "replay-dependency",
+                "--env-file",
+                str(env_file),
+                *arguments,
+            ],
+            cwd=directory,
+            env=_minimal_environment(),
+            capture_output=True,
+            check=False,
+            text=True,
+            timeout=15,
+        )
+
+
 class CliProcessIntegrationTests(unittest.TestCase):
     def test_two_consecutive_runs_are_isolated_and_successful(self) -> None:
         for expected_environment in ("development", "test"):
@@ -184,6 +207,53 @@ class CliProcessIntegrationTests(unittest.TestCase):
         self.assertEqual(
             json.loads(result.stderr)["event"], "order.demo_environment_rejected"
         )
+
+    def test_replay_failure_process_exports_evidence_without_evaluator_data(
+        self,
+    ) -> None:
+        arguments = (
+            "--environment",
+            "test",
+            "--seed",
+            "17",
+            "--mode",
+            "failure",
+        )
+        first = _run_replay(*arguments)
+        second = _run_replay(*arguments)
+
+        self.assertEqual(first.returncode, 0, first.stderr)
+        self.assertEqual(second.returncode, 0, second.stderr)
+        first_result = json.loads(first.stdout)
+        second_result = json.loads(second.stdout)
+        self.assertEqual(first_result["status"], "dependency_failed")
+        self.assertEqual(
+            [record["event"] for record in first_result["evidence"]["records"]],
+            [
+                "order.requested",
+                "customer.found",
+                "payment.timeout",
+                "order.dependency_failed",
+            ],
+        )
+        self.assertEqual(
+            [record["evidence_id"] for record in first_result["evidence"]["records"]],
+            [record["evidence_id"] for record in second_result["evidence"]["records"]],
+        )
+        self.assertNotIn("notification.recorded", first.stdout)
+        self.assertNotIn("ground_truth", first.stdout)
+        self.assertNotIn("mechanism", first.stdout)
+        self.assertNotIn("expected_evidence", first.stdout)
+        self.assertIn('"event":"replay.completed"', first.stderr)
+        self.assertNotIn("ground_truth", first.stderr)
+
+    def test_replay_rejects_production_environment(self) -> None:
+        result = _run_replay(
+            "--environment", "production", "--seed", "17", "--mode", "normal"
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertEqual(json.loads(result.stderr)["event"], "replay.invalid")
 
     def test_fixture_is_removed_after_cli_failure(self) -> None:
         with tempfile.TemporaryDirectory(prefix="trace-integration-") as directory:
