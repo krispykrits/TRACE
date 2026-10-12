@@ -15,7 +15,6 @@ from trace_app.knowledge import (
 )
 from trace_app.retrieval_backends import dense_scores, lexical_scores, validate_vectors
 from trace_app.retrieval_contracts import (
-    CANDIDATE_POOL,
     RRF_K,
     CorpusReader,
     Encoder,
@@ -60,6 +59,8 @@ class SearchService:
                 eligible,
                 candidates,
                 results,
+                request.candidate_pool,
+                request.max_chunks_per_document,
             )
             _LOG.info(
                 "Knowledge search completed.",
@@ -117,7 +118,9 @@ class SearchService:
                 for chunk, score in zip(eligible, scores, strict=True)
                 if not positive or score > 0
             ]
-            return sorted(pairs, key=lambda pair: (-pair[1], pair[0]))[:CANDIDATE_POOL]
+            return sorted(pairs, key=lambda pair: (-pair[1], pair[0]))[
+                : request.candidate_pool
+            ]
 
         lexical: list[tuple[str, float]] = []
         dense: list[tuple[str, float]] = []
@@ -171,7 +174,10 @@ class SearchService:
         try:
             for identity, score in ranked:
                 chunk = lookup[identity]
-                if counts[chunk.metadata.document_id] >= 1:
+                if (
+                    counts[chunk.metadata.document_id]
+                    >= request.max_chunks_per_document
+                ):
                     continue
                 # Repeat source authorization immediately before exposing a candidate.
                 resolved = self._reader.resolve(

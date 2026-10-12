@@ -1,4 +1,4 @@
-.PHONY: sync run check lint format-check type-check test integration integration-live integration-semantic clean
+.PHONY: sync run check lint format-check type-check test integration integration-live integration-semantic retrieval-evaluate clean
 
 sync:
 	uv sync --locked
@@ -29,6 +29,9 @@ integration-live:
 
 integration-semantic:
 	uv run --locked --extra semantic python -m evaluation.retrieval_baseline
+
+retrieval-evaluate:
+	uv run --locked --extra semantic python -m evaluation.retrieval_quality
 
 clean:
 	rm -rf .venv build dist

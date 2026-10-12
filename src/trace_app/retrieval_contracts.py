@@ -9,7 +9,7 @@ from typing import Literal, Protocol
 from trace_app.knowledge import CorpusReadContext, KnowledgeChunk, _text
 
 SearchMode = Literal["lexical", "semantic", "hybrid"]
-RETRIEVAL_VERSION = "exact-retrieval.v1"
+RETRIEVAL_VERSION = "exact-retrieval.v2"
 MAX_TOP_K = 20
 CANDIDATE_POOL = 100
 RRF_K = 60
@@ -97,6 +97,8 @@ class SearchRequest:
     mode: SearchMode = "lexical"
     service: str | None = None
     document_type: str | None = None
+    candidate_pool: int = CANDIDATE_POOL
+    max_chunks_per_document: int = 1
 
     def __post_init__(self) -> None:
         if (
@@ -110,6 +112,20 @@ class SearchRequest:
             )
         if type(self.top_k) is not int or not 1 <= self.top_k <= MAX_TOP_K:
             raise SearchInputError("top_k must be an integer from 1 through 20.")
+        if (
+            type(self.candidate_pool) is not int
+            or not self.top_k <= self.candidate_pool <= CANDIDATE_POOL
+        ):
+            raise SearchInputError(
+                "candidate_pool must be an integer from top_k through 100."
+            )
+        if (
+            type(self.max_chunks_per_document) is not int
+            or not 1 <= self.max_chunks_per_document <= MAX_TOP_K
+        ):
+            raise SearchInputError(
+                "max_chunks_per_document must be an integer from 1 through 20."
+            )
         if self.mode not in ("lexical", "semantic", "hybrid"):
             raise SearchInputError("mode requires lexical, semantic or hybrid.")
         if self.service is not None:
@@ -165,6 +181,8 @@ class SearchResponse:
     eligible_chunks: int
     candidate_count: int
     results: tuple[RetrievalResult, ...]
+    candidate_pool: int = CANDIDATE_POOL
+    max_chunks_per_document: int = 1
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -176,6 +194,8 @@ class SearchResponse:
             "corpus_generation_id": self.corpus_generation_id,
             "eligible_chunks": self.eligible_chunks,
             "candidate_count": self.candidate_count,
+            "candidate_pool": self.candidate_pool,
+            "max_chunks_per_document": self.max_chunks_per_document,
             "score_semantics": "Within-retriever ranking only; not probability, answerability or causal support.",
             "results": [result.to_dict() for result in self.results],
         }

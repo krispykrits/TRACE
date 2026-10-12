@@ -1,6 +1,6 @@
 # Data contracts and decisions
 
-Status: Sprint 3 foundations including evaluation merged; Sprint 4 corpus ingestion merged and retrieval proposed, 2026-10-12. Configuration, application logs, synthetic Order records and version 1 synthetic incident evidence have distinct contracts.
+Status: Sprint 3 foundations including evaluation merged; Sprint 4 corpus and retrieval merged; bounded context proposed, 2026-10-12. Configuration, application logs, synthetic Order records and version 1 synthetic incident evidence have distinct contracts.
 
 | Existing record | Current contract | Source |
 | --- | --- | --- |
@@ -15,7 +15,9 @@ Status: Sprint 3 foundations including evaluation merged; Sprint 4 corpus ingest
 | Candidate report | Version 1 separates observations, primary/competing hypotheses, citations, qualitative uncertainty, missing evidence and abstention; strict bounded parser, independent of evaluator labels | [Evaluation contract](development-evaluation.md), [report code](../../src/trace_app/assessment.py) |
 | Evaluator attempt and run | Repository-only execution outcomes, expected labels, support reviews, usage availability, score denominators and versioned/hash-verified artifacts; excluded from investigator inputs | [Evaluation contract](development-evaluation.md), [scorer](../../evaluation/scoring.py) and [runner](../../evaluation/runner.py) |
 | Knowledge document/chunk and generation (#15) | Source-owned opaque identity/revision, snapshot version, original offsets, normalized text, access/time/evaluation metadata; atomic local generations and current policy checks across retained citations | [Corpus contract](knowledge-corpus.md), [ADR 0008](../adr/0008-local-corpus-generations-and-source-policy.md) |
-| Knowledge search and citation (proposed #16) | Bounded top-K, named exact-search/encoder artifacts, current authorization before scoring/resolution, untrusted passage text and explicit failures; rank scores do not establish answerability | [Retrieval contract](knowledge-retrieval.md), [ADR 0009](../adr/0009-local-exact-knowledge-retrieval.md) |
+| Knowledge search and citation (#16) | Bounded top-K, named exact-search/encoder artifacts, current authorization before scoring/resolution, untrusted passage text and explicit failures; rank scores do not establish answerability | [Retrieval contract](knowledge-retrieval.md), [ADR 0009](../adr/0009-local-exact-knowledge-retrieval.md) |
+
+| Bounded knowledge context (proposed #17) | Whole original quotes within exact UTF-8 JSON/passages limits, generation-bound full-provenance citation map, omission ledger and current source revalidation; untrusted data separated from policy | [Context contract](retrieval-evaluation-context.md), [assembler](../../src/trace_app/knowledge_context.py) |
 
 ## Evidence boundary and next increment
 

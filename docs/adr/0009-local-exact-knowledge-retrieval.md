@@ -1,6 +1,6 @@
 # ADR 0009: Pinned local embedding and exact knowledge retrieval
 
-- **Status:** Proposed in [PR #44](https://github.com/krispykrits/TRACE/pull/44) for issue #16; owner review pending
+- **Status:** Accepted through merged [PR #44](https://github.com/krispykrits/TRACE/pull/44) for issue #16
 - **Date:** 2026-10-12
 - **Decision owner:** Project owner, through scoped implementation review
 - **Scope:** Local MVP read-only retrieval; cloud direction remains ADR 0006
@@ -56,3 +56,7 @@ The 1,000-chunk/20 MB artifact and top-K bounds are implementation limits, not o
 ## Revisit conditions
 
 Revisit defaults/token-window policy on broader independently reviewed development queries and actual encoder-budget failures. Revisit linear scans or serialized local policy reads with measured workload/concurrency and cloud migration evidence. Preserve version, citation, source-policy and no-fallback contracts through pgvector migration. Before real-source use, settle source identity/access, freshness, retention/derived-artifact deletion, cache provenance and independent cohort review. Do not treat synthetic ranking or local model execution as Operational Pilot acceptance.
+
+## #17 candidate configuration extension — 2026-10-12
+
+The [passage evaluation/context contract](../architecture/retrieval-evaluation-context.md) records a measured section-recall gap with the one-passage-per-document baseline. Adapt Volume 4's existing configurable limits behind `SearchRequest`: defaults remain candidate pool 100 and one passage per document; #17 explicitly retains pool 20 and up to 20 passages per document before a five-passage/byte-bounded context. The owner supplied primary/secondary K, minimum 100 queries and thresholds before measurement. Lexical remains the existing default; no reranker or new dependency is selected. Human judgment review and acceptance remain pending. Version `exact-retrieval.v2` requires explicit index rebuilding; chunk/source/embedding identities remain unchanged.

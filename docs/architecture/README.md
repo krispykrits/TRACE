@@ -1,6 +1,6 @@
 # TRACE architecture view
 
-Status: Sprint 3 foundations including evaluation merged; Sprint 4 corpus ingestion merged and retrieval proposed, 2026-10-12. This view describes implemented code and approved direction; it does not claim an incident investigation is implemented.
+Status: Sprint 3 foundations including evaluation merged; Sprint 4 corpus and retrieval merged; bounded context proposed, 2026-10-12. This view describes implemented code and approved direction; it does not claim an incident investigation is implemented.
 
 ```mermaid
 flowchart LR
@@ -18,6 +18,9 @@ flowchart LR
     SearchDemo[Developer search CLI] --> Search[Authorized exact knowledge search]
     Search --> Corpus[SQLite corpus and current source policy]
     Search --> Encoder[Optional cached CPU embeddings]
+    ContextDemo[Developer context CLI] --> Context[Bounded quoted context]
+    Context --> Search
+    Context --> Corpus
     Log -. planned EC2 collection .-> CW[CloudWatch Logs]
     CLI -. later S3-S6 .-> Investigation[Read-only investigation]
     Investigation -. later source adapters .-> Sources[Authorized evidence sources]
@@ -42,3 +45,5 @@ The Local/Cloud MVP investigation remains read-only. The final capstone's [appro
 - [Interfaces and API contracts](interfaces.md) describe the current CLI and the deferred application/source APIs.
 - [Development guide](../development.md) gives runnable local commands and the current quality gate.
 - [Reuse review](../planning/production-usefulness-review.md) and [approved amendment](../planning/production-roadmap-amendment.md) explain why educational components must enter through TRACE-owned contracts.
+
+The [passage evaluation and context contract](retrieval-evaluation-context.md) records #17's configured candidate limits, current source revalidation, exact byte budget and separate citation map. Evaluator-only labels/reviews remain outside runtime imports; human review gates acceptance.

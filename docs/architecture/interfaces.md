@@ -1,6 +1,6 @@
 # Interfaces and API contract gates
 
-Status: Sprint 3 local foundations merged; Sprint 4 corpus merged and retrieval proposed, 2026-10-12. TRACE exposes a local `trace-app` command, not a network API.
+Status: Sprint 3 local foundations merged; Sprint 4 corpus and retrieval merged; bounded context proposed, 2026-10-12. TRACE exposes a local `trace-app` command, not a network API.
 
 | Existing CLI behavior | Contract and evidence |
 | --- | --- |
@@ -23,3 +23,7 @@ Issue #7 defines the synthetic Order workflow; issue #8 defines the source-neutr
 ## Knowledge search boundary
 
 `uv run --locked python scripts/demo_search.py` uses the fixed development corpus/grants and lexical default, publishes/reopens a temporary index and resolves returned citations. Explicit `--mode semantic` or `--mode hybrid` requires the locked semantic extra and pinned cached model. `SearchRequest` bounds query/top-K; trusted scope is checked before candidate scoring and again for citations. Invalid input, unavailable encoder, incompatible index and storage/source failures never become successful fallback output. The [search contract](knowledge-retrieval.md) defines response statuses, provenance, rebuild steps and the separate real-model development comparison. This is a local developer demonstration, not a network endpoint or model-tool registry.
+
+## Bounded knowledge context
+
+`uv run --locked python scripts/demo_context.py` searches with an explicit 20-candidate request, then assembles at most five quoted passages within 8,192 canonical JSON bytes and resolves the emitted citation map. `--max-passages` and `--max-bytes` demonstrate omissions. The [context contract](retrieval-evaluation-context.md) separates untrusted quotes, source mappings and omission diagnostics, with current authorization checks and explicit failures. This remains a developer command; model tools belong to #18.

@@ -17,6 +17,7 @@ The supported development and CI runtime is CPython 3.12 on Linux. Install Pytho
 | Run the deterministic test suite | `make test` |
 | Run the process-boundary integration test | `make integration` |
 | Compare real cached lexical/semantic/hybrid baselines | `make integration-semantic` |
+| Compare #17 passage rankings and context | `make retrieval-evaluate` |
 | Run the opt-in provider gate | `make integration-live` |
 | Remove generated local build state | `make clean` |
 
@@ -140,3 +141,7 @@ The [evaluation contract](architecture/development-evaluation.md) defines metric
 ## Knowledge search and cached embedding comparison
 
 `uv run --locked python scripts/demo_search.py --query "TLS certificate expiry" --top-k 3` runs the measured lexical default without model packages or weights. Semantic/hybrid modes are explicit and require `--extra semantic` plus the pinned cached model. Follow the [search setup, rebuild and comparison instructions](architecture/knowledge-retrieval.md); missing dependencies/cache fail without fallback. `make integration-semantic` runs a real local model comparison separately from fast CI and the live-provider gate. Model preparation is an explicit public download; search itself reads cached files only. The checked-in development report does not establish held-out quality or pilot usefulness.
+
+## Passage evaluation and context demonstration
+
+`uv run --locked python scripts/demo_context.py --query "PAYMENT_TIMEOUT evidence" --max-passages 1` demonstrates whole-passage omissions and resolvable source mappings. `uv run --locked python -m evaluation.retrieval_quality --modes lexical --output /tmp/trace-passage-review.json` scores 100 evaluator-only development requests without an encoder. Follow the [protocol, review bundle and reproduction instructions](architecture/retrieval-evaluation-context.md) for real-model comparison, model-free rescoring and the owner's pending human review. Acceptance cannot run until those decisions are recorded; the saved thresholds precede measurement.
