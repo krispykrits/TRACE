@@ -103,6 +103,68 @@ def _run_persistence_demo(
 
 
 class CliProcessIntegrationTests(unittest.TestCase):
+    def test_timeline_demo_shuffles_resolves_and_preserves_incompleteness(self) -> None:
+        script = Path(__file__).resolve().parents[1] / "scripts" / "demo_timeline.py"
+        with tempfile.TemporaryDirectory(prefix="trace-timeline-cli-") as directory:
+            for arguments, expected_count in (
+                (
+                    [
+                        "--case",
+                        "c01",
+                        "--window-start",
+                        "2026-01-01T05:30:17+05:30",
+                        "--window-end",
+                        "2026-01-01T05:30:24+05:30",
+                    ],
+                    9,
+                ),
+                (["--case", "c03"], 4),
+                (["--case", "c02", "--limit", "1"], 1),
+            ):
+                result = subprocess.run(
+                    [sys.executable, str(script), *arguments],
+                    cwd=directory,
+                    env=_minimal_environment(),
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=15,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                timeline = json.loads(result.stdout)
+                self.assertEqual(timeline["status"], "incomplete")
+                self.assertEqual(
+                    timeline["query"]["window_start"], "2026-01-01T00:00:17Z"
+                )
+                self.assertEqual(len(timeline["events"]), expected_count)
+                self.assertEqual(
+                    timeline["resolved_evidence_ids"],
+                    [e["evidence_id"] for e in timeline["events"]],
+                )
+                self.assertTrue(
+                    all(e["causal_status"] == "observed" for e in timeline["events"])
+                )
+                self.assertEqual(timeline["truncated"], expected_count == 1)
+                logs = [json.loads(line) for line in result.stderr.splitlines()]
+                self.assertEqual(logs[-1]["event"], "timeline.constructed")
+                self.assertEqual(
+                    logs[-1]["investigation_id"], timeline["investigation_id"]
+                )
+                self.assertNotIn("cause_label", result.stdout)
+            invalid = subprocess.run(
+                [sys.executable, str(script), "--window-start", "2026-01-01T01:00:00"],
+                cwd=directory,
+                env=_minimal_environment(),
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=15,
+            )
+            self.assertEqual(invalid.returncode, 2)
+            self.assertEqual(invalid.stdout, "")
+            self.assertIn("numeric offset", invalid.stderr)
+            self.assertEqual(list(Path(directory).iterdir()), [])
+
     def test_development_suite_cli_export_and_invalid_requests(self) -> None:
         with tempfile.TemporaryDirectory(prefix="trace-suite-") as directory:
             env_file = Path(directory) / "settings.env"

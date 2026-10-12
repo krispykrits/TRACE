@@ -5,10 +5,31 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Literal, Mapping, cast
 
 EVIDENCE_SCHEMA_VERSION = "1"
+
+
+def normalize_timestamp(value: str) -> str:
+    """Normalize explicit RFC 3339 source offsets, rejecting unknown local time."""
+    if (
+        not isinstance(value, str)
+        or not re.fullmatch(
+            r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)",
+            value,
+        )
+        or value.endswith("-00:00")
+    ):
+        raise ValueError(
+            "Timestamp requires RFC 3339 with Z or a known numeric offset."
+        )
+    try:
+        return format_utc(datetime.fromisoformat(value).astimezone(UTC))
+    except (ValueError, OverflowError) as error:
+        raise ValueError(
+            "Timestamp has an invalid date, time or UTC offset."
+        ) from error
 
 
 def format_utc(value: datetime) -> str:
@@ -73,6 +94,18 @@ class EvidenceRecord:
             r"[0-9a-f]{64}", self.integrity_sha256
         ):
             raise ValueError("integrity_sha256 must be a SHA-256 hex digest.")
+
+    @classmethod
+    def from_source_dict(cls, data: Mapping[str, object]) -> EvidenceRecord:
+        """Normalize source times before validating the unchanged UTC envelope."""
+        normalized = dict(data)
+        for name in ("observed_at", "collected_at"):
+            if name in normalized:
+                try:
+                    normalized[name] = normalize_timestamp(cast(str, normalized[name]))
+                except ValueError as error:
+                    raise ValueError(f"{name}: {error}") from error
+        return cls.from_dict(normalized)
 
     @classmethod
     def from_dict(cls, data: Mapping[str, object]) -> EvidenceRecord:
@@ -177,5 +210,8 @@ class EvidenceBundle:
 
     def timeline(self) -> tuple[EvidenceRecord, ...]:
         return tuple(
-            sorted(self.records, key=lambda item: (item.observed_at, item.evidence_id))
+            sorted(
+                self.records,
+                key=lambda item: (_parse_utc(item.observed_at), item.evidence_id),
+            )
         )
