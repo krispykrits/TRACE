@@ -1,5 +1,24 @@
 # Evaluation material
 
+## Package refactor and archived source identity
+
+The #46 package refactor preserves frozen suites, reviews and reports. V4 passage reports were produced with the pre-refactor scorer and require commit `43582e3f084ff645b1227bc139d4d441b99fd220` for exact rescoring. Do not modify their source hashes or interpret a current-source mismatch as changed historical metrics. For those reports:
+
+```sh
+git worktree add --detach /tmp/trace-retrieval-v4 43582e3f084ff645b1227bc139d4d441b99fd220
+cd /tmp/trace-retrieval-v4
+uv run --locked python -m evaluation.retrieval_quality --rescore evaluation/reports/retrieval_passage_acceptance_v4.json
+```
+
+From the current checkout, use a fresh exploration output path and rescore that new artifact:
+
+```sh
+uv run --locked python -m evaluation.retrieval_quality --modes lexical --output /tmp/trace-retrieval-current.json
+uv run --locked python -m evaluation.retrieval_quality --rescore /tmp/trace-retrieval-current.json
+```
+
+Fresh source manifests include nested application modules. The remaining historical evidence descriptions below refer to their recorded implementation; they do not instruct current code to accept an incompatible scorer snapshot.
+
 `ground_truth/` contains evaluator-only manifests. It is outside the installable runtime package. Never mount, index, retrieve, prompt with or export this directory through investigator interfaces. See the [development catalog and isolation boundary](../docs/architecture/development-scenarios.md).
 
 The `mvp-suite.v1` manifest records four development cases at seed 17. Related seed, capture-gap, distractor and original `payment-dependency.v1` variants form one `order-payment-timeout-v1` group. Keep the entire group in development. Validation and final-test allocations/answers remain reserved and ungenerated; independent grouping and cohort allocation must precede later acceptance/final study. Opaque case/evidence IDs are bookkeeping, not legitimate diagnostic features.

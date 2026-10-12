@@ -1,5 +1,7 @@
 # TRACE architecture view
 
+The [capability package layout](package-layout.md) and [ADR 0010](../adr/0010-capability-packages-and-adapter-boundaries.md) define dependency direction and composition; make architecture-check and make package-check enforce this during every future PR.
+
 Status: Sprint 3 foundations including evaluation merged; Sprint 4 corpus and retrieval merged; bounded context proposed, 2026-10-12. This view describes implemented code and approved direction; it does not claim an incident investigation is implemented.
 
 ```mermaid

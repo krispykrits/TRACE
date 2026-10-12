@@ -4,7 +4,7 @@ Status: accepted implementation for [#16](https://github.com/krispykrits/TRACE/i
 
 ## Contract and bounds
 
-[SearchService](../../src/trace_app/retrieval.py) depends on TRACE-owned `CorpusReader` and `Encoder` ports. The local adapters use SQLite source policy, technical TF-IDF, a pinned optional CPU sentence encoder and exact float32 dot products. Volume 4's lexical, dense and reciprocal-rank-fusion algorithms are adapted within TRACE; no sibling application or separate vector database is required.
+[SearchService](../../src/trace_app/knowledge/search.py) depends on TRACE-owned `CorpusReader` and `Encoder` ports. The local adapters use SQLite source policy, technical TF-IDF, a pinned optional CPU sentence encoder and exact float32 dot products. Volume 4's lexical, dense and reciprocal-rank-fusion algorithms are adapted within TRACE; no sibling application or separate vector database is required.
 
 `SearchRequest` requires 1–4,000 nonblank characters without NUL and integer `top_k` from 1 through 20. Modes are `lexical` (development-selected default), `semantic` and `hybrid`. Optional service/document-type filters narrow eligibility. Each branch sorts by descending score then stable chunk ID, retaining at most `candidate_pool` candidates (default 100, validated from top-K through 100). Hybrid sums `1 / (60 + rank)` from both branches. Final results contain at most `max_chunks_per_document` passages per document (default 1, validated 1–20), and at most `top_k` passages total. Scores describe within-mode ranking, not probabilities, answerability or causal support. Dense/hybrid search has no unmeasured similarity cutoff; it can return candidates even when the answer is absent.
 

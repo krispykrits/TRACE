@@ -47,10 +47,14 @@ jobs:
         run: make format-check
       - name: Type check
         run: make type-check
-      - name: Unit tests
+      - name: Architecture boundaries
+        run: make architecture-check
+      - name: Unit and contract tests
         run: make test
-      - name: CLI process integration tests
+      - name: Storage, evaluation and CLI integration tests
         run: make integration
+      - name: Installed runtime wheel
+        run: make package-check
 
   live-provider-integration:
     name: Opt-in live provider integration

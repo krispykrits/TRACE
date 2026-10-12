@@ -19,22 +19,27 @@ from evaluation.scoring import (
     aggregate_scores,
     score_candidate,
 )
-from trace_app.assessment import REPORT_SCHEMA_VERSION, _object, _text
-from trace_app.evidence import (
+from trace_app.demo.scenarios import (
+    CASE_IDS,
+    SUITE_VERSION,
+    ScenarioConfig,
+    ScenarioSession,
+)
+from trace_app.evidence.models import (
     EVIDENCE_SCHEMA_VERSION,
     EvidenceRecord,
     SourceAvailability,
 )
-from trace_app.investigation_state import (
+from trace_app.evidence.timeline import TIMELINE_SCHEMA_VERSION
+from trace_app.investigation.assessment import REPORT_SCHEMA_VERSION, _object, _text
+from trace_app.investigation.models import (
     DeploymentPayload,
     EvidenceEntry,
     EvidenceSnapshot,
     LogPayload,
     MetricPayload,
 )
-from trace_app.scenarios import CASE_IDS, SUITE_VERSION, ScenarioConfig, ScenarioSession
-from trace_app.structured_logging import configure_logging
-from trace_app.timeline import TIMELINE_SCHEMA_VERSION
+from trace_app.runtime.logging import configure_logging
 
 _ROOT = Path(__file__).resolve().parents[1]
 _CONFIG = {
@@ -84,7 +89,7 @@ def _parse(data: bytes) -> object:
 
 
 def _implementation_hashes() -> dict[str, str]:
-    files = sorted((_ROOT / "src/trace_app").glob("*.py")) + sorted(
+    files = sorted((_ROOT / "src/trace_app").rglob("*.py")) + sorted(
         (_ROOT / "evaluation").glob("*.py")
     )
     return {path.relative_to(_ROOT).as_posix(): _sha(_read(path)) for path in files}

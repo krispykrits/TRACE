@@ -4,7 +4,7 @@ Status: Sprint 3 local foundations merged; Sprint 4 corpus and retrieval merged;
 
 | Existing CLI behavior | Contract and evidence |
 | --- | --- |
-| `trace-app` / `--help` / `--version` | Prints help or package version without an incident source; see [CLI](../../src/trace_app/cli.py) and [smoke tests](../../tests/test_cli.py) |
+| `trace-app` / `--help` / `--version` | Prints help or package version without an incident source; see [CLI](../../src/trace_app/cli/commands.py) and [smoke tests](../../tests/unit/test_cli.py) |
 | `trace-app check-config` | Validates current environment/log configuration, emits one correlated JSON operational record on success and an actionable error on invalid input; see [development guide](../development.md) |
 | `trace-app demo-order` | Validates a synthetic Order request, calls in-process Customer/Payment/Notification fixtures, and returns a JSON business outcome with service/environment/correlation identity; see [workflow contract](order-payment-workflow.md) and [ADR 0004](../adr/0004-synchronous-synthetic-order-workflow.md) |
 

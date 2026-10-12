@@ -1,4 +1,4 @@
-.PHONY: sync run check lint format-check type-check test integration integration-live integration-semantic retrieval-evaluate clean
+.PHONY: sync run check lint format-check type-check architecture-check package-check test integration integration-live integration-semantic retrieval-evaluate clean
 
 sync:
 	uv sync --locked
@@ -19,10 +19,17 @@ type-check:
 	uv run --locked mypy src tests evaluation
 
 test:
-	uv run --locked python -m unittest discover -s tests -v
+	uv run --locked python -m unittest discover -s tests/unit -t . -v
+	uv run --locked python -m unittest discover -s tests/contracts -t . -v
 
 integration:
-	uv run --locked python -m unittest discover -s tests -p 'test_cli_process.py' -v
+	uv run --locked python -m unittest discover -s tests/integration -t . -v
+
+architecture-check:
+	uv run --locked python scripts/check_architecture.py
+
+package-check:
+	uv run --locked python scripts/check_package.py
 
 integration-live:
 	uv run --locked python scripts/run_live_provider_checks.py

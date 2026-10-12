@@ -16,6 +16,8 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 
 ## Open decision register
 
+[ADR 0010](0010-capability-packages-and-adapter-boundaries.md) records the owner-authorized capability layout, adapter composition, test categories and automated import/package checks; implementation is proposed in #46.
+
 These are gates, not inferred decisions. The [charter](../charter.md) is the full owner/input register; update the relevant ADR when a design choice is made.
 
 | Input | Owner and gate | Current effect |

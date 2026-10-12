@@ -29,7 +29,7 @@ The CLI can demonstrate Order → Payment behavior and failure propagation with 
 
 ## Evidence
 
-[Unit and contract tests](../../tests/test_order_workflow.py) exercise validation, boundary context propagation, rejection and dependency failures. [Process integration tests](../../tests/test_cli_process.py) run the real CLI, validate the accepted result and correlated service logs, and reject unsafe input/production use. The [implementation review](../planning/production-usefulness-review.md) and [approved amendment](../planning/production-roadmap-amendment.md) constrain claims and future adapters.
+[Unit and contract tests](../../tests/unit/test_order_workflow.py) exercise validation, boundary context propagation, rejection and dependency failures. [Process integration tests](../../tests/integration/test_cli_process.py) run the real CLI, validate the accepted result and correlated service logs, and reject unsafe input/production use. The [implementation review](../planning/production-usefulness-review.md) and [approved amendment](../planning/production-roadmap-amendment.md) constrain claims and future adapters.
 
 ## Revisit conditions
 

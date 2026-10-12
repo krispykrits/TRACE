@@ -20,8 +20,8 @@ def discover_live_provider_suite(test_directory: Path) -> unittest.TestSuite | N
 
 
 def main() -> int:
-    """Run tests/live_provider and fail closed until it contains real tests."""
-    test_directory = Path(__file__).resolve().parents[1] / "tests" / "live_provider"
+    """Run tests/live and fail closed until it contains real tests."""
+    test_directory = Path(__file__).resolve().parents[1] / "tests" / "live"
     suite = discover_live_provider_suite(test_directory)
     if suite is None:
         if test_directory.is_dir():
@@ -29,8 +29,7 @@ def main() -> int:
         else:
             reason = "No live provider checks are configured"
         print(
-            f"{reason} under tests/live_provider; "
-            "this gate cannot be reported as verified.",
+            f"{reason} under tests/live; this gate cannot be reported as verified.",
             file=sys.stderr,
         )
         return 2

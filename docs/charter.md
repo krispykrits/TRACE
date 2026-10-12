@@ -44,7 +44,7 @@ Passing a synthetic evaluation, deploying to AWS or finishing the capstone does 
 ## Minimum scaffold decisions
 
 - **Runtime:** CPython 3.12, Linux as the first supported development/CI environment. Revisit only for a demonstrated dependency, deployment or course-platform constraint.
-- **Package:** one installable project configured in `pyproject.toml`, with application code under `src/trace`. Do not create multiple deployable services in Sprint 1.
+- **Package:** one installable project configured in `pyproject.toml`, with application code under `src/trace_app`. Follow [ADR 0010](adr/0010-capability-packages-and-adapter-boundaries.md) for capability placement and adapter composition; keep one modular deployable application.
 - **Environment and dependency locking:** use `uv` with a committed `uv.lock`; separate runtime and development dependency groups. Keep runtime dependencies empty until a real application boundary needs one. Any dependency added later must have a stated purpose.
 - **Local tasks:** provide a small Makefile or equivalent documented commands for sync, run, lint/format, type-check, test and cleanup; avoid Docker/Compose until a real external dependency needs it.
 - **Quality checks:** deterministic, credential-free tests and lint/format/type checks run locally and in GitHub Actions on Linux. CI must fail on a failing check and use minimal workflow permissions. Live provider checks are separate and explicitly identified.
