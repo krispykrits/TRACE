@@ -1,0 +1,18 @@
+{
+  "schema_version": "1",
+  "protocol_version": "retrieval-acceptance.v2",
+  "suite_sha256": "5a1c9aa5fd301c11cdf3af51f53c8b0b989352d0ade822a2e655ddbec3efe4e7",
+  "approved_by": "krispykrits (project owner, task response)",
+  "approved_at": "2026-10-12T19:27:42Z",
+  "candidate_k": 20,
+  "rerank_top_k": 5,
+  "primary_k": 5,
+  "secondary_k": 10,
+  "mode": "lexical",
+  "acceptance": {
+    "recall_at_5": 0.9,
+    "mrr_at_5": 0.8,
+    "recall_at_10": 0.95,
+    "minimum_evaluation_queries": 100
+  }
+}

@@ -24,6 +24,7 @@ from trace_app.corpus_sources import CorpusBatch, CuratedFileSource
 from trace_app.corpus_store import SQLiteCorpusStore
 from trace_app.evidence import _parse_utc, format_utc
 from trace_app.knowledge import (
+    CorpusAccessError,
     CorpusDependencyError,
     CorpusReadContext,
     _object,
@@ -40,7 +41,7 @@ from trace_app.retrieval_contracts import EncoderFailure, SearchMode, SearchRequ
 from trace_app.retrieval_index import build_index, load_index
 from trace_app.structured_logging import configure_logging
 
-SCORER_VERSION = "passage-retrieval-scorer.v1"
+SCORER_VERSION = "passage-retrieval-scorer.v2"
 _ROOT = Path(__file__).resolve().parents[1]
 _INPUT = _ROOT / "evaluation/retrieval"
 _AT = datetime(2026, 10, 12, 12, tzinfo=UTC)
@@ -74,16 +75,20 @@ def validate_suite(value: object) -> dict[str, Any]:
             "cohort",
             "judgment_kind",
             "corpus_version",
+            "relevance_scope",
             "queries",
         },
         "retrieval suite",
     )
     if (
-        suite["schema_version"] != "2"
+        suite["schema_version"] != "3"
         or suite["cohort"] != "development"
         or suite["judgment_kind"] != "agent_authored_proposal"
+        or suite["relevance_scope"] != "eligible_passage_content"
     ):
-        raise ValueError("Only version 2 development proposals are supported.")
+        raise ValueError(
+            "Only version 3 eligible-passage development proposals are supported."
+        )
     _text(suite["suite_version"], "suite_version")
     _text(suite["corpus_version"], "corpus_version")
     queries = suite["queries"]
@@ -254,7 +259,7 @@ def validate_protocol(
     )
     if (
         protocol["schema_version"] != "1"
-        or protocol["protocol_version"] != "retrieval-acceptance.v1"
+        or protocol["protocol_version"] != "retrieval-acceptance.v2"
         or protocol["suite_sha256"] != digest(canonical(suite))
     ):
         raise ValueError("Protocol version or frozen suite hash differs.")
@@ -303,6 +308,40 @@ def _rate(numerator: float, denominator: int) -> dict[str, Any]:
     }
 
 
+def _verified_policy_exclusions(row: dict[str, Any], query: dict[str, Any]) -> int:
+    checks = row.get("policy_checks", [])
+    expected = set(query.get("stale_document_ids", []))
+    if (
+        not isinstance(checks, list)
+        or len(checks) != len(expected)
+        or {check["document_id"] for check in checks} != expected
+    ):
+        raise ValueError("Every expected source exclusion requires one policy check.")
+    verified = 0
+    for check in checks:
+        ids = check["excluded_chunk_ids"]
+        if (
+            not isinstance(ids, list)
+            or not ids
+            or any(not isinstance(identity, str) for identity in ids)
+            or len(set(ids)) != len(ids)
+            or type(check["eligible_at_query_chunks"]) is not int
+            or type(check["saved_citations_denied"]) is not int
+        ):
+            raise ValueError("Source-policy check observations are malformed.")
+        verified += (
+            check["reason"] == "freshness_expired"
+            and _parse_utc(check["before_at"])
+            < _parse_utc(check["fresh_until"])
+            <= _parse_utc(check["query_at"])
+            and check["eligible_at_query_chunks"] == 0
+            and check["saved_citations_denied"] == len(ids)
+            and not set(ids).intersection(row["chunk_ids"])
+            and not set(ids).intersection(row.get("context_chunk_ids", []))
+        )
+    return verified
+
+
 def score(
     suite: dict[str, Any],
     attempts: list[dict[str, Any]],
@@ -331,6 +370,10 @@ def score(
     output: dict[str, Any] = {}
     for mode in modes:
         rows = [row for row in attempts if row["mode"] == mode]
+        policy_counts = {
+            row["query_id"]: _verified_policy_exclusions(row, queries[row["query_id"]])
+            for row in rows
+        }
         by_k = {}
         for k in ks:
             recalls, reciprocal, absent_with_results, no_relevant, failures = (
@@ -357,6 +400,8 @@ def score(
                     row["failure_code"] is not None
                     or row["search_status"] not in ("ok", "no_results")
                     or row["context_status"] not in ("ok", "empty")
+                    or policy_counts[row["query_id"]]
+                    != len(queries[row["query_id"]].get("stale_document_ids", []))
                 )
                 failures += failed
                 ranked = [] if failed else ranks[:k]
@@ -386,7 +431,17 @@ def score(
                 "no_relevant_queries": no_relevant,
                 "no_relevant_queries_returning_candidates": absent_with_results,
             }
-        output[mode] = {"attempts": len(rows), "failures": failures, "by_k": by_k}
+        output[mode] = {
+            "attempts": len(rows),
+            "failures": failures,
+            "by_k": by_k,
+            "policy_exclusions": {
+                "expected": sum(
+                    len(q.get("stale_document_ids", [])) for q in queries.values()
+                ),
+                "verified": sum(policy_counts.values()),
+            },
+        }
     return output
 
 
@@ -400,6 +455,10 @@ def acceptance_checks(
         return value is not None and value >= minimum
 
     return {
+        "source_policy_exclusions": metrics[protocol["mode"]]["policy_exclusions"][
+            "verified"
+        ]
+        == metrics[protocol["mode"]]["policy_exclusions"]["expected"],
         "minimum_queries": count >= thresholds["minimum_evaluation_queries"],
         "recall_at_5": meets(
             rates["5"]["passage_recall"]["value"], thresholds["recall_at_5"]
@@ -469,6 +528,8 @@ def review_bundle(suite: dict[str, Any]) -> str:
         "",
         "The 100 requests are variants across 15 related development families over six fictional/curated references. They are not 100 independent incidents. Stale-source cases give the certificate reference a fixture freshness deadline of 12:05 UTC, index it at 12:00 and query at 12:10 on 2026-10-12. No held-out material is supplied.",
         "",
+        "Relevance means eligible passage content directly addressing the question, not merely supporting a reused probe. An empty set does not mean policy metadata cannot answer a freshness question. Stale cases separately check before-expiry eligibility, query-time exclusion, the freshness deadline and saved-citation denial. Policy observations are evaluator-only and are not retrieved passage gold.",
+        "",
         "## Original passages",
         "",
     ]
@@ -508,6 +569,14 @@ def review_bundle(suite: dict[str, Any]) -> str:
             "",
             "Relevance target: `relevance:" + query["id"] + "`.",
             "",
+            "Policy exclusion expectation: "
+            + (
+                ", ".join(query["stale_document_ids"])
+                + "; freshness_expired at 12:10 UTC after the 12:05 deadline; eligible at 12:04, then excluded and saved citations denied."
+                if query["stale_document_ids"]
+                else "none"
+            ),
+            "",
             "Proposed relevant passages: "
             + (
                 ", ".join("`" + j["chunk_id"] + "`" for j in query["judgments"])
@@ -530,6 +599,48 @@ def review_bundle(suite: dict[str, Any]) -> str:
                 "",
             ]
     return "\n".join(lines)
+
+
+def _policy_checks(
+    store: SQLiteCorpusStore, generation_id: str, stale_ids: tuple[str, ...]
+) -> list[dict[str, Any]]:
+    if not stale_ids:
+        return []
+    before_at = _AT + timedelta(minutes=4)
+    before = store.read_chunks(
+        context=_CONTEXT, at=before_at, generation_id=generation_id
+    )
+    current = store.read_chunks(
+        context=_CONTEXT, at=_READ_AT, generation_id=generation_id
+    )
+    checks = []
+    for identity in stale_ids:
+        chunks = [c for c in before if c.metadata.document_id == identity]
+        if not chunks:
+            raise ValueError("Expected stale source was not eligible before expiry.")
+        denied = 0
+        for chunk in chunks:
+            try:
+                store.resolve(
+                    generation_id, chunk.chunk_id, context=_CONTEXT, at=_READ_AT
+                )
+            except CorpusAccessError:
+                denied += 1
+        checks.append(
+            {
+                "document_id": identity,
+                "reason": "freshness_expired",
+                "before_at": format_utc(before_at),
+                "fresh_until": chunks[0].metadata.fresh_until,
+                "query_at": format_utc(_READ_AT),
+                "excluded_chunk_ids": [c.chunk_id for c in chunks],
+                "eligible_at_query_chunks": sum(
+                    c.metadata.document_id == identity for c in current
+                ),
+                "saved_citations_denied": denied,
+            }
+        )
+    return checks
 
 
 def run(
@@ -627,6 +738,7 @@ def run(
                     index = load_index(case_root / "lexical")
                 states[state_key] = (store, corpus, index, build_failure)
             store, corpus, index, build_failure = states[state_key]
+            policy_checks = _policy_checks(store, corpus.generation_id, state_key)
             service = SearchService(store, index, encoder)
             assembler = ContextAssembler(store)
             for mode in modes:
@@ -639,6 +751,7 @@ def run(
                             "chunk_ids": [],
                             "search_status": "provider_failure",
                             "context_status": "retrieval_failed",
+                            "policy_checks": policy_checks,
                         }
                     )
                     continue
@@ -674,6 +787,7 @@ def run(
                         "failure_code": failure,
                         "search_status": response.status,
                         "context_status": assembled.status,
+                        "policy_checks": policy_checks,
                         "chunk_ids": [
                             result.chunk.chunk_id for result in response.results
                         ],
@@ -824,9 +938,9 @@ def _write_new(path: Path, content: str) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", type=Path, default=_INPUT / "queries_v2.json")
-    parser.add_argument("--reviews", type=Path, default=_INPUT / "reviews_v2.json")
-    parser.add_argument("--protocol", type=Path, default=_INPUT / "acceptance_v1.json")
+    parser.add_argument("--suite", type=Path, default=_INPUT / "queries_v3.json")
+    parser.add_argument("--reviews", type=Path, default=_INPUT / "reviews_v3.json")
+    parser.add_argument("--protocol", type=Path, default=_INPUT / "acceptance_v2.json")
     parser.add_argument("--modes", nargs="+", choices=_MODES, default=list(_MODES))
     parser.add_argument("--max-chunks-per-document", type=int, default=20)
     operation = parser.add_mutually_exclusive_group()

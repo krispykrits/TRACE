@@ -162,7 +162,7 @@ class CliProcessIntegrationTests(unittest.TestCase):
             output = Path(directory) / "report.json"
             review_path = Path(directory) / "unreviewed.json"
             review_fixture = json.loads(
-                (repository / "evaluation/retrieval/reviews_v2.json").read_text()
+                (repository / "evaluation/retrieval/reviews_v3.json").read_text()
             )
             review_fixture["reviews"] = []
             review_path.write_text(json.dumps(review_fixture))

@@ -34,11 +34,11 @@ _AT = datetime(2026, 10, 12, 20, tzinfo=UTC)
 class PassageEvaluationTests(unittest.TestCase):
     def setUp(self) -> None:
         self.suite = validate_suite(
-            read_json(_ROOT / "evaluation/retrieval/queries_v2.json")
+            read_json(_ROOT / "evaluation/retrieval/queries_v3.json")
         )
-        self.protocol = read_json(_ROOT / "evaluation/retrieval/acceptance_v1.json")
+        self.protocol = read_json(_ROOT / "evaluation/retrieval/acceptance_v2.json")
         review_summary(
-            self.suite, read_json(_ROOT / "evaluation/retrieval/reviews_v2.json")
+            self.suite, read_json(_ROOT / "evaluation/retrieval/reviews_v3.json")
         )
         self.reviews: dict[str, Any] = {
             "schema_version": "1",
@@ -122,7 +122,7 @@ class PassageEvaluationTests(unittest.TestCase):
     ) -> None:
         self.assertEqual(len(self.suite["queries"]), 100)
         self.assertEqual(len({q["family"] for q in self.suite["queries"]}), 15)
-        self.assertEqual(len(review_targets(self.suite)), 198)
+        self.assertEqual(len(review_targets(self.suite)), 211)
         protocol = validate_protocol(self.protocol, self.suite, run_at=_AT)
         self.assertEqual(protocol["candidate_k"], 20)
         self.assertEqual(
@@ -156,7 +156,7 @@ class PassageEvaluationTests(unittest.TestCase):
         self.assertIn("Original offsets", bundle)
         self.assertEqual(
             bundle.rstrip("\n"),
-            (_ROOT / "evaluation/retrieval/review_bundle_v2.md")
+            (_ROOT / "evaluation/retrieval/review_bundle_v3.md")
             .read_text()
             .rstrip("\n"),
         )
@@ -194,6 +194,77 @@ class PassageEvaluationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             review_summary(self.suite, reviews)
 
+    def test_owner_corrections_bind_relevance_and_question_specific_claims(
+        self,
+    ) -> None:
+        queries = {q["id"]: q for q in self.suite["queries"]}
+        exact = {
+            (j["document_id"], j["section"])
+            for j in queries["exact-code-2"]["judgments"]
+        }
+        self.assertIn(("trace-dev-timeout-evidence", "Scope"), exact)
+        self.assertIn(("trace-dev-timeout-evidence", "Missing evidence"), exact)
+        self.assertNotIn(("trace-dev-timeout-evidence", "Evidence checks"), exact)
+        for q in self.suite["queries"]:
+            if q["family"] == "production-approval":
+                self.assertIn(
+                    ("trace-dev-history-certificate", "Investigation lesson"),
+                    {(j["document_id"], j["section"]) for j in q["judgments"]},
+                )
+        self.assertEqual(
+            queries["service-boundary-4"]["claim"],
+            "The Payment development fixture makes no real charge.",
+        )
+        self.assertEqual(
+            queries["service-identity-5"]["claim"],
+            "Failed requests and accepted receipts are distinct observations.",
+        )
+        self.assertEqual(self.suite["relevance_scope"], "eligible_passage_content")
+        self.assertIn("eligible", queries["stale-certificate-3"]["query"])
+        old = read_json(_ROOT / "evaluation/retrieval/acceptance_v1.json")
+        for field in (
+            "approved_at",
+            "candidate_k",
+            "rerank_top_k",
+            "primary_k",
+            "secondary_k",
+            "mode",
+            "acceptance",
+        ):
+            self.assertEqual(self.protocol[field], old[field])
+
+    def test_completed_simulated_reviews_allow_acceptance_and_rescoring(self) -> None:
+        # In-memory parser fixtures are not actual human evidence or saved decisions.
+        reviews = copy.deepcopy(self.reviews)
+        for q in self.suite["queries"]:
+            decisions = {"relevance:" + q["id"]: "supported"}
+            decisions.update(
+                {
+                    "support:" + q["id"] + ":" + j["chunk_id"]: j["proposed_support"]
+                    for j in q["judgments"]
+                }
+            )
+            for target, verdict in decisions.items():
+                reviews["reviews"].append(
+                    {
+                        "claim_id": target,
+                        "verdict": verdict,
+                        "reviewer_id": "synthetic-test-reviewer",
+                        "rationale": "Test fixture; not actual human evidence.",
+                        "kind": "human_review",
+                    }
+                )
+        report = run(
+            self.suite, reviews, self.protocol, modes=("lexical",), acceptance=True
+        )
+        self.assertTrue(report["human_review"]["complete"])
+        self.assertEqual(
+            report["metrics"]["lexical"]["policy_exclusions"],
+            {"expected": 6, "verified": 6},
+        )
+        self.assertEqual(report["acceptance_status"], "passed")
+        self.assertEqual(rescore(report), report["metrics"])
+
     def test_acceptance_waits_for_real_reviews_before_loading_any_model(self) -> None:
         with patch("evaluation.retrieval_quality.LocalSentenceEncoder") as encoder:
             with self.assertRaisesRegex(ValueError, "human"):
@@ -205,12 +276,13 @@ class PassageEvaluationTests(unittest.TestCase):
                     acceptance=True,
                 )
             encoder.assert_not_called()
-        result = {
+        result: dict[str, Any] = {
             "lexical": {
+                "policy_exclusions": {"expected": 6, "verified": 6},
                 "by_k": {
                     "5": {"passage_recall": {"value": 0.90}, "mrr": {"value": 0.80}},
                     "10": {"passage_recall": {"value": 0.95}},
-                }
+                },
             }
         }
         self.assertTrue(all(acceptance_checks(self.protocol, result, 100).values()))
@@ -281,6 +353,28 @@ class PassageEvaluationTests(unittest.TestCase):
         ][0]
         self.assertEqual(stale["eligible_chunks"], 6)
         self.assertEqual(stale["context_status"], "ok")
+        self.assertEqual(
+            report["metrics"]["lexical"]["policy_exclusions"],
+            {"expected": 1, "verified": 1},
+        )
+        check = stale["policy_checks"][0]
+        self.assertEqual(check["reason"], "freshness_expired")
+        self.assertEqual(len(check["excluded_chunk_ids"]), 3)
+        self.assertEqual(check["eligible_at_query_chunks"], 0)
+        self.assertEqual(check["saved_citations_denied"], 3)
+        check["saved_citations_denied"] = 0
+        failed_policy = score(
+            suite,
+            report["attempts"],
+            modes=("lexical", "semantic", "hybrid"),
+            ks=(5, 10),
+            candidate_k=20,
+        )
+        self.assertEqual(failed_policy["lexical"]["failures"], 1)
+        self.assertEqual(failed_policy["lexical"]["policy_exclusions"]["verified"], 0)
+        self.assertFalse(
+            acceptance_checks(protocol, failed_policy, 100)["source_policy_exclusions"]
+        )
 
     def test_input_file_bounds_and_duplicate_json_are_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
