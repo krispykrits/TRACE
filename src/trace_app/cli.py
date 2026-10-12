@@ -23,6 +23,7 @@ from trace_app.order_workflow import (
     OrderWorkflow,
 )
 from trace_app.replay import ReplayConfig, ReplaySession
+from trace_app.scenarios import CASE_IDS, ScenarioConfig, ScenarioSession
 from trace_app.structured_logging import collect_secret_values, configure_logging
 
 
@@ -80,6 +81,13 @@ def _parser() -> argparse.ArgumentParser:
     _settings_arguments(replay_parser)
     replay_parser.add_argument("--seed", required=True, type=int)
     replay_parser.add_argument("--mode", required=True, choices=("normal", "failure"))
+    scenario_parser = commands.add_parser(
+        "replay-scenario", help="export one synthetic development-suite case"
+    )
+    _settings_arguments(scenario_parser)
+    scenario_parser.add_argument("--case", required=True, choices=CASE_IDS)
+    scenario_parser.add_argument("--seed", required=True, type=int)
+    scenario_parser.add_argument("--without-distractor", action="store_true")
     return parser
 
 
@@ -91,7 +99,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.print_help()
         return 0
     parsed = parser.parse_args(arguments)
-    if parsed.command not in {"check-config", "demo-order", "replay-dependency"}:
+    if parsed.command not in {
+        "check-config",
+        "demo-order",
+        "replay-dependency",
+        "replay-scenario",
+    }:
         return 0
 
     process_environment = dict(os.environ)
@@ -131,7 +144,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         return 0
 
-    if parsed.command == "replay-dependency":
+    if parsed.command in ("replay-dependency", "replay-scenario"):
         replay_environment: Literal["development", "test"]
         if settings.environment == "development":
             replay_environment = "development"
@@ -147,6 +160,33 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
             return 2
         try:
+            if parsed.command == "replay-scenario":
+                scenario = ScenarioSession(
+                    ScenarioConfig(
+                        case_id=parsed.case,
+                        seed=parsed.seed,
+                        environment=replay_environment,
+                        notification_deployment=not parsed.without_distractor,
+                    )
+                ).replay()
+                logging.getLogger("trace_app.replay").info(
+                    "Synthetic development replay completed.",
+                    extra={
+                        "event": "replay.completed",
+                        "environment": replay_environment,
+                        "correlation_id": scenario.snapshot.entries[
+                            0
+                        ].record.correlation_id,
+                        "status": scenario.status,
+                        "evidence_count": len(scenario.snapshot.entries),
+                    },
+                )
+                print(
+                    json.dumps(
+                        scenario.to_dict(), sort_keys=True, separators=(",", ":")
+                    )
+                )
+                return 0
             config = ReplayConfig(
                 seed=parsed.seed,
                 mode=parsed.mode,

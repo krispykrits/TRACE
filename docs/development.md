@@ -110,3 +110,7 @@ Amazon CloudWatch Logs is the selected hosted platform (owner decision, 2026-09-
 TRACE's incident investigation still needs read-only adapters to query the operator's actual log and metric sources. The roadmap places bounded evidence queries in S3 and real-source contracts and controlled tools in S4. Sending TRACE's own runtime logs to CloudWatch does not satisfy those incident evidence integrations. If the authorized pilot source already uses Elastic, TRACE should query that source through an adapter rather than creating a second log store.
 
 References: [CloudWatch agent collection](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html), [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/), [Elastic pricing](https://www.elastic.co/pricing), [Elastic licensing](https://www.elastic.co/pricing/faq/licensing).
+
+## MVP development fixtures
+
+Replay the four small synthetic cases with `trace-app replay-scenario --environment test --case c01 --seed 17` (also `c02`, `c03`, `c04`). Add `--without-distractor` to remove the unrelated Notification deployment. The [scenario catalog](architecture/development-scenarios.md) defines configuration, typed output, capture gaps/delays, reset and evaluator isolation. Its manifest is developer/evaluator material, outside investigator inputs. No held-out answers, real-source access or operational acceptance is claimed.
