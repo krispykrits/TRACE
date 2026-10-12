@@ -1,6 +1,6 @@
 # Interfaces and API contract gates
 
-Status: Sprint 3 local foundations merged; Sprint 4 corpus boundary proposed, 2026-10-12. TRACE exposes a local `trace-app` command, not a network API.
+Status: Sprint 3 local foundations merged; Sprint 4 corpus merged and retrieval proposed, 2026-10-12. TRACE exposes a local `trace-app` command, not a network API.
 
 | Existing CLI behavior | Contract and evidence |
 | --- | --- |
@@ -18,4 +18,8 @@ Issue #7 defines the synthetic Order workflow; issue #8 defines the source-neutr
 
 ## Corpus ingestion and read boundary
 
-`uv run --locked python scripts/demo_corpus.py` ingests the six curated development sources twice across a restart and resolves 18 stable chunks. This developer command uses a fixed synthetic clock, grants and temporary database. The [corpus contract](knowledge-corpus.md) exposes `CorpusSource.load()` for trusted source adapters and scoped `read_chunks`/`resolve` operations. Ingestion, withdrawal and retention purge are publisher administration, not investigator tools. Current access/freshness/tombstones also apply to saved generations. No embedding/search endpoint, live source publisher or remote authentication is implemented here.
+`uv run --locked python scripts/demo_corpus.py` ingests the six curated development sources twice across a restart and resolves 18 stable chunks. This developer command uses a fixed synthetic clock, grants and temporary database. The [corpus contract](knowledge-corpus.md) exposes `CorpusSource.load()` for trusted source adapters and scoped `read_chunks`/`resolve` operations. Ingestion, withdrawal and retention purge are publisher administration, not investigator tools. Current access/freshness/tombstones also apply to saved generations. No live source publisher or remote authentication is implemented here. The [retrieval contract](knowledge-retrieval.md) adds read-only search behind TRACE-owned reader/encoder ports.
+
+## Knowledge search boundary
+
+`uv run --locked python scripts/demo_search.py` uses the fixed development corpus/grants and lexical default, publishes/reopens a temporary index and resolves returned citations. Explicit `--mode semantic` or `--mode hybrid` requires the locked semantic extra and pinned cached model. `SearchRequest` bounds query/top-K; trusted scope is checked before candidate scoring and again for citations. Invalid input, unavailable encoder, incompatible index and storage/source failures never become successful fallback output. The [search contract](knowledge-retrieval.md) defines response statuses, provenance, rebuild steps and the separate real-model development comparison. This is a local developer demonstration, not a network endpoint or model-tool registry.

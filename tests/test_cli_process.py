@@ -103,6 +103,58 @@ def _run_persistence_demo(
 
 
 class CliProcessIntegrationTests(unittest.TestCase):
+    def test_search_demo_repeats_resolves_and_checks_bounds_without_a_model(
+        self,
+    ) -> None:
+        script = Path(__file__).resolve().parents[1] / "scripts/demo_search.py"
+        with tempfile.TemporaryDirectory(prefix="trace-search-cli-") as directory:
+
+            def execute(*arguments: str) -> subprocess.CompletedProcess[str]:
+                return subprocess.run(
+                    [sys.executable, str(script), *arguments],
+                    cwd=directory,
+                    env=_minimal_environment(),
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=15,
+                )
+
+            first = execute("--query", "TLS certificate expiry", "--top-k", "1")
+            second = execute("--query", "TLS certificate expiry", "--top-k", "1")
+            self.assertEqual(first.returncode, 0, first.stderr)
+            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertEqual(first.stdout, second.stdout)
+            output = json.loads(first.stdout)
+            self.assertEqual(output["search"]["mode"], "lexical")
+            self.assertIsNone(output["embedding"])
+            self.assertEqual(len(output["search"]["results"]), 1)
+            result = output["search"]["results"][0]
+            self.assertEqual(
+                result["chunk"]["metadata"]["document_id"],
+                "trace-dev-history-certificate",
+            )
+            self.assertEqual(
+                output["resolved_chunk_ids"], [result["citation"]["chunk_id"]]
+            )
+            log = json.loads(first.stderr.splitlines()[-1])
+            self.assertEqual(log["event"], "retrieval.completed")
+            self.assertNotEqual(log["correlation_id"], "unassigned")
+            self.assertNotIn("query", log)
+            empty = execute("--query", "zzzzzzzzzz")
+            self.assertEqual(empty.returncode, 0, empty.stderr)
+            self.assertEqual(json.loads(empty.stdout)["search"]["status"], "no_results")
+            for arguments in (
+                ("--top-k", "21"),
+                ("--query", ""),
+                ("--service", "notification"),
+            ):
+                failed = execute(*arguments)
+                self.assertEqual(failed.returncode, 2)
+                self.assertEqual(failed.stdout, "")
+                self.assertEqual(json.loads(failed.stderr)["status"], "error")
+            self.assertEqual(list(Path(directory).iterdir()), [])
+
     def test_corpus_demo_repeats_resolves_sources_and_rejects_invalid_input(
         self,
     ) -> None:

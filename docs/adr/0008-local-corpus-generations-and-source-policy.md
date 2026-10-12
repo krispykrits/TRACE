@@ -1,6 +1,6 @@
 # ADR 0008: Local corpus generations and current source policy
 
-- **Status:** Proposed in issue #15; owner review pending
+- **Status:** Accepted with merged [PR #43](https://github.com/krispykrits/TRACE/pull/43) for issue #15
 - **Date:** 2026-10-12
 - **Decision owner:** Project owner, through the scoped implementation review
 - **Scope:** Local knowledge ingestion and saved chunk access; embeddings/retrieval remain #16

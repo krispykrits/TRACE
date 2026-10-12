@@ -1,0 +1,19 @@
+{
+  "schema_version": "1",
+  "suite_version": "trace-retrieval-development.v1",
+  "cohort": "development",
+  "judgment_unit": "document",
+  "top_k": 3,
+  "queries": [
+    {"id": "deadline", "query": "How can I distinguish a changed caller time limit from slower downstream processing?", "relevant_documents": ["trace-dev-timeout-evidence", "trace-dev-payment-interface"]},
+    {"id": "exact-code", "query": "HTTP 504 /v1/orders timeout configuration work duration", "relevant_documents": ["trace-dev-timeout-evidence", "trace-dev-payment-interface"]},
+    {"id": "collection-delay", "query": "Which timestamp belongs on the incident timeline when logs arrive late?", "relevant_documents": ["trace-dev-source-freshness"]},
+    {"id": "request-path", "query": "Which services handle an accepted order before the notification is dispatched?", "relevant_documents": ["trace-dev-order-interface"]},
+    {"id": "certificate", "query": "TLS certificate expiry during Payment certificate rollover", "relevant_documents": ["trace-dev-history-certificate"]},
+    {"id": "queue", "query": "Growing Order work queue while the dependency health check is healthy and the worker is paused", "relevant_documents": ["trace-dev-history-queue"]},
+    {"id": "missing-evidence", "query": "What should I report when neither the effective budget nor downstream duration was captured?", "relevant_documents": ["trace-dev-timeout-evidence", "trace-dev-payment-interface"]},
+    {"id": "saved-permission", "query": "Can a saved reference still be read after its source permission is withdrawn?", "relevant_documents": ["trace-dev-source-freshness"]},
+    {"id": "absent-database", "query": "PostgreSQL WAL archive recovery commands and replication slots", "relevant_documents": []},
+    {"id": "absent-dns", "query": "DNS NXDOMAIN resolver configuration and TTL negative caching", "relevant_documents": []}
+  ]
+}
