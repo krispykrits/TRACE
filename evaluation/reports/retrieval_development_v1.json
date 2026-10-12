@@ -1,0 +1,833 @@
+{
+  "attempts": [
+    {
+      "chunk_ids": [
+        "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b",
+        "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+        "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af"
+      ],
+      "document_ids": [
+        "trace-dev-payment-interface",
+        "trace-dev-timeout-evidence",
+        "trace-dev-source-freshness"
+      ],
+      "mode": "lexical",
+      "query_id": "deadline",
+      "reason": null,
+      "scores": [
+        0.16779199242591858,
+        0.10998757183551788,
+        0.07922748476266861
+      ],
+      "search_ms": 17.960101999960898,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+        "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+        "chunk-4e0343369dacbfad9affc8fbb8011cbc9bd296d5702cbe8fe5297ab6b2ddeeb0"
+      ],
+      "document_ids": [
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface",
+        "trace-dev-history-queue"
+      ],
+      "mode": "lexical",
+      "query_id": "exact-code",
+      "reason": null,
+      "scores": [
+        0.30392947793006897,
+        0.2046595811843872,
+        0.03339983522891998
+      ],
+      "search_ms": 16.311518999827967,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af",
+        "chunk-d75f8b3a2d09e63d77a1bde080640c97f3ece21ef5985b441b26ba86ea071b1a",
+        "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa"
+      ],
+      "document_ids": [
+        "trace-dev-source-freshness",
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface"
+      ],
+      "mode": "lexical",
+      "query_id": "collection-delay",
+      "reason": null,
+      "scores": [
+        0.1556393802165985,
+        0.08142556250095367,
+        0.07974863052368164
+      ],
+      "search_ms": 14.391458999853057,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-3bcd76338ebe1579510d564f6f648afd1ceb859dc121564efbb701307fa81538",
+        "chunk-d75f8b3a2d09e63d77a1bde080640c97f3ece21ef5985b441b26ba86ea071b1a",
+        "chunk-afc1fc54e71e5da0bc5007b338b1e1ad1282f5fa8e0317222f9b646a021f8821"
+      ],
+      "document_ids": [
+        "trace-dev-order-interface",
+        "trace-dev-timeout-evidence",
+        "trace-dev-history-certificate"
+      ],
+      "mode": "lexical",
+      "query_id": "request-path",
+      "reason": null,
+      "scores": [
+        0.1369878053665161,
+        0.10709317028522491,
+        0.09196913242340088
+      ],
+      "search_ms": 14.212480999958643,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+        "chunk-a38ad3f58e817f8c656d0c027be95c8a4d56665062d074ae6c065355716c7574",
+        "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8"
+      ],
+      "document_ids": [
+        "trace-dev-history-certificate",
+        "trace-dev-order-interface",
+        "trace-dev-payment-interface"
+      ],
+      "mode": "lexical",
+      "query_id": "certificate",
+      "reason": null,
+      "scores": [
+        0.3920544981956482,
+        0.03263430297374725,
+        0.020949266850948334
+      ],
+      "search_ms": 14.31813500039425,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+        "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+        "chunk-afc1fc54e71e5da0bc5007b338b1e1ad1282f5fa8e0317222f9b646a021f8821"
+      ],
+      "document_ids": [
+        "trace-dev-history-queue",
+        "trace-dev-payment-interface",
+        "trace-dev-history-certificate"
+      ],
+      "mode": "lexical",
+      "query_id": "queue",
+      "reason": null,
+      "scores": [
+        0.49151328206062317,
+        0.0782480388879776,
+        0.06453689187765121
+      ],
+      "search_ms": 14.328421999380225,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+        "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+        "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748"
+      ],
+      "document_ids": [
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface",
+        "trace-dev-history-queue"
+      ],
+      "mode": "lexical",
+      "query_id": "missing-evidence",
+      "reason": null,
+      "scores": [
+        0.15048106014728546,
+        0.1436561495065689,
+        0.044406525790691376
+      ],
+      "search_ms": 14.6996309995302,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-f3dded5575d6ece71420e0371428faaf0dcfeb0fb2efb0e4db97782c18aee6ce",
+        "chunk-3bcd76338ebe1579510d564f6f648afd1ceb859dc121564efbb701307fa81538",
+        "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa"
+      ],
+      "document_ids": [
+        "trace-dev-source-freshness",
+        "trace-dev-order-interface",
+        "trace-dev-payment-interface"
+      ],
+      "mode": "lexical",
+      "query_id": "saved-permission",
+      "reason": null,
+      "scores": [
+        0.2858874201774597,
+        0.064174585044384,
+        0.06000154837965965
+      ],
+      "search_ms": 17.397498999343952,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-7952c735c44e632f1f4314d0aa0bffcaf390c3006a23af2a007c0d09a4b7aed9",
+        "chunk-afc1fc54e71e5da0bc5007b338b1e1ad1282f5fa8e0317222f9b646a021f8821",
+        "chunk-7ffb5ee9fd1c54938d530e73a30dfd387264efe8e39c2760cc6827a88ae68553"
+      ],
+      "document_ids": [
+        "trace-dev-history-queue",
+        "trace-dev-history-certificate",
+        "trace-dev-source-freshness"
+      ],
+      "mode": "lexical",
+      "query_id": "absent-database",
+      "reason": null,
+      "scores": [
+        0.10664449632167816,
+        0.08186168223619461,
+        0.02620231732726097
+      ],
+      "search_ms": 14.328911999655247,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+        "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+        "chunk-7ffb5ee9fd1c54938d530e73a30dfd387264efe8e39c2760cc6827a88ae68553"
+      ],
+      "document_ids": [
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface",
+        "trace-dev-source-freshness"
+      ],
+      "mode": "lexical",
+      "query_id": "absent-dns",
+      "reason": null,
+      "scores": [
+        0.15548956394195557,
+        0.06638789176940918,
+        0.027018487453460693
+      ],
+      "search_ms": 15.089448999788146,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-d75f8b3a2d09e63d77a1bde080640c97f3ece21ef5985b441b26ba86ea071b1a",
+        "chunk-4e0343369dacbfad9affc8fbb8011cbc9bd296d5702cbe8fe5297ab6b2ddeeb0",
+        "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af"
+      ],
+      "document_ids": [
+        "trace-dev-timeout-evidence",
+        "trace-dev-history-queue",
+        "trace-dev-source-freshness"
+      ],
+      "mode": "semantic",
+      "query_id": "deadline",
+      "reason": null,
+      "scores": [
+        0.3661194145679474,
+        0.277768075466156,
+        0.2746020555496216
+      ],
+      "search_ms": 22.03819799979101,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+        "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+        "chunk-4e0343369dacbfad9affc8fbb8011cbc9bd296d5702cbe8fe5297ab6b2ddeeb0"
+      ],
+      "document_ids": [
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface",
+        "trace-dev-history-queue"
+      ],
+      "mode": "semantic",
+      "query_id": "exact-code",
+      "reason": null,
+      "scores": [
+        0.5143755078315735,
+        0.38150542974472046,
+        0.38010650873184204
+      ],
+      "search_ms": 22.453143000348064,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af",
+        "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+        "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65"
+      ],
+      "document_ids": [
+        "trace-dev-source-freshness",
+        "trace-dev-timeout-evidence",
+        "trace-dev-history-certificate"
+      ],
+      "mode": "semantic",
+      "query_id": "collection-delay",
+      "reason": null,
+      "scores": [
+        0.5326283574104309,
+        0.3890226483345032,
+        0.36997929215431213
+      ],
+      "search_ms": 21.42100200035202,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-a38ad3f58e817f8c656d0c027be95c8a4d56665062d074ae6c065355716c7574",
+        "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+        "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748"
+      ],
+      "document_ids": [
+        "trace-dev-order-interface",
+        "trace-dev-payment-interface",
+        "trace-dev-history-queue"
+      ],
+      "mode": "semantic",
+      "query_id": "request-path",
+      "reason": null,
+      "scores": [
+        0.439857542514801,
+        0.3142900764942169,
+        0.3140672743320465
+      ],
+      "search_ms": 22.22151100068004,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+        "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+        "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8"
+      ],
+      "document_ids": [
+        "trace-dev-history-certificate",
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface"
+      ],
+      "mode": "semantic",
+      "query_id": "certificate",
+      "reason": null,
+      "scores": [
+        0.6316832304000854,
+        0.2405024915933609,
+        0.22624337673187256
+      ],
+      "search_ms": 20.10019299996202,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+        "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+        "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8"
+      ],
+      "document_ids": [
+        "trace-dev-history-queue",
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface"
+      ],
+      "mode": "semantic",
+      "query_id": "queue",
+      "reason": null,
+      "scores": [
+        0.7356150150299072,
+        0.3092688024044037,
+        0.30106639862060547
+      ],
+      "search_ms": 21.20815299986134,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+        "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b",
+        "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65"
+      ],
+      "document_ids": [
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface",
+        "trace-dev-history-certificate"
+      ],
+      "mode": "semantic",
+      "query_id": "missing-evidence",
+      "reason": null,
+      "scores": [
+        0.5509363412857056,
+        0.44199395179748535,
+        0.36996912956237793
+      ],
+      "search_ms": 20.98007300082827,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-f3dded5575d6ece71420e0371428faaf0dcfeb0fb2efb0e4db97782c18aee6ce",
+        "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+        "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65"
+      ],
+      "document_ids": [
+        "trace-dev-source-freshness",
+        "trace-dev-history-queue",
+        "trace-dev-history-certificate"
+      ],
+      "mode": "semantic",
+      "query_id": "saved-permission",
+      "reason": null,
+      "scores": [
+        0.6331139802932739,
+        0.20654717087745667,
+        0.17011116445064545
+      ],
+      "search_ms": 20.918157999403775,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+        "chunk-f3dded5575d6ece71420e0371428faaf0dcfeb0fb2efb0e4db97782c18aee6ce",
+        "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c"
+      ],
+      "document_ids": [
+        "trace-dev-history-queue",
+        "trace-dev-source-freshness",
+        "trace-dev-history-certificate"
+      ],
+      "mode": "semantic",
+      "query_id": "absent-database",
+      "reason": null,
+      "scores": [
+        0.3144877851009369,
+        0.2856558561325073,
+        0.27670788764953613
+      ],
+      "search_ms": 20.409694000591116,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+        "chunk-4e0343369dacbfad9affc8fbb8011cbc9bd296d5702cbe8fe5297ab6b2ddeeb0",
+        "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3"
+      ],
+      "document_ids": [
+        "trace-dev-history-certificate",
+        "trace-dev-history-queue",
+        "trace-dev-timeout-evidence"
+      ],
+      "mode": "semantic",
+      "query_id": "absent-dns",
+      "reason": null,
+      "scores": [
+        0.20426619052886963,
+        0.11136189103126526,
+        0.10471422225236893
+      ],
+      "search_ms": 21.126757999809342,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+        "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+        "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af"
+      ],
+      "document_ids": [
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface",
+        "trace-dev-source-freshness"
+      ],
+      "mode": "hybrid",
+      "query_id": "deadline",
+      "reason": null,
+      "scores": [
+        0.031754032258064516,
+        0.03125763125763126,
+        0.031009615384615385
+      ],
+      "search_ms": 30.188898999767844,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+        "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+        "chunk-4e0343369dacbfad9affc8fbb8011cbc9bd296d5702cbe8fe5297ab6b2ddeeb0"
+      ],
+      "document_ids": [
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface",
+        "trace-dev-history-queue"
+      ],
+      "mode": "hybrid",
+      "query_id": "exact-code",
+      "reason": null,
+      "scores": [
+        0.03278688524590164,
+        0.03200204813108039,
+        0.031009615384615385
+      ],
+      "search_ms": 22.683744000460138,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af",
+        "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+        "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65"
+      ],
+      "document_ids": [
+        "trace-dev-source-freshness",
+        "trace-dev-timeout-evidence",
+        "trace-dev-history-certificate"
+      ],
+      "mode": "hybrid",
+      "query_id": "collection-delay",
+      "reason": null,
+      "scores": [
+        0.03278688524590164,
+        0.031754032258064516,
+        0.031024531024531024
+      ],
+      "search_ms": 28.754926000146952,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-3bcd76338ebe1579510d564f6f648afd1ceb859dc121564efbb701307fa81538",
+        "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+        "chunk-d75f8b3a2d09e63d77a1bde080640c97f3ece21ef5985b441b26ba86ea071b1a"
+      ],
+      "document_ids": [
+        "trace-dev-order-interface",
+        "trace-dev-payment-interface",
+        "trace-dev-timeout-evidence"
+      ],
+      "mode": "hybrid",
+      "query_id": "request-path",
+      "reason": null,
+      "scores": [
+        0.03252247488101534,
+        0.030776515151515152,
+        0.030158730158730156
+      ],
+      "search_ms": 22.045052999601467,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+        "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+        "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8"
+      ],
+      "document_ids": [
+        "trace-dev-history-certificate",
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface"
+      ],
+      "mode": "hybrid",
+      "query_id": "certificate",
+      "reason": null,
+      "scores": [
+        0.03278688524590164,
+        0.0315136476426799,
+        0.03149801587301587
+      ],
+      "search_ms": 25.218758999471902,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+        "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+        "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe"
+      ],
+      "document_ids": [
+        "trace-dev-history-queue",
+        "trace-dev-payment-interface",
+        "trace-dev-timeout-evidence"
+      ],
+      "mode": "hybrid",
+      "query_id": "queue",
+      "reason": null,
+      "scores": [
+        0.03278688524590164,
+        0.03200204813108039,
+        0.031054405392392875
+      ],
+      "search_ms": 28.23648400044476,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+        "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b",
+        "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65"
+      ],
+      "document_ids": [
+        "trace-dev-timeout-evidence",
+        "trace-dev-payment-interface",
+        "trace-dev-history-certificate"
+      ],
+      "mode": "hybrid",
+      "query_id": "missing-evidence",
+      "reason": null,
+      "scores": [
+        0.03278688524590164,
+        0.031754032258064516,
+        0.03036576949620428
+      ],
+      "search_ms": 27.75796499918215,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-f3dded5575d6ece71420e0371428faaf0dcfeb0fb2efb0e4db97782c18aee6ce",
+        "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65",
+        "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b"
+      ],
+      "document_ids": [
+        "trace-dev-source-freshness",
+        "trace-dev-history-certificate",
+        "trace-dev-payment-interface"
+      ],
+      "mode": "hybrid",
+      "query_id": "saved-permission",
+      "reason": null,
+      "scores": [
+        0.03278688524590164,
+        0.03149801587301587,
+        0.029910714285714284
+      ],
+      "search_ms": 24.04915700026322,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+        "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+        "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af"
+      ],
+      "document_ids": [
+        "trace-dev-history-queue",
+        "trace-dev-history-certificate",
+        "trace-dev-source-freshness"
+      ],
+      "mode": "hybrid",
+      "query_id": "absent-database",
+      "reason": null,
+      "scores": [
+        0.032018442622950824,
+        0.031746031746031744,
+        0.030776515151515152
+      ],
+      "search_ms": 33.25301800032321,
+      "status": "ok"
+    },
+    {
+      "chunk_ids": [
+        "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+        "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af",
+        "chunk-a38ad3f58e817f8c656d0c027be95c8a4d56665062d074ae6c065355716c7574"
+      ],
+      "document_ids": [
+        "trace-dev-timeout-evidence",
+        "trace-dev-source-freshness",
+        "trace-dev-order-interface"
+      ],
+      "mode": "hybrid",
+      "query_id": "absent-dns",
+      "reason": null,
+      "scores": [
+        0.03200204813108039,
+        0.030776515151515152,
+        0.030090497737556562
+      ],
+      "search_ms": 36.1538239994843,
+      "status": "ok"
+    }
+  ],
+  "attempts_sha256": "a6eede2a1de6b43534abe7dfdcd5277f648d10fec7465e2a78ede335007e7a3b",
+  "configuration": {
+    "batch_size": 32,
+    "chunk_count": 18,
+    "clock": "2026-10-12T12:00:00Z",
+    "corpus_generation_id": "gen-92e6361c2a19ff49ede5af062757e54702d16d228b1b1bad9bc2df8e5f86e581",
+    "corpus_sha256": "6cba0fb7ab115be6aaee49d96ecfdcabbfb0ce26f439ae4bfbfedcedf4b59a66",
+    "document_count": 6,
+    "embedding": {
+      "dimension": 384,
+      "dtype": "float32",
+      "max_sequence_length": 256,
+      "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+      "normalized": true,
+      "packages": {
+        "huggingface-hub": "2.2.0",
+        "sentence-transformers": "5.7.0",
+        "tokenizers": "0.23.3",
+        "torch": "2.14.0+cpu",
+        "transformers": "5.19.0"
+      },
+      "provider": "sentence-transformers.cpu.v1",
+      "revision": "ee8519ce6a28a61c9190da0a16e199d262197a1b"
+    },
+    "index_build_ms": 202.97982500051148,
+    "index_generation_id": "idx-66d74831b5794167e89c2ed56b3c8e58905c2f97e864bc7dc69ba89371ee1af7",
+    "model_load_ms": 3665.31187199962,
+    "paid_calls": 0,
+    "platform": "Linux CPU",
+    "python": "3.12.3",
+    "source_sha256": {
+      "corpus/development/manifest.json": "22df61b81d9b1f2d12399a7eacb4b9b4f6bfc312a8acd643a4860569e8164592",
+      "evaluation/retrieval_baseline.py": "85e5750868d79443f1b271e1db2db1be07989144bda3d4bbc571dd391fbf3baa",
+      "src/trace_app/corpus_sources.py": "2536b5284bef1e64e02d4259c0930a7f711e53861ce4def7eefebb2bd83715fb",
+      "src/trace_app/corpus_store.py": "79f93a7c5312ebfae796703a78edc57b447b233a8f15ba236588144f02786f59",
+      "src/trace_app/knowledge.py": "7ff76ca16b1e18bb0420203776babf72b50e1474895d8aea938bbc2706225606",
+      "src/trace_app/retrieval.py": "2e34d86ad3424e7d549aa4b0746c79b9897b359dd9bd1e370094f59e43fd6b75",
+      "src/trace_app/retrieval_backends.py": "4f2e0728fa2317d3c56c6785a435180d07f44cfba32cdf03f253ec1772346e06",
+      "src/trace_app/retrieval_contracts.py": "ac8bf5682925d4d39c6238c5d17c7d3de4f224359a9b7fa122a7bd74d8f1baf5",
+      "src/trace_app/retrieval_index.py": "25af7f330bf488fa79d7b63cb343447164d7c6a948150b7e7012a8538f0a5844",
+      "uv.lock": "139dbf8a72d42fa297b5800e7b036a1180b60ad1d92fee5ed98d3a668e94657c"
+    },
+    "threads": 4,
+    "versions": {
+      "chunker": "section-words.v1",
+      "numpy": "2.5.3",
+      "retriever": "exact-retrieval.v1",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1"
+    }
+  },
+  "limitations": [
+    "Ten hand-authored synthetic development queries; not held-out quality or operational acceptance.",
+    "Document judgments do not establish passage-level support, diagnosis or answerability.",
+    "Dense and hybrid always rank eligible passages; absent-knowledge candidates are not answers.",
+    "Single CPU run includes warm-up/order effects; latency is descriptive, not an SLA."
+  ],
+  "metrics": {
+    "hybrid": {
+      "absent_knowledge_queries": 2,
+      "absent_queries_returning_candidates": 2,
+      "answerable_queries": 8,
+      "attempts": 10,
+      "document_recall_at_3": 1.0,
+      "failures": 0,
+      "mean_search_ms": 27.834182899914595,
+      "mrr_at_3": 1.0
+    },
+    "lexical": {
+      "absent_knowledge_queries": 2,
+      "absent_queries_returning_candidates": 2,
+      "answerable_queries": 8,
+      "attempts": 10,
+      "document_recall_at_3": 1.0,
+      "failures": 0,
+      "mean_search_ms": 15.303760899769259,
+      "mrr_at_3": 1.0
+    },
+    "semantic": {
+      "absent_knowledge_queries": 2,
+      "absent_queries_returning_candidates": 2,
+      "answerable_queries": 8,
+      "attempts": 10,
+      "document_recall_at_3": 0.9375,
+      "failures": 0,
+      "mean_search_ms": 21.2876883001627,
+      "mrr_at_3": 1.0
+    }
+  },
+  "schema_version": "1",
+  "suite": {
+    "cohort": "development",
+    "judgment_unit": "document",
+    "queries": [
+      {
+        "id": "deadline",
+        "query": "How can I distinguish a changed caller time limit from slower downstream processing?",
+        "relevant_documents": [
+          "trace-dev-timeout-evidence",
+          "trace-dev-payment-interface"
+        ]
+      },
+      {
+        "id": "exact-code",
+        "query": "HTTP 504 /v1/orders timeout configuration work duration",
+        "relevant_documents": [
+          "trace-dev-timeout-evidence",
+          "trace-dev-payment-interface"
+        ]
+      },
+      {
+        "id": "collection-delay",
+        "query": "Which timestamp belongs on the incident timeline when logs arrive late?",
+        "relevant_documents": [
+          "trace-dev-source-freshness"
+        ]
+      },
+      {
+        "id": "request-path",
+        "query": "Which services handle an accepted order before the notification is dispatched?",
+        "relevant_documents": [
+          "trace-dev-order-interface"
+        ]
+      },
+      {
+        "id": "certificate",
+        "query": "TLS certificate expiry during Payment certificate rollover",
+        "relevant_documents": [
+          "trace-dev-history-certificate"
+        ]
+      },
+      {
+        "id": "queue",
+        "query": "Growing Order work queue while the dependency health check is healthy and the worker is paused",
+        "relevant_documents": [
+          "trace-dev-history-queue"
+        ]
+      },
+      {
+        "id": "missing-evidence",
+        "query": "What should I report when neither the effective budget nor downstream duration was captured?",
+        "relevant_documents": [
+          "trace-dev-timeout-evidence",
+          "trace-dev-payment-interface"
+        ]
+      },
+      {
+        "id": "saved-permission",
+        "query": "Can a saved reference still be read after its source permission is withdrawn?",
+        "relevant_documents": [
+          "trace-dev-source-freshness"
+        ]
+      },
+      {
+        "id": "absent-database",
+        "query": "PostgreSQL WAL archive recovery commands and replication slots",
+        "relevant_documents": []
+      },
+      {
+        "id": "absent-dns",
+        "query": "DNS NXDOMAIN resolver configuration and TTL negative caching",
+        "relevant_documents": []
+      }
+    ],
+    "schema_version": "1",
+    "suite_version": "trace-retrieval-development.v1",
+    "top_k": 3
+  },
+  "suite_sha256": "3a3c4004005a04cc320e14e5968058ac362bad26019cbed230518a1beff5f368"
+}

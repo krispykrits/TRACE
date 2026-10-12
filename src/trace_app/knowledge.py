@@ -6,7 +6,7 @@ import hashlib
 import json
 import re
 from dataclasses import asdict, dataclass
-from typing import cast
+from typing import Literal, cast
 from urllib.parse import urlsplit
 
 from trace_app.evidence import _parse_utc
@@ -338,3 +338,30 @@ def chunk_document(document: KnowledgeDocument) -> tuple[KnowledgeChunk, ...]:
     if not chunks or len(chunks) > 1_000:
         raise CorpusInputError("Document has no chunks or exceeds the chunk bound.")
     return tuple(chunks)
+
+
+@dataclass(frozen=True, slots=True)
+class CorpusReadContext:
+    """Trusted grants, never derived from a search filter or document content."""
+
+    access_scope: str
+    environment: str
+    allowed_services: tuple[str, ...]
+    evaluation_role: Literal["development_reference", "shared_reference"]
+    valid_at: str
+
+    def __post_init__(self) -> None:
+        _text(self.access_scope, "access_scope")
+        if self.environment not in ("test", "development", "production"):
+            raise CorpusInputError("Context environment is invalid.")
+        if self.evaluation_role not in ("development_reference", "shared_reference"):
+            raise CorpusInputError("Context evaluation_role is invalid.")
+        if (
+            not isinstance(self.allowed_services, tuple)
+            or not 1 <= len(self.allowed_services) <= 100
+            or len(set(self.allowed_services)) != len(self.allowed_services)
+        ):
+            raise CorpusInputError("Context requires bounded unique service grants.")
+        for service in self.allowed_services:
+            _text(service, "allowed_services")
+        _parse_utc(self.valid_at)

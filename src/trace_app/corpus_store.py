@@ -30,6 +30,7 @@ from trace_app.knowledge import (
     digest,
     parse_json,
 )
+from trace_app.knowledge import CorpusReadContext as CorpusReadContext
 
 _LOG = logging.getLogger("trace_app.corpus")
 _SCHEMA = (
@@ -52,33 +53,6 @@ def _at(value: datetime) -> str:
     # Preserve microseconds: expiry checks compare parsed UTC instants, not strings.
     format_utc(value)
     return value.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-
-
-@dataclass(frozen=True, slots=True)
-class CorpusReadContext:
-    """Trusted grants, never derived from a search filter or document content."""
-
-    access_scope: str
-    environment: str
-    allowed_services: tuple[str, ...]
-    evaluation_role: Literal["development_reference", "shared_reference"]
-    valid_at: str
-
-    def __post_init__(self) -> None:
-        _text(self.access_scope, "access_scope")
-        if self.environment not in ("test", "development", "production"):
-            raise CorpusInputError("Context environment is invalid.")
-        if self.evaluation_role not in ("development_reference", "shared_reference"):
-            raise CorpusInputError("Context evaluation_role is invalid.")
-        if (
-            not isinstance(self.allowed_services, tuple)
-            or not 1 <= len(self.allowed_services) <= 100
-            or len(set(self.allowed_services)) != len(self.allowed_services)
-        ):
-            raise CorpusInputError("Context requires bounded unique service grants.")
-        for service in self.allowed_services:
-            _text(service, "allowed_services")
-        _parse_utc(self.valid_at)
 
 
 @dataclass(frozen=True, slots=True)

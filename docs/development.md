@@ -1,6 +1,6 @@
 # Local development
 
-TRACE currently provides an importable CLI, configuration check, synthetic Order–Payment demo and a local SQLite evidence-store demo. It has no incident investigator, real provider integration, retrieval, model call or deployed cloud runtime.
+TRACE currently provides an importable CLI, configuration check, synthetic Order–Payment demo and a local SQLite evidence-store demo. It also provides authorized local knowledge search with optional cached CPU embeddings. It has no incident investigator, hosted model API, operational source integration or deployed cloud runtime.
 
 ## Supported setup
 
@@ -16,6 +16,7 @@ The supported development and CI runtime is CPython 3.12 on Linux. Install Pytho
 | Run static type checks | `make type-check` |
 | Run the deterministic test suite | `make test` |
 | Run the process-boundary integration test | `make integration` |
+| Compare real cached lexical/semantic/hybrid baselines | `make integration-semantic` |
 | Run the opt-in provider gate | `make integration-live` |
 | Remove generated local build state | `make clean` |
 
@@ -83,7 +84,7 @@ uv run --locked trace-app check-config --environment test --log-level DEBUG
 uv run --locked trace-app check-config --env-file .env.example
 ```
 
-The current CLI has no model provider or model artifact configuration. A successful configuration check does not claim provider or artifact readiness. When a future command requires a provider or artifact, production startup must fail if that required capability is missing or incompatible; it must not silently select a development fallback.
+`trace-app check-config` has no model provider or model artifact configuration; the separate developer knowledge-search command validates its pinned optional cached embedding model when that mode is requested. A successful configuration check does not claim provider or artifact readiness. When a future command requires a provider or artifact, production startup must fail if that required capability is missing or incompatible; it must not silently select a development fallback.
 
 ## Structured logs
 
@@ -134,4 +135,8 @@ The [evaluation contract](architecture/development-evaluation.md) defines metric
 
 ## Curated knowledge ingestion
 
-`uv run --locked python scripts/demo_corpus.py` ingests six development references twice across a SQLite restart and resolves all 18 stable chunks. It runs offline with a fixed synthetic clock and temporary state. The [corpus contract](architecture/knowledge-corpus.md) defines adapters, metadata, chunking, atomic generations, revision/policy updates, revocation and retention, plus the contamination checklist. The historical notes are explicitly fictional development material. Real source permission, freshness and retention remain owner-dependent inputs; retrieval and embeddings belong to #16.
+`uv run --locked python scripts/demo_corpus.py` ingests six development references twice across a SQLite restart and resolves all 18 stable chunks. It runs offline with a fixed synthetic clock and temporary state. The [corpus contract](architecture/knowledge-corpus.md) defines adapters, metadata, chunking, atomic generations, revision/policy updates, revocation and retention, plus the contamination checklist. The historical notes are explicitly fictional development material. Real source permission, freshness and retention remain owner-dependent inputs; the [retrieval contract](architecture/knowledge-retrieval.md) records #16 search and measured development evidence.
+
+## Knowledge search and cached embedding comparison
+
+`uv run --locked python scripts/demo_search.py --query "TLS certificate expiry" --top-k 3` runs the measured lexical default without model packages or weights. Semantic/hybrid modes are explicit and require `--extra semantic` plus the pinned cached model. Follow the [search setup, rebuild and comparison instructions](architecture/knowledge-retrieval.md); missing dependencies/cache fail without fallback. `make integration-semantic` runs a real local model comparison separately from fast CI and the live-provider gate. Model preparation is an explicit public download; search itself reads cached files only. The checked-in development report does not establish held-out quality or pilot usefulness.

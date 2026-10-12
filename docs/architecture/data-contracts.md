@@ -1,6 +1,6 @@
 # Data contracts and decisions
 
-Status: Sprint 3 foundations including evaluation merged; Sprint 4 corpus ingestion proposed, 2026-10-12. Configuration, application logs, synthetic Order records and version 1 synthetic incident evidence have distinct contracts.
+Status: Sprint 3 foundations including evaluation merged; Sprint 4 corpus ingestion merged and retrieval proposed, 2026-10-12. Configuration, application logs, synthetic Order records and version 1 synthetic incident evidence have distinct contracts.
 
 | Existing record | Current contract | Source |
 | --- | --- | --- |
@@ -12,11 +12,10 @@ Status: Sprint 3 foundations including evaluation merged; Sprint 4 corpus ingest
 | Local evidence snapshot and execution state | SQLite schema version 1 stores bounded typed log/metric/deployment entries, source availability, attempts, execution, assessment and review status; reads require a trusted scope | [SQLite store contract](sqlite-investigation-store.md), [ADR 0005](../adr/0005-sqlite-local-postgresql-rds-cloud.md) |
 | Bounded local evidence query | Trusted context supplies scope, environment and service grants; caller filters only narrow them; inclusive UTC event-time window, result/read bounds, evidence IDs/provenance and distinct empty/incomplete/failure outcomes | [Query contract](bounded-evidence-queries.md) |
 | Incident timeline | Parsed UTC observed-time/evidence-ID order; collection/provenance retained; every event is an observation with a scoped citation; missing/truncated/failure outcomes are explicit | [Timeline contract](incident-timelines.md) |
-
 | Candidate report | Version 1 separates observations, primary/competing hypotheses, citations, qualitative uncertainty, missing evidence and abstention; strict bounded parser, independent of evaluator labels | [Evaluation contract](development-evaluation.md), [report code](../../src/trace_app/assessment.py) |
 | Evaluator attempt and run | Repository-only execution outcomes, expected labels, support reviews, usage availability, score denominators and versioned/hash-verified artifacts; excluded from investigator inputs | [Evaluation contract](development-evaluation.md), [scorer](../../evaluation/scoring.py) and [runner](../../evaluation/runner.py) |
-
-| Knowledge document/chunk and generation (proposed #15) | Source-owned opaque identity/revision, snapshot version, original offsets, normalized text, access/time/evaluation metadata; atomic local generations and current policy checks across retained citations | [Corpus contract](knowledge-corpus.md), [ADR 0008](../adr/0008-local-corpus-generations-and-source-policy.md) |
+| Knowledge document/chunk and generation (#15) | Source-owned opaque identity/revision, snapshot version, original offsets, normalized text, access/time/evaluation metadata; atomic local generations and current policy checks across retained citations | [Corpus contract](knowledge-corpus.md), [ADR 0008](../adr/0008-local-corpus-generations-and-source-policy.md) |
+| Knowledge search and citation (proposed #16) | Bounded top-K, named exact-search/encoder artifacts, current authorization before scoring/resolution, untrusted passage text and explicit failures; rank scores do not establish answerability | [Retrieval contract](knowledge-retrieval.md), [ADR 0009](../adr/0009-local-exact-knowledge-retrieval.md) |
 
 ## Evidence boundary and next increment
 
