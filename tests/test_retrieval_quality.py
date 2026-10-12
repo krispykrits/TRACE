@@ -37,7 +37,14 @@ class PassageEvaluationTests(unittest.TestCase):
             read_json(_ROOT / "evaluation/retrieval/queries_v2.json")
         )
         self.protocol = read_json(_ROOT / "evaluation/retrieval/acceptance_v1.json")
-        self.reviews = read_json(_ROOT / "evaluation/retrieval/reviews_v2.json")
+        review_summary(
+            self.suite, read_json(_ROOT / "evaluation/retrieval/reviews_v2.json")
+        )
+        self.reviews: dict[str, Any] = {
+            "schema_version": "1",
+            "suite_sha256": digest(canonical(self.suite)),
+            "reviews": [],
+        }
 
     def test_hand_computed_recalls_mrr_failures_and_empty_gold_denominators(
         self,

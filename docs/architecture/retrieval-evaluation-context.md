@@ -1,6 +1,6 @@
 # Passage evaluation and bounded knowledge context
 
-Status: proposed implementation for [#17](https://github.com/krispykrits/TRACE/issues/17), in draft [PR #45](https://github.com/krispykrits/TRACE/pull/45), 2026-10-12. The owner selected the thresholds below and will review the prepared judgments. Human review and the acceptance run remain pending. This increment builds on merged [#16 / PR #44](https://github.com/krispykrits/TRACE/pull/44), [authorized search](knowledge-retrieval.md) and [corpus policy](knowledge-corpus.md).
+Status: proposed implementation for [#17](https://github.com/krispykrits/TRACE/issues/17), in draft [PR #45](https://github.com/krispykrits/TRACE/pull/45), 2026-10-12. The owner selected the thresholds below and reported corrections to the prepared judgments. Affected targets and revised decisions are awaiting input; human sign-off and the acceptance run remain pending. This increment builds on merged [#16 / PR #44](https://github.com/krispykrits/TRACE/pull/44), [authorized search](knowledge-retrieval.md) and [corpus policy](knowledge-corpus.md).
 
 ## Frozen protocol and development evidence
 

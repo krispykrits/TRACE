@@ -160,6 +160,12 @@ class CliProcessIntegrationTests(unittest.TestCase):
         repository = Path(__file__).resolve().parents[1]
         with tempfile.TemporaryDirectory(prefix="trace-passage-cli-") as directory:
             output = Path(directory) / "report.json"
+            review_path = Path(directory) / "unreviewed.json"
+            review_fixture = json.loads(
+                (repository / "evaluation/retrieval/reviews_v2.json").read_text()
+            )
+            review_fixture["reviews"] = []
+            review_path.write_text(json.dumps(review_fixture))
 
             def execute(*arguments: str) -> subprocess.CompletedProcess[str]:
                 return subprocess.run(
@@ -172,7 +178,14 @@ class CliProcessIntegrationTests(unittest.TestCase):
                     timeout=45,
                 )
 
-            first = execute("--modes", "lexical", "--output", str(output))
+            first = execute(
+                "--reviews",
+                str(review_path),
+                "--modes",
+                "lexical",
+                "--output",
+                str(output),
+            )
             self.assertEqual(first.returncode, 0, first.stderr)
             summary = json.loads(first.stdout)
             self.assertEqual(summary["acceptance_status"], "not_run")
@@ -182,7 +195,9 @@ class CliProcessIntegrationTests(unittest.TestCase):
             self.assertEqual(saved.returncode, 0, saved.stderr)
             self.assertEqual(json.loads(saved.stdout), summary["metrics"])
             blocked = Path(directory) / "acceptance.json"
-            failed = execute("--acceptance", "--output", str(blocked))
+            failed = execute(
+                "--reviews", str(review_path), "--acceptance", "--output", str(blocked)
+            )
             self.assertEqual(failed.returncode, 2)
             self.assertIn("human", failed.stderr)
             self.assertFalse(blocked.exists())
