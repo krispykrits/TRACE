@@ -103,6 +103,116 @@ def _run_persistence_demo(
 
 
 class CliProcessIntegrationTests(unittest.TestCase):
+    def test_context_demo_repeats_preserves_citations_and_discloses_omissions(
+        self,
+    ) -> None:
+        script = Path(__file__).resolve().parents[1] / "scripts/demo_context.py"
+        with tempfile.TemporaryDirectory(prefix="trace-context-cli-") as directory:
+
+            def execute(*arguments: str) -> subprocess.CompletedProcess[str]:
+                return subprocess.run(
+                    [sys.executable, str(script), *arguments],
+                    cwd=directory,
+                    env=_minimal_environment(),
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=15,
+                )
+
+            first = execute("--max-passages", "1")
+            second = execute("--max-passages", "1")
+            self.assertEqual(first.returncode, 0, first.stderr)
+            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertEqual(first.stdout, second.stdout)
+            output = json.loads(first.stdout)
+            context = output["context"]
+            self.assertEqual(context["status"], "ok")
+            self.assertEqual(context["data"]["content_role"], "untrusted_source_data")
+            self.assertEqual(len(context["data"]["passages"]), 1)
+            self.assertTrue(context["incomplete"])
+            self.assertFalse(context["passage_text_truncated"])
+            self.assertTrue(
+                all(item["reason"] == "passage_budget" for item in context["omitted"])
+            )
+            self.assertEqual(
+                output["resolved_chunk_ids"],
+                [
+                    mapping["chunk_id"]
+                    for mapping in context["data"]["citations"].values()
+                ],
+            )
+            empty = execute("--max-bytes", "128")
+            self.assertEqual(empty.returncode, 0, empty.stderr)
+            self.assertEqual(json.loads(empty.stdout)["context"]["status"], "empty")
+            for arguments in (
+                ("--max-bytes", "127"),
+                ("--max-passages", "0"),
+                ("--candidate-k", "21"),
+                ("--service", "notification"),
+            ):
+                failed = execute(*arguments)
+                self.assertEqual(failed.returncode, 2)
+                self.assertEqual(failed.stdout, "")
+            self.assertEqual(list(Path(directory).iterdir()), [])
+
+    def test_passage_evaluation_rescores_and_blocks_unreviewed_acceptance(self) -> None:
+        repository = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory(prefix="trace-passage-cli-") as directory:
+            output = Path(directory) / "report.json"
+            review_path = Path(directory) / "unreviewed.json"
+            review_fixture = json.loads(
+                (repository / "evaluation/retrieval/reviews_v4.json").read_text()
+            )
+            review_fixture["reviews"] = []
+            review_path.write_text(json.dumps(review_fixture))
+
+            def execute(*arguments: str) -> subprocess.CompletedProcess[str]:
+                return subprocess.run(
+                    [sys.executable, "-m", "evaluation.retrieval_quality", *arguments],
+                    cwd=repository,
+                    env=_minimal_environment(),
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=45,
+                )
+
+            first = execute(
+                "--reviews",
+                str(review_path),
+                "--modes",
+                "lexical",
+                "--output",
+                str(output),
+            )
+            self.assertEqual(first.returncode, 0, first.stderr)
+            summary = json.loads(first.stdout)
+            self.assertEqual(summary["acceptance_status"], "not_run")
+            self.assertFalse(summary["human_review_complete"])
+            self.assertEqual(summary["metrics"]["lexical"]["attempts"], 100)
+            saved = execute("--rescore", str(output))
+            self.assertEqual(saved.returncode, 0, saved.stderr)
+            self.assertEqual(json.loads(saved.stdout), summary["metrics"])
+            bundle_path = Path(directory) / "review.md"
+            generated = execute(
+                "--reviews", str(review_path), "--review-bundle", str(bundle_path)
+            )
+            self.assertEqual(generated.returncode, 0, generated.stderr)
+            self.assertIn("in " + review_path.name, bundle_path.read_text())
+            self.assertNotIn("in reviews_v2.json", bundle_path.read_text())
+            blocked = Path(directory) / "acceptance.json"
+            failed = execute(
+                "--reviews", str(review_path), "--acceptance", "--output", str(blocked)
+            )
+            self.assertEqual(failed.returncode, 2)
+            self.assertIn("human", failed.stderr)
+            self.assertFalse(blocked.exists())
+            report = json.loads(output.read_text())
+            report["attempts"][0]["chunk_ids"] = []
+            output.write_text(json.dumps(report))
+            self.assertEqual(execute("--rescore", str(output)).returncode, 2)
+
     def test_search_demo_repeats_resolves_and_checks_bounds_without_a_model(
         self,
     ) -> None:

@@ -72,6 +72,43 @@ class FixtureEncoder:
 
 
 class RetrievalTests(unittest.TestCase):
+    def test_explicit_candidate_limits_preserve_sections_and_default_diversity(
+        self,
+    ) -> None:
+        legacy = self.service.search(
+            SearchRequest("Payment request caller work", 20), context=_CONTEXT, at=_AT
+        )
+        candidate = self.service.search(
+            SearchRequest(
+                "Payment request caller work",
+                20,
+                candidate_pool=20,
+                max_chunks_per_document=20,
+            ),
+            context=_CONTEXT,
+            at=_AT,
+        )
+        self.assertGreater(len(candidate.results), len(legacy.results))
+        self.assertEqual(candidate.candidate_pool, 20)
+        self.assertEqual(candidate.max_chunks_per_document, 20)
+        documents = [result.chunk.metadata.document_id for result in legacy.results]
+        self.assertEqual(len(documents), len(set(documents)))
+        self.assertLessEqual(len(candidate.results), 20)
+        for result in candidate.results:
+            self.assertEqual(
+                self.service.resolve(result, context=_CONTEXT, at=_AT), result.chunk
+            )
+        for kwargs in (
+            {"candidate_pool": 4},
+            {"candidate_pool": 101},
+            {"candidate_pool": True},
+            {"max_chunks_per_document": 0},
+            {"max_chunks_per_document": 21},
+            {"max_chunks_per_document": True},
+        ):
+            with self.assertRaises(SearchInputError):
+                SearchRequest("q", **kwargs)
+
     def test_local_encoder_rejects_actual_token_budget_before_encoding(self) -> None:
         encoder = LocalSentenceEncoder.__new__(LocalSentenceEncoder)
         encoder.spec = EncoderSpec("fixture", "v1", 3, 256, "test_fixture", ())

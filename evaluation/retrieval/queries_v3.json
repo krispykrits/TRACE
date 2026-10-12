@@ -1,0 +1,1883 @@
+{
+  "schema_version": "3",
+  "suite_version": "trace-retrieval-development.v3",
+  "cohort": "development",
+  "judgment_kind": "agent_authored_proposal",
+  "corpus_version": "trace-knowledge-development.v1",
+  "queries": [
+    {
+      "id": "exact-code",
+      "category": "exact_code",
+      "query": "HTTP 504 /v1/orders: what do the exact code and path establish?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": "HTTP 504 is a symptom, and exact codes and paths must be preserved.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Evidence checks",
+          "proposed_support": "supported",
+          "claim": "Exact HTTP 504 codes and /v1/orders paths should be preserved."
+        },
+        {
+          "chunk_id": "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Evidence vocabulary",
+          "proposed_support": "supported",
+          "claim": "HTTP 504 is a symptom code, not a root-cause label."
+        },
+        {
+          "chunk_id": "chunk-d75f8b3a2d09e63d77a1bde080640c97f3ece21ef5985b441b26ba86ea071b1a",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Scope",
+          "proposed_support": "supported",
+          "claim": "A timeout symptom does not identify the dependency or configuration that caused the delay."
+        },
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "supported",
+          "claim": "A symptom alone does not establish a cause."
+        }
+      ],
+      "family": "exact-code"
+    },
+    {
+      "id": "negation-order",
+      "category": "negation",
+      "query": "Does a Notification deployment near an Order error prove Notification caused it?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Notification caused the Order error because its deployment was nearby.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-3bcd76338ebe1579510d564f6f648afd1ceb859dc121564efbb701307fa81538",
+          "document_id": "trace-dev-order-interface",
+          "section": "Limits",
+          "proposed_support": "unsupported",
+          "claim": "Notification caused the Order error because its deployment was nearby."
+        }
+      ],
+      "family": "negation-order"
+    },
+    {
+      "id": "negation-certificate",
+      "category": "misleading",
+      "query": "Did the nearby Notification rollout cause Payment failures in the fictional certificate archive?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "The archived records did not support a causal connection to Notification.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The archived records did not support a causal connection to Notification."
+        }
+      ],
+      "family": "negation-certificate"
+    },
+    {
+      "id": "service-boundary",
+      "category": "service_ambiguity",
+      "query": "Which service receives a positive amount, and how do work results differ from caller deadlines?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Payment receives an order ID and positive amount; work results and caller deadlines are separate observations.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Boundary",
+          "proposed_support": "supported",
+          "claim": "Payment receives an order ID and positive amount; work results and caller deadlines are separate observations."
+        }
+      ],
+      "family": "service-boundary"
+    },
+    {
+      "id": "request-path",
+      "category": "answerable",
+      "query": "Which services handle an accepted order before the notification is dispatched?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Order asks Customer, invokes Payment, then dispatches Notification after success.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-a38ad3f58e817f8c656d0c027be95c8a4d56665062d074ae6c065355716c7574",
+          "document_id": "trace-dev-order-interface",
+          "section": "Request boundary",
+          "proposed_support": "supported",
+          "claim": "Order asks Customer, invokes Payment, then dispatches Notification after success."
+        }
+      ],
+      "family": "request-path"
+    },
+    {
+      "id": "collection-delay",
+      "category": "answerable",
+      "query": "Which timestamp belongs on a timeline when source collection arrives late?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Observed event time determines the timeline; collection time remains provenance.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Time and provenance",
+          "proposed_support": "supported",
+          "claim": "Observed event time determines the timeline; collection time remains provenance."
+        }
+      ],
+      "family": "collection-delay"
+    },
+    {
+      "id": "saved-permission",
+      "category": "answerable",
+      "query": "Can a saved citation bypass withdrawn permissions or source freshness?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "A saved citation must still pass current permission and freshness checks.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-f3dded5575d6ece71420e0371428faaf0dcfeb0fb2efb0e4db97782c18aee6ce",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Recheck",
+          "proposed_support": "supported",
+          "claim": "A saved citation must still pass current permission and freshness checks."
+        }
+      ],
+      "family": "saved-permission"
+    },
+    {
+      "id": "queue-health",
+      "category": "answerable",
+      "query": "What did the fictional queue archive retain when dependencies were healthy but the worker was paused?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "The queue archive retained queue growth, worker completion metrics and a healthy dependency check; its paused-worker attribution used retained worker state.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+          "document_id": "trace-dev-history-queue",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The queue archive retained queue growth, worker completion metrics and a healthy dependency check; its paused-worker attribution used retained worker state."
+        }
+      ],
+      "family": "queue-health"
+    },
+    {
+      "id": "missing-evidence",
+      "category": "answerable",
+      "query": "What should be reported when neither configuration nor downstream duration is observable?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        },
+        {
+          "chunk_id": "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Interpretation",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        }
+      ],
+      "family": "missing-evidence"
+    },
+    {
+      "id": "historical-transfer",
+      "category": "misleading",
+      "query": "Does the fictional archive establish that the current live worker is paused?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "The archived paused worker is a fact about the current live incident.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7952c735c44e632f1f4314d0aa0bffcaf390c3006a23af2a007c0d09a4b7aed9",
+          "document_id": "trace-dev-history-queue",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "The archived paused worker is a fact about the current live incident."
+        }
+      ],
+      "family": "historical-transfer"
+    },
+    {
+      "id": "production-approval",
+      "category": "misleading",
+      "query": "Does a timeout symptom authorize changing production configuration?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Suggested evidence checks authorize a production configuration change.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "unsupported",
+          "claim": "Suggested evidence checks authorize a production configuration change."
+        },
+        {
+          "chunk_id": "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "Suggested evidence checks authorize a production configuration change."
+        }
+      ],
+      "family": "production-approval"
+    },
+    {
+      "id": "service-identity",
+      "category": "service_ambiguity",
+      "query": "Does a correlation ID make all receiving boundaries the same service?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Service identity changes at the receiving boundary while correlation is preserved.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-ab1aed6f89a2841d256dc1b1329689c8db0663363d23115949db1ab7a44698cd",
+          "document_id": "trace-dev-order-interface",
+          "section": "Observability",
+          "proposed_support": "supported",
+          "claim": "Service identity changes at the receiving boundary while correlation is preserved."
+        }
+      ],
+      "family": "service-identity"
+    },
+    {
+      "id": "absent-database",
+      "category": "absent_knowledge",
+      "query": "PostgreSQL WAL archive recovery commands and replication slots",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": null,
+      "judgments": [],
+      "family": "absent-database"
+    },
+    {
+      "id": "absent-notification",
+      "category": "absent_knowledge",
+      "query": "Notification webhook signature algorithm and rate-limit retry configuration",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": null,
+      "judgments": [],
+      "family": "absent-notification"
+    },
+    {
+      "id": "stale-certificate",
+      "category": "stale_source",
+      "query": "What currently permitted evidence describes TLS certificate expiry during rollover?",
+      "service": "payment",
+      "stale_document_ids": [
+        "trace-dev-history-certificate"
+      ],
+      "claim": null,
+      "judgments": [],
+      "family": "stale-certificate"
+    },
+    {
+      "id": "exact-code-1",
+      "category": "exact_code",
+      "query": "Why should HTTP 504 and /v1/orders be retained verbatim in timeout evidence?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": "HTTP 504 is a symptom, and exact codes and paths must be preserved.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Evidence checks",
+          "proposed_support": "supported",
+          "claim": "Exact HTTP 504 codes and /v1/orders paths should be preserved."
+        },
+        {
+          "chunk_id": "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Evidence vocabulary",
+          "proposed_support": "supported",
+          "claim": "HTTP 504 is a symptom code, not a root-cause label."
+        }
+      ],
+      "family": "exact-code"
+    },
+    {
+      "id": "exact-code-2",
+      "category": "exact_code",
+      "query": "Does an HTTP 504 response identify the failing configuration or only a symptom?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": "HTTP 504 is a symptom, not identification of the failing dependency or configuration.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Evidence vocabulary",
+          "proposed_support": "supported",
+          "claim": "HTTP 504 is a symptom code, not a root-cause label."
+        },
+        {
+          "chunk_id": "chunk-d75f8b3a2d09e63d77a1bde080640c97f3ece21ef5985b441b26ba86ea071b1a",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Scope",
+          "proposed_support": "supported",
+          "claim": "A timeout symptom does not identify the dependency or configuration that caused the delay."
+        },
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "supported",
+          "claim": "A symptom alone does not establish a cause."
+        }
+      ],
+      "family": "exact-code"
+    },
+    {
+      "id": "exact-code-3",
+      "category": "exact_code",
+      "query": "Which reference distinguishes HTTP 504 symptoms from causal labels?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": "HTTP 504 is a symptom, not identification of the failing dependency or configuration.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Evidence vocabulary",
+          "proposed_support": "supported",
+          "claim": "HTTP 504 is a symptom code, not a root-cause label."
+        },
+        {
+          "chunk_id": "chunk-d75f8b3a2d09e63d77a1bde080640c97f3ece21ef5985b441b26ba86ea071b1a",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Scope",
+          "proposed_support": "supported",
+          "claim": "A timeout symptom does not identify the dependency or configuration that caused the delay."
+        },
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "supported",
+          "claim": "A symptom alone does not establish a cause."
+        }
+      ],
+      "family": "exact-code"
+    },
+    {
+      "id": "exact-code-4",
+      "category": "exact_code",
+      "query": "How should /v1/orders errors be compared with request work duration?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": "HTTP 504 is a symptom, and exact codes and paths must be preserved.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Evidence checks",
+          "proposed_support": "supported",
+          "claim": "Exact HTTP 504 codes and /v1/orders paths should be preserved."
+        },
+        {
+          "chunk_id": "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Evidence vocabulary",
+          "proposed_support": "supported",
+          "claim": "HTTP 504 is a symptom code, not a root-cause label."
+        }
+      ],
+      "family": "exact-code"
+    },
+    {
+      "id": "exact-code-5",
+      "category": "exact_code",
+      "query": "What evidence vocabulary accompanies an exact HTTP 504 failure code?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": "HTTP 504 is a symptom, and exact codes and paths must be preserved.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Evidence checks",
+          "proposed_support": "supported",
+          "claim": "Exact HTTP 504 codes and /v1/orders paths should be preserved."
+        },
+        {
+          "chunk_id": "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Evidence vocabulary",
+          "proposed_support": "supported",
+          "claim": "HTTP 504 is a symptom code, not a root-cause label."
+        }
+      ],
+      "family": "exact-code"
+    },
+    {
+      "id": "exact-code-6",
+      "category": "exact_code",
+      "query": "Can rewriting HTTP 504 into a causal label lose incident evidence?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": "HTTP 504 is a symptom, and exact codes and paths must be preserved.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Evidence checks",
+          "proposed_support": "supported",
+          "claim": "Exact HTTP 504 codes and /v1/orders paths should be preserved."
+        },
+        {
+          "chunk_id": "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Evidence vocabulary",
+          "proposed_support": "supported",
+          "claim": "HTTP 504 is a symptom code, not a root-cause label."
+        },
+        {
+          "chunk_id": "chunk-d75f8b3a2d09e63d77a1bde080640c97f3ece21ef5985b441b26ba86ea071b1a",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Scope",
+          "proposed_support": "supported",
+          "claim": "A timeout symptom does not identify the dependency or configuration that caused the delay."
+        },
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "supported",
+          "claim": "A symptom alone does not establish a cause."
+        }
+      ],
+      "family": "exact-code"
+    },
+    {
+      "id": "negation-order-1",
+      "category": "negation",
+      "query": "Is nearby Notification activity sufficient evidence of an Order root cause?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Notification caused the Order error because its deployment was nearby.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-3bcd76338ebe1579510d564f6f648afd1ceb859dc121564efbb701307fa81538",
+          "document_id": "trace-dev-order-interface",
+          "section": "Limits",
+          "proposed_support": "unsupported",
+          "claim": "Notification caused the Order error because its deployment was nearby."
+        }
+      ],
+      "family": "negation-order"
+    },
+    {
+      "id": "negation-order-2",
+      "category": "negation",
+      "query": "What does Order documentation say about blaming a nearby Notification rollout?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Notification caused the Order error because its deployment was nearby.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-3bcd76338ebe1579510d564f6f648afd1ceb859dc121564efbb701307fa81538",
+          "document_id": "trace-dev-order-interface",
+          "section": "Limits",
+          "proposed_support": "unsupported",
+          "claim": "Notification caused the Order error because its deployment was nearby."
+        }
+      ],
+      "family": "negation-order"
+    },
+    {
+      "id": "negation-order-3",
+      "category": "negation",
+      "query": "Does timing alone connect a Notification deployment to an Order error?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Notification caused the Order error because its deployment was nearby.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-3bcd76338ebe1579510d564f6f648afd1ceb859dc121564efbb701307fa81538",
+          "document_id": "trace-dev-order-interface",
+          "section": "Limits",
+          "proposed_support": "unsupported",
+          "claim": "Notification caused the Order error because its deployment was nearby."
+        }
+      ],
+      "family": "negation-order"
+    },
+    {
+      "id": "negation-order-4",
+      "category": "negation",
+      "query": "Can I conclude Notification caused Order failures from a recent deployment?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Notification caused the Order error because its deployment was nearby.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-3bcd76338ebe1579510d564f6f648afd1ceb859dc121564efbb701307fa81538",
+          "document_id": "trace-dev-order-interface",
+          "section": "Limits",
+          "proposed_support": "unsupported",
+          "claim": "Notification caused the Order error because its deployment was nearby."
+        }
+      ],
+      "family": "negation-order"
+    },
+    {
+      "id": "negation-order-5",
+      "category": "negation",
+      "query": "Is Notification causal merely because it appeared close to the error?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Notification caused the Order error because its deployment was nearby.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-3bcd76338ebe1579510d564f6f648afd1ceb859dc121564efbb701307fa81538",
+          "document_id": "trace-dev-order-interface",
+          "section": "Limits",
+          "proposed_support": "unsupported",
+          "claim": "Notification caused the Order error because its deployment was nearby."
+        }
+      ],
+      "family": "negation-order"
+    },
+    {
+      "id": "negation-order-6",
+      "category": "negation",
+      "query": "Which Order reference warns against inferring cause from Notification timing?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Notification caused the Order error because its deployment was nearby.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-3bcd76338ebe1579510d564f6f648afd1ceb859dc121564efbb701307fa81538",
+          "document_id": "trace-dev-order-interface",
+          "section": "Limits",
+          "proposed_support": "unsupported",
+          "claim": "Notification caused the Order error because its deployment was nearby."
+        }
+      ],
+      "family": "negation-order"
+    },
+    {
+      "id": "negation-certificate-1",
+      "category": "misleading",
+      "query": "Was Notification implicated by records in the fictional certificate investigation?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "The archived records did not support a causal connection to Notification.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The archived records did not support a causal connection to Notification."
+        }
+      ],
+      "family": "negation-certificate"
+    },
+    {
+      "id": "negation-certificate-2",
+      "category": "misleading",
+      "query": "What explanation did the certificate archive reject despite a nearby rollout?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "The archived records did not support a causal connection to Notification.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The archived records did not support a causal connection to Notification."
+        }
+      ],
+      "family": "negation-certificate"
+    },
+    {
+      "id": "negation-certificate-3",
+      "category": "misleading",
+      "query": "Did the archived Payment TLS failures have a supported Notification connection?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "The archived records did not support a causal connection to Notification.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The archived records did not support a causal connection to Notification."
+        }
+      ],
+      "family": "negation-certificate"
+    },
+    {
+      "id": "negation-certificate-4",
+      "category": "misleading",
+      "query": "How did the fictional certificate archive treat the Notification rollout?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "The archived records did not support a causal connection to Notification.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The archived records did not support a causal connection to Notification."
+        }
+      ],
+      "family": "negation-certificate"
+    },
+    {
+      "id": "negation-certificate-5",
+      "category": "misleading",
+      "query": "What did the archive retain about TLS validity and the nearby Notification change?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "The archived records did not support a causal connection to Notification.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The archived records did not support a causal connection to Notification."
+        }
+      ],
+      "family": "negation-certificate"
+    },
+    {
+      "id": "negation-certificate-6",
+      "category": "misleading",
+      "query": "Can the Payment certificate example substantiate Notification as the cause?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "The archived records did not support a causal connection to Notification.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The archived records did not support a causal connection to Notification."
+        }
+      ],
+      "family": "negation-certificate"
+    },
+    {
+      "id": "service-boundary-1",
+      "category": "service_ambiguity",
+      "query": "What does the Payment fixture receive at its request boundary?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "The Payment development fixture receives an order ID and positive amount.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Boundary",
+          "proposed_support": "supported",
+          "claim": "The Payment development fixture receives an order ID and positive amount."
+        }
+      ],
+      "family": "service-boundary"
+    },
+    {
+      "id": "service-boundary-2",
+      "category": "service_ambiguity",
+      "query": "Are the Payment work result and caller deadline the same observation?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Payment work results and caller deadlines are separate observations.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Boundary",
+          "proposed_support": "supported",
+          "claim": "Payment work results and caller deadlines are separate observations."
+        }
+      ],
+      "family": "service-boundary"
+    },
+    {
+      "id": "service-boundary-3",
+      "category": "service_ambiguity",
+      "query": "How does Payment separate positive amount input from the caller time limit?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Payment receives an order ID and positive amount; work results and caller deadlines are separate observations.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Boundary",
+          "proposed_support": "supported",
+          "claim": "Payment receives an order ID and positive amount; work results and caller deadlines are separate observations."
+        }
+      ],
+      "family": "service-boundary"
+    },
+    {
+      "id": "service-boundary-4",
+      "category": "service_ambiguity",
+      "query": "Does Payment charge real money in the development request fixture?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "The Payment development fixture makes no real charge.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Boundary",
+          "proposed_support": "supported",
+          "claim": "The Payment development fixture makes no real charge."
+        }
+      ],
+      "family": "service-boundary"
+    },
+    {
+      "id": "service-boundary-5",
+      "category": "service_ambiguity",
+      "query": "Which Payment boundary documents positive amounts and separate deadline results?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Payment receives an order ID and positive amount; work results and caller deadlines are separate observations.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Boundary",
+          "proposed_support": "supported",
+          "claim": "Payment receives an order ID and positive amount; work results and caller deadlines are separate observations."
+        }
+      ],
+      "family": "service-boundary"
+    },
+    {
+      "id": "service-boundary-6",
+      "category": "service_ambiguity",
+      "query": "Where are order ID, positive amount and caller deadline distinguished?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Payment receives an order ID and positive amount; work results and caller deadlines are separate observations.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Boundary",
+          "proposed_support": "supported",
+          "claim": "Payment receives an order ID and positive amount; work results and caller deadlines are separate observations."
+        }
+      ],
+      "family": "service-boundary"
+    },
+    {
+      "id": "request-path-1",
+      "category": "answerable",
+      "query": "When does Order send the in-process Notification after Payment?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Order asks Customer, invokes Payment, then dispatches Notification after success.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-a38ad3f58e817f8c656d0c027be95c8a4d56665062d074ae6c065355716c7574",
+          "document_id": "trace-dev-order-interface",
+          "section": "Request boundary",
+          "proposed_support": "supported",
+          "claim": "Order asks Customer, invokes Payment, then dispatches Notification after success."
+        }
+      ],
+      "family": "request-path"
+    },
+    {
+      "id": "request-path-2",
+      "category": "answerable",
+      "query": "Which request arguments does Order accept before asking Customer?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Order accepts an order ID, customer ID and amount in cents before asking Customer for eligibility.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-a38ad3f58e817f8c656d0c027be95c8a4d56665062d074ae6c065355716c7574",
+          "document_id": "trace-dev-order-interface",
+          "section": "Request boundary",
+          "proposed_support": "supported",
+          "claim": "Order accepts an order ID, customer ID and amount in cents before asking Customer for eligibility."
+        }
+      ],
+      "family": "request-path"
+    },
+    {
+      "id": "request-path-3",
+      "category": "answerable",
+      "query": "How are Customer eligibility and Payment invoked on the Order path?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Order asks Customer, invokes Payment, then dispatches Notification after success.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-a38ad3f58e817f8c656d0c027be95c8a4d56665062d074ae6c065355716c7574",
+          "document_id": "trace-dev-order-interface",
+          "section": "Request boundary",
+          "proposed_support": "supported",
+          "claim": "Order asks Customer, invokes Payment, then dispatches Notification after success."
+        }
+      ],
+      "family": "request-path"
+    },
+    {
+      "id": "request-path-4",
+      "category": "answerable",
+      "query": "What happens after an Order payment succeeds?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Order dispatches the in-process Notification fixture after successful payment.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-a38ad3f58e817f8c656d0c027be95c8a4d56665062d074ae6c065355716c7574",
+          "document_id": "trace-dev-order-interface",
+          "section": "Request boundary",
+          "proposed_support": "supported",
+          "claim": "Order dispatches the in-process Notification fixture after successful payment."
+        }
+      ],
+      "family": "request-path"
+    },
+    {
+      "id": "request-path-5",
+      "category": "answerable",
+      "query": "What is the Customer to Payment to Notification sequence for Order?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Order asks Customer, invokes Payment, then dispatches Notification after success.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-a38ad3f58e817f8c656d0c027be95c8a4d56665062d074ae6c065355716c7574",
+          "document_id": "trace-dev-order-interface",
+          "section": "Request boundary",
+          "proposed_support": "supported",
+          "claim": "Order asks Customer, invokes Payment, then dispatches Notification after success."
+        }
+      ],
+      "family": "request-path"
+    },
+    {
+      "id": "request-path-6",
+      "category": "answerable",
+      "query": "Does the development Order request dispatch Notification before payment succeeds?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Order dispatches Notification after successful payment, not before it.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-a38ad3f58e817f8c656d0c027be95c8a4d56665062d074ae6c065355716c7574",
+          "document_id": "trace-dev-order-interface",
+          "section": "Request boundary",
+          "proposed_support": "supported",
+          "claim": "Order dispatches Notification after successful payment, not before it."
+        }
+      ],
+      "family": "request-path"
+    },
+    {
+      "id": "collection-delay-1",
+      "category": "answerable",
+      "query": "Does delayed collection move the operational event later on the timeline?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Delayed collection must not imply a later operational event.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Time and provenance",
+          "proposed_support": "supported",
+          "claim": "Delayed collection must not imply a later operational event."
+        }
+      ],
+      "family": "collection-delay"
+    },
+    {
+      "id": "collection-delay-2",
+      "category": "answerable",
+      "query": "Which clock is used for events and which clock preserves source collection?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Observed event time determines the timeline; collection time remains provenance.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Time and provenance",
+          "proposed_support": "supported",
+          "claim": "Observed event time determines the timeline; collection time remains provenance."
+        }
+      ],
+      "family": "collection-delay"
+    },
+    {
+      "id": "collection-delay-3",
+      "category": "answerable",
+      "query": "How should observed event time and collection time be distinguished?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Observed event time determines the timeline; collection time remains provenance.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Time and provenance",
+          "proposed_support": "supported",
+          "claim": "Observed event time determines the timeline; collection time remains provenance."
+        }
+      ],
+      "family": "collection-delay"
+    },
+    {
+      "id": "collection-delay-4",
+      "category": "answerable",
+      "query": "What source identity and revision should accompany a delayed record?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Source identity and revision should accompany delayed records.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Time and provenance",
+          "proposed_support": "supported",
+          "claim": "Source identity and revision should accompany delayed records."
+        }
+      ],
+      "family": "collection-delay"
+    },
+    {
+      "id": "collection-delay-5",
+      "category": "answerable",
+      "query": "Should late-arriving logs be ordered by observed or collection time?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Observed event time determines the timeline; collection time remains provenance.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Time and provenance",
+          "proposed_support": "supported",
+          "claim": "Observed event time determines the timeline; collection time remains provenance."
+        }
+      ],
+      "family": "collection-delay"
+    },
+    {
+      "id": "collection-delay-6",
+      "category": "answerable",
+      "query": "Can a delayed collection timestamp imply a later incident event?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Delayed collection must not imply a later operational event.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-d2228cb1127d51fbf4d5d21c99c8a31d14411ebe37907a9fd0057dc6605bd8af",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Time and provenance",
+          "proposed_support": "supported",
+          "claim": "Delayed collection must not imply a later operational event."
+        }
+      ],
+      "family": "collection-delay"
+    },
+    {
+      "id": "saved-permission-1",
+      "category": "answerable",
+      "query": "Does a previously saved snapshot provide standing access permission?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "A saved citation must still pass current permission and freshness checks.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-f3dded5575d6ece71420e0371428faaf0dcfeb0fb2efb0e4db97782c18aee6ce",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Recheck",
+          "proposed_support": "supported",
+          "claim": "A saved citation must still pass current permission and freshness checks."
+        }
+      ],
+      "family": "saved-permission"
+    },
+    {
+      "id": "saved-permission-2",
+      "category": "answerable",
+      "query": "What should happen when an old citation source is no longer fresh?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "A saved citation must still pass current permission and freshness checks.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-f3dded5575d6ece71420e0371428faaf0dcfeb0fb2efb0e4db97782c18aee6ce",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Recheck",
+          "proposed_support": "supported",
+          "claim": "A saved citation must still pass current permission and freshness checks."
+        }
+      ],
+      "family": "saved-permission"
+    },
+    {
+      "id": "saved-permission-3",
+      "category": "answerable",
+      "query": "How are saved references rechecked after source withdrawal?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "A saved citation must still pass current permission and freshness checks.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-f3dded5575d6ece71420e0371428faaf0dcfeb0fb2efb0e4db97782c18aee6ce",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Recheck",
+          "proposed_support": "supported",
+          "claim": "A saved citation must still pass current permission and freshness checks."
+        }
+      ],
+      "family": "saved-permission"
+    },
+    {
+      "id": "saved-permission-4",
+      "category": "answerable",
+      "query": "Can I bypass current scope checks by reading a historical citation?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "A saved citation must still pass current permission and freshness checks.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-f3dded5575d6ece71420e0371428faaf0dcfeb0fb2efb0e4db97782c18aee6ce",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Recheck",
+          "proposed_support": "supported",
+          "claim": "A saved citation must still pass current permission and freshness checks."
+        }
+      ],
+      "family": "saved-permission"
+    },
+    {
+      "id": "saved-permission-5",
+      "category": "answerable",
+      "query": "What limitation should be disclosed for a withdrawn source reference?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "A saved citation must still pass current permission and freshness checks.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-f3dded5575d6ece71420e0371428faaf0dcfeb0fb2efb0e4db97782c18aee6ce",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Recheck",
+          "proposed_support": "supported",
+          "claim": "A saved citation must still pass current permission and freshness checks."
+        }
+      ],
+      "family": "saved-permission"
+    },
+    {
+      "id": "saved-permission-6",
+      "category": "answerable",
+      "query": "When should a source citation request authorized revalidation?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "A saved citation must still pass current permission and freshness checks.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-f3dded5575d6ece71420e0371428faaf0dcfeb0fb2efb0e4db97782c18aee6ce",
+          "document_id": "trace-dev-source-freshness",
+          "section": "Recheck",
+          "proposed_support": "supported",
+          "claim": "A saved citation must still pass current permission and freshness checks."
+        }
+      ],
+      "family": "saved-permission"
+    },
+    {
+      "id": "queue-health-1",
+      "category": "answerable",
+      "query": "What distinguished the paused-worker explanation in the fictional queue note?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "The archive attributed backlog to a paused worker using retained worker state.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+          "document_id": "trace-dev-history-queue",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The archive attributed backlog to a paused worker using retained worker state."
+        }
+      ],
+      "family": "queue-health"
+    },
+    {
+      "id": "queue-health-2",
+      "category": "answerable",
+      "query": "Was the downstream dependency healthy while the archived Order queue grew?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "The dependency check was healthy while the archived Order queue kept growing.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+          "document_id": "trace-dev-history-queue",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The dependency check was healthy while the archived Order queue kept growing."
+        }
+      ],
+      "family": "queue-health"
+    },
+    {
+      "id": "queue-health-3",
+      "category": "answerable",
+      "query": "Which retained worker state explained the fictional backlog?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "The archive attributed backlog to a paused worker using retained worker state.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+          "document_id": "trace-dev-history-queue",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The archive attributed backlog to a paused worker using retained worker state."
+        }
+      ],
+      "family": "queue-health"
+    },
+    {
+      "id": "queue-health-4",
+      "category": "answerable",
+      "query": "Did a Payment deployment alone establish the archived queue explanation?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "A recent Payment deployment alone did not establish the archived queue explanation.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+          "document_id": "trace-dev-history-queue",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "A recent Payment deployment alone did not establish the archived queue explanation."
+        }
+      ],
+      "family": "queue-health"
+    },
+    {
+      "id": "queue-health-5",
+      "category": "answerable",
+      "query": "How did queue growth, completions and dependency health differ in the archive?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "The archive retained a growing Order queue, worker completion metrics and a healthy dependency check.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+          "document_id": "trace-dev-history-queue",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The archive retained a growing Order queue, worker completion metrics and a healthy dependency check."
+        }
+      ],
+      "family": "queue-health"
+    },
+    {
+      "id": "queue-health-6",
+      "category": "answerable",
+      "query": "What supported the historical paused-worker attribution?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "The archive attributed backlog to a paused worker using retained worker state.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-e2debbd2df4c20f2624bb63dcb8bc6b97e9e9e8fbfdabddaaf1607323574a748",
+          "document_id": "trace-dev-history-queue",
+          "section": "Observations",
+          "proposed_support": "supported",
+          "claim": "The archive attributed backlog to a paused worker using retained worker state."
+        }
+      ],
+      "family": "queue-health"
+    },
+    {
+      "id": "missing-evidence-1",
+      "category": "answerable",
+      "query": "Can absent budget and duration evidence distinguish timeout mechanisms?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        },
+        {
+          "chunk_id": "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Interpretation",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        }
+      ],
+      "family": "missing-evidence"
+    },
+    {
+      "id": "missing-evidence-2",
+      "category": "answerable",
+      "query": "What should be retained when configuration and downstream observations are missing?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        },
+        {
+          "chunk_id": "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Interpretation",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        }
+      ],
+      "family": "missing-evidence"
+    },
+    {
+      "id": "missing-evidence-3",
+      "category": "answerable",
+      "query": "How should competing explanations be handled when the duration source is absent?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        },
+        {
+          "chunk_id": "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Interpretation",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        }
+      ],
+      "family": "missing-evidence"
+    },
+    {
+      "id": "missing-evidence-4",
+      "category": "answerable",
+      "query": "Does missing configuration evidence permit guessing a cause from a symptom?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Missing configuration evidence permits guessing a cause from a symptom.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "unsupported",
+          "claim": "Missing configuration evidence permits guessing a cause from a symptom."
+        },
+        {
+          "chunk_id": "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Interpretation",
+          "proposed_support": "unsupported",
+          "claim": "Missing configuration evidence permits guessing a cause from a symptom."
+        }
+      ],
+      "family": "missing-evidence"
+    },
+    {
+      "id": "missing-evidence-5",
+      "category": "answerable",
+      "query": "What gap should be disclosed if caller budget or downstream work cannot be observed?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        },
+        {
+          "chunk_id": "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Interpretation",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        }
+      ],
+      "family": "missing-evidence"
+    },
+    {
+      "id": "missing-evidence-6",
+      "category": "answerable",
+      "query": "When can changed-budget and slower-work explanations be indistinguishable?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        },
+        {
+          "chunk_id": "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b",
+          "document_id": "trace-dev-payment-interface",
+          "section": "Interpretation",
+          "proposed_support": "supported",
+          "claim": "Missing configuration or duration observations can leave competing explanations indistinguishable."
+        }
+      ],
+      "family": "missing-evidence"
+    },
+    {
+      "id": "historical-transfer-1",
+      "category": "misleading",
+      "query": "Can historical cause statements establish facts about a new live Order incident?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "The archived paused worker is a fact about the current live incident.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7952c735c44e632f1f4314d0aa0bffcaf390c3006a23af2a007c0d09a4b7aed9",
+          "document_id": "trace-dev-history-queue",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "The archived paused worker is a fact about the current live incident."
+        }
+      ],
+      "family": "historical-transfer"
+    },
+    {
+      "id": "historical-transfer-2",
+      "category": "misleading",
+      "query": "What checks precede transferring the old paused-worker explanation?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Live worker state, source coverage and the relevant window must be checked before transferring the historical explanation.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7952c735c44e632f1f4314d0aa0bffcaf390c3006a23af2a007c0d09a4b7aed9",
+          "document_id": "trace-dev-history-queue",
+          "section": "Investigation lesson",
+          "proposed_support": "supported",
+          "claim": "Live worker state, source coverage and the relevant window must be checked before transferring the historical explanation."
+        }
+      ],
+      "family": "historical-transfer"
+    },
+    {
+      "id": "historical-transfer-3",
+      "category": "misleading",
+      "query": "Does a fictional queue postmortem replace checking current worker state?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "The archived paused worker is a fact about the current live incident.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7952c735c44e632f1f4314d0aa0bffcaf390c3006a23af2a007c0d09a4b7aed9",
+          "document_id": "trace-dev-history-queue",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "The archived paused worker is a fact about the current live incident."
+        }
+      ],
+      "family": "historical-transfer"
+    },
+    {
+      "id": "historical-transfer-4",
+      "category": "misleading",
+      "query": "What uncertainty remains if live worker observations are absent?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Absent live observations require preserving uncertainty and asking for missing evidence.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7952c735c44e632f1f4314d0aa0bffcaf390c3006a23af2a007c0d09a4b7aed9",
+          "document_id": "trace-dev-history-queue",
+          "section": "Investigation lesson",
+          "proposed_support": "supported",
+          "claim": "Absent live observations require preserving uncertainty and asking for missing evidence."
+        }
+      ],
+      "family": "historical-transfer"
+    },
+    {
+      "id": "historical-transfer-5",
+      "category": "misleading",
+      "query": "Can I claim the current worker is paused from the archived example alone?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "The archived paused worker is a fact about the current live incident.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7952c735c44e632f1f4314d0aa0bffcaf390c3006a23af2a007c0d09a4b7aed9",
+          "document_id": "trace-dev-history-queue",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "The archived paused worker is a fact about the current live incident."
+        }
+      ],
+      "family": "historical-transfer"
+    },
+    {
+      "id": "historical-transfer-6",
+      "category": "misleading",
+      "query": "Does the queue archive authorize recovery of a live worker?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "The fictional queue archive authorizes recovery of a live worker.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7952c735c44e632f1f4314d0aa0bffcaf390c3006a23af2a007c0d09a4b7aed9",
+          "document_id": "trace-dev-history-queue",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "The fictional queue archive authorizes recovery of a live worker."
+        }
+      ],
+      "family": "historical-transfer"
+    },
+    {
+      "id": "production-approval-1",
+      "category": "misleading",
+      "query": "Are suggested timeout source checks permission to change production settings?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Suggested evidence checks authorize a production configuration change.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "unsupported",
+          "claim": "Suggested evidence checks authorize a production configuration change."
+        },
+        {
+          "chunk_id": "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "Suggested evidence checks authorize a production configuration change."
+        }
+      ],
+      "family": "production-approval"
+    },
+    {
+      "id": "production-approval-2",
+      "category": "misleading",
+      "query": "Does missing incident evidence authorize reducing a production deadline?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Suggested evidence checks authorize a production configuration change.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "unsupported",
+          "claim": "Suggested evidence checks authorize a production configuration change."
+        },
+        {
+          "chunk_id": "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "Suggested evidence checks authorize a production configuration change."
+        }
+      ],
+      "family": "production-approval"
+    },
+    {
+      "id": "production-approval-3",
+      "category": "misleading",
+      "query": "Can a timeout runbook itself approve a configuration mutation?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Suggested evidence checks authorize a production configuration change.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "unsupported",
+          "claim": "Suggested evidence checks authorize a production configuration change."
+        },
+        {
+          "chunk_id": "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "Suggested evidence checks authorize a production configuration change."
+        }
+      ],
+      "family": "production-approval"
+    },
+    {
+      "id": "production-approval-4",
+      "category": "misleading",
+      "query": "What boundary separates proposed checks from authorization to change configuration?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Suggested evidence checks authorize a production configuration change.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "unsupported",
+          "claim": "Suggested evidence checks authorize a production configuration change."
+        },
+        {
+          "chunk_id": "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "Suggested evidence checks authorize a production configuration change."
+        }
+      ],
+      "family": "production-approval"
+    },
+    {
+      "id": "production-approval-5",
+      "category": "misleading",
+      "query": "Does capture delay give permission to perform production remediation?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "Capture delay authorizes production remediation.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "unsupported",
+          "claim": "Capture delay authorizes production remediation."
+        },
+        {
+          "chunk_id": "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "Capture delay authorizes production remediation."
+        }
+      ],
+      "family": "production-approval"
+    },
+    {
+      "id": "production-approval-6",
+      "category": "misleading",
+      "query": "Can a root-cause guess authorize a timeout configuration change?",
+      "service": "payment",
+      "stale_document_ids": [],
+      "claim": "A root-cause guess authorizes changing timeout configuration.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+          "document_id": "trace-dev-timeout-evidence",
+          "section": "Missing evidence",
+          "proposed_support": "unsupported",
+          "claim": "A root-cause guess authorizes changing timeout configuration."
+        },
+        {
+          "chunk_id": "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65",
+          "document_id": "trace-dev-history-certificate",
+          "section": "Investigation lesson",
+          "proposed_support": "unsupported",
+          "claim": "A root-cause guess authorizes changing timeout configuration."
+        }
+      ],
+      "family": "production-approval"
+    },
+    {
+      "id": "service-identity-1",
+      "category": "service_ambiguity",
+      "query": "Is correlation identity the same field as receiving service identity?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Service identity changes at the receiving boundary while correlation is preserved.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-ab1aed6f89a2841d256dc1b1329689c8db0663363d23115949db1ab7a44698cd",
+          "document_id": "trace-dev-order-interface",
+          "section": "Observability",
+          "proposed_support": "supported",
+          "claim": "Service identity changes at the receiving boundary while correlation is preserved."
+        }
+      ],
+      "family": "service-identity"
+    },
+    {
+      "id": "service-identity-2",
+      "category": "service_ambiguity",
+      "query": "What fields distinguish Order records from receiving Payment records?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Service identity changes at the receiving boundary while correlation is preserved.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-ab1aed6f89a2841d256dc1b1329689c8db0663363d23115949db1ab7a44698cd",
+          "document_id": "trace-dev-order-interface",
+          "section": "Observability",
+          "proposed_support": "supported",
+          "claim": "Service identity changes at the receiving boundary while correlation is preserved."
+        }
+      ],
+      "family": "service-identity"
+    },
+    {
+      "id": "service-identity-3",
+      "category": "service_ambiguity",
+      "query": "How should service identity change across correlated logical boundaries?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Service identity changes at the receiving boundary while correlation is preserved.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-ab1aed6f89a2841d256dc1b1329689c8db0663363d23115949db1ab7a44698cd",
+          "document_id": "trace-dev-order-interface",
+          "section": "Observability",
+          "proposed_support": "supported",
+          "claim": "Service identity changes at the receiving boundary while correlation is preserved."
+        }
+      ],
+      "family": "service-identity"
+    },
+    {
+      "id": "service-identity-4",
+      "category": "service_ambiguity",
+      "query": "Why preserve service names separately on a single correlated request?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Service identity changes at the receiving boundary while correlation is preserved.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-ab1aed6f89a2841d256dc1b1329689c8db0663363d23115949db1ab7a44698cd",
+          "document_id": "trace-dev-order-interface",
+          "section": "Observability",
+          "proposed_support": "supported",
+          "claim": "Service identity changes at the receiving boundary while correlation is preserved."
+        }
+      ],
+      "family": "service-identity"
+    },
+    {
+      "id": "service-identity-5",
+      "category": "service_ambiguity",
+      "query": "Do accepted receipts and failed requests represent the same observation?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Failed requests and accepted receipts are distinct observations.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-ab1aed6f89a2841d256dc1b1329689c8db0663363d23115949db1ab7a44698cd",
+          "document_id": "trace-dev-order-interface",
+          "section": "Observability",
+          "proposed_support": "supported",
+          "claim": "Failed requests and accepted receipts are distinct observations."
+        }
+      ],
+      "family": "service-identity"
+    },
+    {
+      "id": "service-identity-6",
+      "category": "service_ambiguity",
+      "query": "Can all correlated request records be treated as one service?",
+      "service": "order",
+      "stale_document_ids": [],
+      "claim": "Service identity changes at the receiving boundary while correlation is preserved.",
+      "judgments": [
+        {
+          "chunk_id": "chunk-ab1aed6f89a2841d256dc1b1329689c8db0663363d23115949db1ab7a44698cd",
+          "document_id": "trace-dev-order-interface",
+          "section": "Observability",
+          "proposed_support": "supported",
+          "claim": "Service identity changes at the receiving boundary while correlation is preserved."
+        }
+      ],
+      "family": "service-identity"
+    },
+    {
+      "id": "absent-database-1",
+      "category": "absent_knowledge",
+      "query": "How do I repair PostgreSQL replication slot bloat?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": null,
+      "judgments": [],
+      "family": "absent-database"
+    },
+    {
+      "id": "absent-database-2",
+      "category": "absent_knowledge",
+      "query": "Which PostgreSQL WAL restore command should I execute?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": null,
+      "judgments": [],
+      "family": "absent-database"
+    },
+    {
+      "id": "absent-database-3",
+      "category": "absent_knowledge",
+      "query": "What is the RDS PostgreSQL archive retention setting?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": null,
+      "judgments": [],
+      "family": "absent-database"
+    },
+    {
+      "id": "absent-database-4",
+      "category": "absent_knowledge",
+      "query": "Which PostgreSQL failover endpoint and credentials are configured?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": null,
+      "judgments": [],
+      "family": "absent-database"
+    },
+    {
+      "id": "absent-notification-1",
+      "category": "absent_knowledge",
+      "query": "What cryptographic key verifies Notification webhook signatures?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": null,
+      "judgments": [],
+      "family": "absent-notification"
+    },
+    {
+      "id": "absent-notification-2",
+      "category": "absent_knowledge",
+      "query": "Which retry interval applies to a Notification HTTP 429 response?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": null,
+      "judgments": [],
+      "family": "absent-notification"
+    },
+    {
+      "id": "absent-notification-3",
+      "category": "absent_knowledge",
+      "query": "Where is the Notification signing-secret rotation procedure?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": null,
+      "judgments": [],
+      "family": "absent-notification"
+    },
+    {
+      "id": "absent-notification-4",
+      "category": "absent_knowledge",
+      "query": "What Notification rate-limit quota is configured?",
+      "service": null,
+      "stale_document_ids": [],
+      "claim": null,
+      "judgments": [],
+      "family": "absent-notification"
+    },
+    {
+      "id": "stale-certificate-1",
+      "category": "stale_source",
+      "query": "Which fresh Payment source currently establishes archived TLS certificate expiry?",
+      "service": "payment",
+      "stale_document_ids": [
+        "trace-dev-history-certificate"
+      ],
+      "claim": null,
+      "judgments": [],
+      "family": "stale-certificate"
+    },
+    {
+      "id": "stale-certificate-2",
+      "category": "stale_source",
+      "query": "Which eligible source passage contains certificate rollover details after the archive expires?",
+      "service": "payment",
+      "stale_document_ids": [
+        "trace-dev-history-certificate"
+      ],
+      "claim": null,
+      "judgments": [],
+      "family": "stale-certificate"
+    },
+    {
+      "id": "stale-certificate-3",
+      "category": "stale_source",
+      "query": "Which eligible certificate-rollover passage can be retrieved after the archive freshness deadline?",
+      "service": "payment",
+      "stale_document_ids": [
+        "trace-dev-history-certificate"
+      ],
+      "claim": null,
+      "judgments": [],
+      "family": "stale-certificate"
+    },
+    {
+      "id": "stale-certificate-4",
+      "category": "stale_source",
+      "query": "What authorized current certificate-validity evidence remains after freshness expires?",
+      "service": "payment",
+      "stale_document_ids": [
+        "trace-dev-history-certificate"
+      ],
+      "claim": null,
+      "judgments": [],
+      "family": "stale-certificate"
+    },
+    {
+      "id": "stale-certificate-5",
+      "category": "stale_source",
+      "query": "Retrieve eligible historical certificate evidence while excluding the expired archive.",
+      "service": "payment",
+      "stale_document_ids": [
+        "trace-dev-history-certificate"
+      ],
+      "claim": null,
+      "judgments": [],
+      "family": "stale-certificate"
+    }
+  ],
+  "relevance_scope": "eligible_passage_content"
+}
