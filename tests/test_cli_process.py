@@ -103,6 +103,81 @@ def _run_persistence_demo(
 
 
 class CliProcessIntegrationTests(unittest.TestCase):
+    def test_evaluation_runner_rescores_saved_artifacts_and_rejects_tampering(
+        self,
+    ) -> None:
+        repository = Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory(prefix="trace-evaluation-cli-") as directory:
+            output = Path(directory) / "run"
+            first = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "evaluation.runner",
+                    "run",
+                    "--output",
+                    str(output),
+                ],
+                cwd=repository,
+                env=_minimal_environment(),
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=15,
+            )
+            self.assertEqual(first.returncode, 0, first.stderr)
+            score = json.loads(first.stdout)
+            self.assertEqual(score["summary"]["attempted"], 7)
+            self.assertEqual(first.stdout, (output / "scores.json").read_text())
+            self.assertTrue(
+                all(
+                    all(value is None for value in item["usage"].values())
+                    for item in score["attempts"]
+                )
+            )
+            logs = [json.loads(line) for line in first.stderr.splitlines()]
+            self.assertEqual(logs[-1]["event"], "evaluation.artifacts.ready")
+            self.assertTrue(logs[-1]["correlation_id"])
+            self.assertEqual(len(logs[-1]["manifest_sha256"]), 64)
+            second = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "evaluation.runner",
+                    "rescore",
+                    "--run-dir",
+                    str(output),
+                ],
+                cwd=repository,
+                env=_minimal_environment(),
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=15,
+            )
+            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertEqual(second.stdout, first.stdout)
+            (output / "inputs/c01.json").write_text("{}\n")
+            failed = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "evaluation.runner",
+                    "rescore",
+                    "--run-dir",
+                    str(output),
+                ],
+                cwd=repository,
+                env=_minimal_environment(),
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=15,
+            )
+            self.assertEqual(failed.returncode, 2)
+            self.assertEqual(failed.stdout, "")
+            self.assertIn("hash", failed.stderr)
+
     def test_timeline_demo_shuffles_resolves_and_preserves_incompleteness(self) -> None:
         script = Path(__file__).resolve().parents[1] / "scripts" / "demo_timeline.py"
         with tempfile.TemporaryDirectory(prefix="trace-timeline-cli-") as directory:

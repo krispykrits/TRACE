@@ -1,0 +1,317 @@
+{
+  "schema_version": "1",
+  "fixture_version": "candidate-fixtures.v1",
+  "attempts": [
+    {
+      "attempt_id": "correct",
+      "case_id": "c01",
+      "seed": 17,
+      "execution_status": "completed",
+      "failure_code": null,
+      "report": {
+        "schema_version": "1",
+        "assessment_status": "supported",
+        "observations": [
+          {
+            "claim_id": "o1",
+            "statement": "Order recorded a dependency failure.",
+            "citations": [
+              "ev-b69b227872f4350bd720-007"
+            ]
+          }
+        ],
+        "primary_hypothesis": {
+          "claim": {
+            "claim_id": "h1",
+            "statement": "The smaller Payment budget does not accommodate the observed work.",
+            "citations": [
+              "ev-b69b227872f4350bd720-000",
+              "ev-b69b227872f4350bd720-004",
+              "ev-b69b227872f4350bd720-005",
+              "ev-b69b227872f4350bd720-006"
+            ]
+          },
+          "service": "payment",
+          "cause": "deployment_regression"
+        },
+        "alternative_hypotheses": [
+          {
+            "claim": {
+              "claim_id": "h2",
+              "statement": "Slow dependency work is a competing explanation to check.",
+              "citations": [
+                "ev-b69b227872f4350bd720-005"
+              ]
+            },
+            "service": "payment",
+            "cause": "downstream_degradation"
+          }
+        ],
+        "uncertainty": "Synthetic evidence constrains these hypotheses; time order alone does not prove cause.",
+        "missing_evidence": [
+          "sanitized_export"
+        ],
+        "abstention_reason": null,
+        "next_check": "Inspect Payment budget and dependency work together.",
+        "timeline_evidence_ids": [
+          "ev-b69b227872f4350bd720-000",
+          "ev-b69b227872f4350bd720-001",
+          "ev-b69b227872f4350bd720-002",
+          "ev-b69b227872f4350bd720-d01",
+          "ev-b69b227872f4350bd720-003",
+          "ev-b69b227872f4350bd720-004",
+          "ev-b69b227872f4350bd720-005",
+          "ev-b69b227872f4350bd720-006",
+          "ev-b69b227872f4350bd720-007"
+        ]
+      },
+      "usage": {
+        "latency_ms": null,
+        "tokens": null,
+        "estimated_cost_usd": null,
+        "tool_calls": null
+      },
+      "support_reviews": []
+    },
+    {
+      "attempt_id": "incorrect",
+      "case_id": "c02",
+      "seed": 17,
+      "execution_status": "completed",
+      "failure_code": null,
+      "report": {
+        "schema_version": "1",
+        "assessment_status": "supported",
+        "observations": [
+          {
+            "claim_id": "o1",
+            "statement": "Payment recorded a timeout.",
+            "citations": [
+              "ev-3275a6cabfb39f07ed5b-006"
+            ]
+          }
+        ],
+        "primary_hypothesis": {
+          "claim": {
+            "claim_id": "h1",
+            "statement": "Notification deployment caused the Payment timeout.",
+            "citations": [
+              "ev-3275a6cabfb39f07ed5b-d01",
+              "ev-not-present"
+            ]
+          },
+          "service": "notification",
+          "cause": "deployment_regression"
+        },
+        "alternative_hypotheses": [],
+        "uncertainty": "Synthetic evidence constrains these hypotheses; time order alone does not prove cause.",
+        "missing_evidence": [
+          "sanitized_export"
+        ],
+        "abstention_reason": null,
+        "next_check": "Inspect Payment budget and dependency work together.",
+        "timeline_evidence_ids": [
+          "ev-3275a6cabfb39f07ed5b-007",
+          "ev-3275a6cabfb39f07ed5b-006",
+          "ev-3275a6cabfb39f07ed5b-005",
+          "ev-3275a6cabfb39f07ed5b-004",
+          "ev-3275a6cabfb39f07ed5b-003",
+          "ev-3275a6cabfb39f07ed5b-d01",
+          "ev-3275a6cabfb39f07ed5b-002",
+          "ev-3275a6cabfb39f07ed5b-001",
+          "ev-3275a6cabfb39f07ed5b-000"
+        ]
+      },
+      "usage": {
+        "latency_ms": null,
+        "tokens": null,
+        "estimated_cost_usd": null,
+        "tool_calls": null
+      },
+      "support_reviews": [
+        {
+          "claim_id": "h1",
+          "verdict": "unsupported",
+          "reviewer_id": "fixture-expectation.v1",
+          "rationale": "A Notification deployment citation does not support a causal link to Payment.",
+          "kind": "fixture_expectation"
+        }
+      ]
+    },
+    {
+      "attempt_id": "abstained",
+      "case_id": "c03",
+      "seed": 17,
+      "execution_status": "completed",
+      "failure_code": null,
+      "report": {
+        "schema_version": "1",
+        "assessment_status": "abstained",
+        "observations": [
+          {
+            "claim_id": "o1",
+            "statement": "Order recorded a dependency failure.",
+            "citations": [
+              "ev-387a6781152ad6cac40e-007"
+            ]
+          }
+        ],
+        "primary_hypothesis": null,
+        "alternative_hypotheses": [
+          {
+            "claim": {
+              "claim_id": "h1",
+              "statement": "A budget regression remains possible, but is unverified.",
+              "citations": [
+                "ev-387a6781152ad6cac40e-007"
+              ]
+            },
+            "service": "payment",
+            "cause": "deployment_regression"
+          },
+          {
+            "claim": {
+              "claim_id": "h2",
+              "statement": "Slow dependency work remains possible, but is unverified.",
+              "citations": [
+                "ev-387a6781152ad6cac40e-007"
+              ]
+            },
+            "service": "payment",
+            "cause": "downstream_degradation"
+          }
+        ],
+        "uncertainty": "Synthetic evidence constrains these hypotheses; time order alone does not prove cause.",
+        "missing_evidence": [
+          "payment_logs",
+          "payment_metrics",
+          "payment_deployments"
+        ],
+        "abstention_reason": "Payment capture is unavailable; this symptom cannot distinguish budget regression from slow dependency work.",
+        "next_check": "Obtain authorized Payment capture before choosing between the explanations.",
+        "timeline_evidence_ids": [
+          "ev-387a6781152ad6cac40e-002",
+          "ev-387a6781152ad6cac40e-d01",
+          "ev-387a6781152ad6cac40e-003",
+          "ev-387a6781152ad6cac40e-007"
+        ]
+      },
+      "usage": {
+        "latency_ms": null,
+        "tokens": null,
+        "estimated_cost_usd": null,
+        "tool_calls": null
+      },
+      "support_reviews": []
+    },
+    {
+      "attempt_id": "forced-diagnosis",
+      "case_id": "c04",
+      "seed": 17,
+      "execution_status": "completed",
+      "failure_code": null,
+      "report": {
+        "schema_version": "1",
+        "assessment_status": "supported",
+        "observations": [
+          {
+            "claim_id": "o1",
+            "statement": "Order recorded a dependency failure.",
+            "citations": [
+              "ev-1d312430df5aff1052e7-007"
+            ]
+          }
+        ],
+        "primary_hypothesis": {
+          "claim": {
+            "claim_id": "h1",
+            "statement": "Slow Payment dependency work is the established cause.",
+            "citations": [
+              "ev-1d312430df5aff1052e7-007"
+            ]
+          },
+          "service": "payment",
+          "cause": "downstream_degradation"
+        },
+        "alternative_hypotheses": [],
+        "uncertainty": "Synthetic evidence constrains these hypotheses; time order alone does not prove cause.",
+        "missing_evidence": [
+          "payment_logs",
+          "payment_metrics",
+          "payment_deployments"
+        ],
+        "abstention_reason": null,
+        "next_check": "Inspect Payment budget and dependency work together.",
+        "timeline_evidence_ids": [
+          "ev-1d312430df5aff1052e7-002",
+          "ev-1d312430df5aff1052e7-d01",
+          "ev-1d312430df5aff1052e7-003",
+          "ev-1d312430df5aff1052e7-007"
+        ]
+      },
+      "usage": {
+        "latency_ms": null,
+        "tokens": null,
+        "estimated_cost_usd": null,
+        "tool_calls": null
+      },
+      "support_reviews": [
+        {
+          "claim_id": "h1",
+          "verdict": "unsupported",
+          "reviewer_id": "fixture-expectation.v1",
+          "rationale": "Order failure alone does not distinguish slow dependency work from a budget regression.",
+          "kind": "fixture_expectation"
+        }
+      ]
+    },
+    {
+      "attempt_id": "missing",
+      "case_id": "c01",
+      "seed": 17,
+      "execution_status": "completed",
+      "failure_code": null,
+      "report": null,
+      "usage": {
+        "latency_ms": null,
+        "tokens": null,
+        "estimated_cost_usd": null,
+        "tool_calls": null
+      },
+      "support_reviews": []
+    },
+    {
+      "attempt_id": "malformed",
+      "case_id": "c02",
+      "seed": 17,
+      "execution_status": "completed",
+      "failure_code": null,
+      "report": {
+        "schema_version": "1",
+        "ground_truth": "must be rejected"
+      },
+      "usage": {
+        "latency_ms": null,
+        "tokens": null,
+        "estimated_cost_usd": null,
+        "tool_calls": null
+      },
+      "support_reviews": []
+    },
+    {
+      "attempt_id": "failed-job",
+      "case_id": "c01",
+      "seed": 17,
+      "execution_status": "failed",
+      "failure_code": "fixture_timeout",
+      "report": null,
+      "usage": {
+        "latency_ms": null,
+        "tokens": null,
+        "estimated_cost_usd": null,
+        "tool_calls": null
+      },
+      "support_reviews": []
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Deterministic incident timelines
 
-Sprint 3 [story #13](https://github.com/krispykrits/TRACE/issues/13), proposed for review. Timelines contain authorized observations from the existing bounded evidence query service. No model, causal inference, real-source integration or operational write capability is added.
+Sprint 3 [story #13](https://github.com/krispykrits/TRACE/issues/13), merged in [PR #41](https://github.com/krispykrits/TRACE/pull/41). Timelines contain authorized observations from the existing bounded evidence query service. No model, causal inference, real-source integration or operational write capability is added.
 
 ## Reproduce
 
