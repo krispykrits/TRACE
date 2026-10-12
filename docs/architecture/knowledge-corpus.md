@@ -1,6 +1,6 @@
 # Versioned knowledge corpus
 
-Status: proposed implementation for [#15](https://github.com/krispykrits/TRACE/issues/15), 2026-10-12. The small development corpus contains two runbooks, two service references and two explicitly fictional historical notes. Six documents produce 18 chunks. No authorized operational archive, retrieval index, embedding model or investigator is supplied by this increment. [ADR 0008](../adr/0008-local-corpus-generations-and-source-policy.md) records the Local MVP storage and adaptation boundary.
+Status: proposed implementation for [#15](https://github.com/krispykrits/TRACE/issues/15), in review via [PR #43](https://github.com/krispykrits/TRACE/pull/43), 2026-10-12. The small development corpus contains two runbooks, two service references and two explicitly fictional historical notes. Six documents produce 18 chunks. No authorized operational archive, retrieval index, embedding model or investigator is supplied by this increment. [ADR 0008](../adr/0008-local-corpus-generations-and-source-policy.md) records the Local MVP storage and adaptation boundary.
 
 ## Curated inputs and source adapters
 
