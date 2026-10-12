@@ -1,6 +1,6 @@
 # TRACE architecture view
 
-Status: Sprint 3 persistence, queries, scenarios and timelines merged; evaluation runner proposed, 2026-10-12. This view describes implemented code and approved direction; it does not claim an incident investigation is implemented.
+Status: Sprint 3 foundations including evaluation merged; Sprint 4 corpus ingestion proposed, 2026-10-12. This view describes implemented code and approved direction; it does not claim an incident investigation is implemented.
 
 ```mermaid
 flowchart LR
@@ -33,6 +33,7 @@ The Local/Cloud MVP investigation remains read-only. The final capstone's [appro
 - [SQLite investigation store](sqlite-investigation-store.md) defines persistence, retry/recovery, access and deletion rules.
 - [Bounded evidence queries](bounded-evidence-queries.md) define local service/time filters, trusted scope and distinct incomplete/empty/failure results.
 - [Incident timelines](incident-timelines.md) define UTC normalization, deterministic observation ordering, duplicate policy and scoped citation resolution.
+- [Knowledge corpus](knowledge-corpus.md) defines source adapters, curated inputs, stable chunk provenance, atomic generations and current access/freshness/tombstone checks.
 - [Development evaluation](development-evaluation.md) defines candidate reports, offline fixture scoring, evaluator isolation, citation-support review and the baseline comparison protocol.
 - [Interfaces and API contracts](interfaces.md) describe the current CLI and the deferred application/source APIs.
 - [Development guide](../development.md) gives runnable local commands and the current quality gate.

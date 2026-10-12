@@ -94,6 +94,7 @@ The formatter redacts values under fields named for passwords, secrets, tokens, 
 ## Repository map
 
 - src/trace_app/ — TRACE-owned application package and CLI entry point
+- corpus/ — curated development knowledge sources and versioned manifests
 - evaluation/ — evaluator-only manifests, candidate fixtures and offline scorer tooling
 - tests/ — deterministic, credential-free unit and process-boundary tests
 - docs/ — project decisions, plans, and development notes
@@ -130,3 +131,7 @@ uv run --locked python -m evaluation.runner rescore --run-dir /tmp/trace-s3-eval
 ```
 
 The [evaluation contract](architecture/development-evaluation.md) defines metrics, expected scores, schemas, artifact isolation and support-review/baseline protocols. Saved runs are exclusive and version/hash checked; input errors exit 2. Successful scoring exits 0 even when candidate fixtures fail checks. Application and evaluator code are included in the documented quality commands. No model usage, actual human review, operator timing or operational acceptance is claimed. Only the operational files under a saved run's `inputs/` may be supplied to an investigator; keep evaluator manifests, candidate fixtures and labels out of its context.
+
+## Curated knowledge ingestion
+
+`uv run --locked python scripts/demo_corpus.py` ingests six development references twice across a SQLite restart and resolves all 18 stable chunks. It runs offline with a fixed synthetic clock and temporary state. The [corpus contract](architecture/knowledge-corpus.md) defines adapters, metadata, chunking, atomic generations, revision/policy updates, revocation and retention, plus the contamination checklist. The historical notes are explicitly fictional development material. Real source permission, freshness and retention remain owner-dependent inputs; retrieval and embeddings belong to #16.

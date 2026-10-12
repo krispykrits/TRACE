@@ -12,6 +12,8 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0006](0006-pgvector-cloud-retrieval-storage.md) | pgvector on RDS for cloud vector storage | Accepted direction; implementation and retrieval evidence pending |
 | [0007](0007-synthetic-evidence-identity-and-isolation.md) | Stable synthetic evidence identity and evaluator isolation | Accepted with merged issue #8 implementation |
 
+| [0008](0008-local-corpus-generations-and-source-policy.md) | Local corpus generations, adapted chunk provenance and current source policy | Proposed in issue #15; owner review pending |
+
 ## Open decision register
 
 These are gates, not inferred decisions. The [charter](../charter.md) is the full owner/input register; update the relevant ADR when a design choice is made.

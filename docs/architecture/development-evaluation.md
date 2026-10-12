@@ -1,6 +1,6 @@
 # Development evaluation contracts
 
-Status: proposed implementation for issue [#14](https://github.com/krispykrits/TRACE/issues/14), in review via [PR #42](https://github.com/krispykrits/TRACE/pull/42), 2026-10-12. This offline runner checks hand-authored candidate fixtures against the four seed-17 development cases. It provides scoring plumbing before investigator/model integration. Its deliberately mixed correct, incorrect, abstaining, missing, malformed and failed outputs are a scorer demonstration; their rates do not measure a model or establish Local MVP, Cloud MVP, Full Capstone or Operational Pilot acceptance.
+Status: issue [#14](https://github.com/krispykrits/TRACE/issues/14) merged via [PR #42](https://github.com/krispykrits/TRACE/pull/42), 2026-10-12. This offline runner checks hand-authored candidate fixtures against the four seed-17 development cases. It provides scoring plumbing before investigator/model integration. Its deliberately mixed correct, incorrect, abstaining, missing, malformed and failed outputs are a scorer demonstration; their rates do not measure a model or establish Local MVP, Cloud MVP, Full Capstone or Operational Pilot acceptance.
 
 ## Run and reproduce
 

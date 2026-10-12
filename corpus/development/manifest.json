@@ -1,0 +1,150 @@
+{
+  "schema_version": "1",
+  "corpus_version": "trace-knowledge-development.v1",
+  "documents": [
+    {
+      "metadata": {
+        "document_id": "trace-dev-timeout-evidence",
+        "document_type": "runbook",
+        "title": "Timeout evidence collection",
+        "service": "payment",
+        "environment": "test",
+        "source_uri": "synthetic://trace-knowledge/timeout-evidence",
+        "source_record_id": "reference/timeout-evidence",
+        "source_revision": "2026-10-12.v1",
+        "version": "1.0.0",
+        "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+        "access_scope": "local:knowledge-development",
+        "access_classification": "synthetic_public",
+        "evaluation_role": "development_reference",
+        "answer_bearing": false,
+        "valid_from": "2026-01-01T00:00:00Z",
+        "valid_until": null,
+        "verified_at": "2026-10-12T12:00:00Z",
+        "fresh_until": "2026-11-12T12:00:00Z"
+      },
+      "path": "documents/timeout-evidence.md",
+      "content_sha256": "c8cace06bc7e2f535a704b554d485de2a7b45ba22404a4e9d7dc23554790c1fc"
+    },
+    {
+      "metadata": {
+        "document_id": "trace-dev-source-freshness",
+        "document_type": "runbook",
+        "title": "Checking source freshness and gaps",
+        "service": "order",
+        "environment": "test",
+        "source_uri": "synthetic://trace-knowledge/source-freshness",
+        "source_record_id": "reference/source-freshness",
+        "source_revision": "2026-10-12.v1",
+        "version": "1.0.0",
+        "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+        "access_scope": "local:knowledge-development",
+        "access_classification": "synthetic_public",
+        "evaluation_role": "development_reference",
+        "answer_bearing": false,
+        "valid_from": "2026-01-01T00:00:00Z",
+        "valid_until": null,
+        "verified_at": "2026-10-12T12:00:00Z",
+        "fresh_until": "2026-11-12T12:00:00Z"
+      },
+      "path": "documents/source-freshness.md",
+      "content_sha256": "f851ce4507518152a433c77b705d007b7f8796d6ce7b6e3a4fcaac99e96f9501"
+    },
+    {
+      "metadata": {
+        "document_id": "trace-dev-order-interface",
+        "document_type": "service",
+        "title": "Order service interface and dependencies",
+        "service": "order",
+        "environment": "test",
+        "source_uri": "synthetic://trace-knowledge/order-interface",
+        "source_record_id": "reference/order-interface",
+        "source_revision": "2026-10-12.v1",
+        "version": "1.0.0",
+        "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+        "access_scope": "local:knowledge-development",
+        "access_classification": "synthetic_public",
+        "evaluation_role": "development_reference",
+        "answer_bearing": false,
+        "valid_from": "2026-01-01T00:00:00Z",
+        "valid_until": null,
+        "verified_at": "2026-10-12T12:00:00Z",
+        "fresh_until": "2026-11-12T12:00:00Z"
+      },
+      "path": "documents/order-interface.md",
+      "content_sha256": "e28c74956f7070986573bfa0d4b01fcfe541079441110da27d3e9859a2a67fac"
+    },
+    {
+      "metadata": {
+        "document_id": "trace-dev-payment-interface",
+        "document_type": "service",
+        "title": "Payment service evidence vocabulary",
+        "service": "payment",
+        "environment": "test",
+        "source_uri": "synthetic://trace-knowledge/payment-interface",
+        "source_record_id": "reference/payment-interface",
+        "source_revision": "2026-10-12.v1",
+        "version": "1.0.0",
+        "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+        "access_scope": "local:knowledge-development",
+        "access_classification": "synthetic_public",
+        "evaluation_role": "development_reference",
+        "answer_bearing": false,
+        "valid_from": "2026-01-01T00:00:00Z",
+        "valid_until": null,
+        "verified_at": "2026-10-12T12:00:00Z",
+        "fresh_until": "2026-11-12T12:00:00Z"
+      },
+      "path": "documents/payment-interface.md",
+      "content_sha256": "ec1e4e77c4acbfd43018a4ae43ac1a2e42509984f0d7ee9a9312ce222f04a517"
+    },
+    {
+      "metadata": {
+        "document_id": "trace-dev-history-certificate",
+        "document_type": "incident",
+        "title": "Fictional archive: certificate expiry investigation",
+        "service": "payment",
+        "environment": "test",
+        "source_uri": "synthetic://trace-knowledge/history-certificate",
+        "source_record_id": "reference/history-certificate",
+        "source_revision": "2026-10-12.v1",
+        "version": "1.0.0",
+        "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+        "access_scope": "local:knowledge-development",
+        "access_classification": "synthetic_public",
+        "evaluation_role": "development_reference",
+        "answer_bearing": true,
+        "valid_from": "2026-01-01T00:00:00Z",
+        "valid_until": null,
+        "verified_at": "2026-10-12T12:00:00Z",
+        "fresh_until": "2026-11-12T12:00:00Z"
+      },
+      "path": "documents/history-certificate.md",
+      "content_sha256": "f32ad28759bb29f39a617c1b746357c2d46acdc8b9d4f9cd349acf5be657e2e2"
+    },
+    {
+      "metadata": {
+        "document_id": "trace-dev-history-queue",
+        "document_type": "postmortem",
+        "title": "Fictional archive: queue backlog investigation",
+        "service": "order",
+        "environment": "test",
+        "source_uri": "synthetic://trace-knowledge/history-queue",
+        "source_record_id": "reference/history-queue",
+        "source_revision": "2026-10-12.v1",
+        "version": "1.0.0",
+        "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+        "access_scope": "local:knowledge-development",
+        "access_classification": "synthetic_public",
+        "evaluation_role": "development_reference",
+        "answer_bearing": true,
+        "valid_from": "2026-01-01T00:00:00Z",
+        "valid_until": null,
+        "verified_at": "2026-10-12T12:00:00Z",
+        "fresh_until": "2026-11-12T12:00:00Z"
+      },
+      "path": "documents/history-queue.md",
+      "content_sha256": "e9f826c4f16a2c540f63d3682f6b34c3a188c5007d7ac1065ae3e767d4b7bea3"
+    }
+  ]
+}
