@@ -103,6 +103,78 @@ def _run_persistence_demo(
 
 
 class CliProcessIntegrationTests(unittest.TestCase):
+    def test_development_suite_cli_export_and_invalid_requests(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="trace-suite-") as directory:
+            env_file = Path(directory) / "settings.env"
+            env_file.write_text("", encoding="utf-8")
+            for case in ("c01", "c02", "c03", "c04"):
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "trace_app.cli",
+                        "replay-scenario",
+                        "--env-file",
+                        str(env_file),
+                        "--environment",
+                        "test",
+                        "--case",
+                        case,
+                        "--seed",
+                        "17",
+                    ],
+                    cwd=directory,
+                    env=_minimal_environment(),
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=15,
+                )
+                self.assertEqual(result.returncode, 0, result.stderr)
+                output = json.loads(result.stdout)
+                self.assertEqual(output["status"], "dependency_failed")
+                self.assertEqual(
+                    len(output["evidence"]["entries"]),
+                    9 if case in ("c01", "c02") else 4,
+                )
+                for forbidden in (
+                    "cause_label",
+                    "ground_truth",
+                    "expected_assessment",
+                    "case_id",
+                    "mvp_suite_v1.json",
+                ):
+                    self.assertNotIn(forbidden, result.stdout + result.stderr)
+                logs = [json.loads(line) for line in result.stderr.splitlines()]
+                self.assertEqual(logs[-1]["event"], "replay.completed")
+                self.assertEqual(len({record["correlation_id"] for record in logs}), 1)
+            for environment, seed in (("production", "17"), ("test", "-1")):
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "trace_app.cli",
+                        "replay-scenario",
+                        "--env-file",
+                        str(env_file),
+                        "--environment",
+                        environment,
+                        "--case",
+                        "c01",
+                        "--seed",
+                        seed,
+                    ],
+                    cwd=directory,
+                    env=_minimal_environment(),
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=15,
+                )
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertEqual(result.stdout, "")
+                self.assertNotIn("order.requested", result.stderr)
+
     def test_two_consecutive_runs_are_isolated_and_successful(self) -> None:
         for expected_environment in ("development", "test"):
             with self.subTest(environment=expected_environment):

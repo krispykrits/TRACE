@@ -1,6 +1,6 @@
 # TRACE architecture view
 
-Status: Sprint 3 local evidence persistence merged; bounded queries proposed, 2026-10-05. This view describes implemented code and approved direction; it does not claim an incident investigation is implemented.
+Status: Sprint 3 persistence and bounded queries merged; development scenarios proposed, 2026-10-12. This view describes implemented code and approved direction; it does not claim an incident investigation is implemented.
 
 ```mermaid
 flowchart LR
@@ -29,6 +29,7 @@ The Local/Cloud MVP investigation remains read-only. The final capstone's [appro
 - [Order–Payment workflow](order-payment-workflow.md) shows the implemented request path and fixture limits.
 - [Evidence and data contracts](data-contracts.md) distinguish settings, logs, workflow records and incident evidence.
 - [Dependency replay contract](dependency-replay-evidence.md) defines the version 1 envelope, replay rules and evaluator separation.
+- [Development scenarios](development-scenarios.md) describe regression, degradation, missing/late telemetry, noncausal deployments and evaluator split/isolation rules.
 - [SQLite investigation store](sqlite-investigation-store.md) defines persistence, retry/recovery, access and deletion rules.
 - [Bounded evidence queries](bounded-evidence-queries.md) define local service/time filters, trusted scope and distinct incomplete/empty/failure results.
 - [Interfaces and API contracts](interfaces.md) describe the current CLI and the deferred application/source APIs.
