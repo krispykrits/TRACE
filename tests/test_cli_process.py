@@ -103,6 +103,51 @@ def _run_persistence_demo(
 
 
 class CliProcessIntegrationTests(unittest.TestCase):
+    def test_corpus_demo_repeats_resolves_sources_and_rejects_invalid_input(
+        self,
+    ) -> None:
+        script = Path(__file__).resolve().parents[1] / "scripts/demo_corpus.py"
+        with tempfile.TemporaryDirectory(prefix="trace-corpus-cli-") as directory:
+
+            def execute(*arguments: str) -> subprocess.CompletedProcess[str]:
+                return subprocess.run(
+                    [sys.executable, str(script), *arguments],
+                    cwd=directory,
+                    env=_minimal_environment(),
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=15,
+                )
+
+            first = execute()
+            second = execute()
+            self.assertEqual(first.returncode, 0, first.stderr)
+            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertEqual(first.stdout, second.stdout)
+            result = json.loads(first.stdout)
+            self.assertTrue(result["same_generation"])
+            self.assertTrue(result["first_created"])
+            self.assertFalse(result["second_created"])
+            self.assertEqual(result["generation"]["document_count"], 6)
+            self.assertEqual(len(result["chunks"]), 18)
+            self.assertTrue(
+                all(
+                    chunk["content_role"] == "untrusted_source_data"
+                    and chunk["metadata"]["source_revision"]
+                    for chunk in result["chunks"]
+                )
+            )
+            logs = [json.loads(line) for line in first.stderr.splitlines()]
+            self.assertEqual(
+                [log["event"] for log in logs], ["corpus.ingested", "corpus.ingested"]
+            )
+            self.assertEqual(len({log["correlation_id"] for log in logs}), 1)
+            rejected = execute("--corpus", directory)
+            self.assertEqual(rejected.returncode, 2)
+            self.assertEqual(rejected.stdout, "")
+            self.assertEqual(list(Path(directory).iterdir()), [])
+
     def test_evaluation_runner_rescores_saved_artifacts_and_rejects_tampering(
         self,
     ) -> None:
