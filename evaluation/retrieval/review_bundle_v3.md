@@ -1,3 +1,5 @@
+> Archived v3 proposals. The review-file instruction below was incorrect and is superseded by [the v4 bundle](review_bundle_v4.md), which identifies reviews_v4.json. Do not record new decisions using this obsolete instruction. The exact original bundle remains in commit 0c38dfb9c06386bf2e407bae8dfd20a0b98268c8.
+
 # Passage relevance and claim-support review
 
 This is evaluator-only development material. All judgments below are agent-authored proposals, with no human sign-off yet.

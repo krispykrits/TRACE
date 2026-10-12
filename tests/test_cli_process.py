@@ -162,7 +162,7 @@ class CliProcessIntegrationTests(unittest.TestCase):
             output = Path(directory) / "report.json"
             review_path = Path(directory) / "unreviewed.json"
             review_fixture = json.loads(
-                (repository / "evaluation/retrieval/reviews_v3.json").read_text()
+                (repository / "evaluation/retrieval/reviews_v4.json").read_text()
             )
             review_fixture["reviews"] = []
             review_path.write_text(json.dumps(review_fixture))
@@ -194,6 +194,13 @@ class CliProcessIntegrationTests(unittest.TestCase):
             saved = execute("--rescore", str(output))
             self.assertEqual(saved.returncode, 0, saved.stderr)
             self.assertEqual(json.loads(saved.stdout), summary["metrics"])
+            bundle_path = Path(directory) / "review.md"
+            generated = execute(
+                "--reviews", str(review_path), "--review-bundle", str(bundle_path)
+            )
+            self.assertEqual(generated.returncode, 0, generated.stderr)
+            self.assertIn("in " + review_path.name, bundle_path.read_text())
+            self.assertNotIn("in reviews_v2.json", bundle_path.read_text())
             blocked = Path(directory) / "acceptance.json"
             failed = execute(
                 "--reviews", str(review_path), "--acceptance", "--output", str(blocked)

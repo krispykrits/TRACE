@@ -34,11 +34,11 @@ _AT = datetime(2026, 10, 12, 20, tzinfo=UTC)
 class PassageEvaluationTests(unittest.TestCase):
     def setUp(self) -> None:
         self.suite = validate_suite(
-            read_json(_ROOT / "evaluation/retrieval/queries_v3.json")
+            read_json(_ROOT / "evaluation/retrieval/queries_v4.json")
         )
-        self.protocol = read_json(_ROOT / "evaluation/retrieval/acceptance_v2.json")
+        self.protocol = read_json(_ROOT / "evaluation/retrieval/acceptance_v3.json")
         review_summary(
-            self.suite, read_json(_ROOT / "evaluation/retrieval/reviews_v3.json")
+            self.suite, read_json(_ROOT / "evaluation/retrieval/reviews_v4.json")
         )
         self.reviews: dict[str, Any] = {
             "schema_version": "1",
@@ -154,9 +154,16 @@ class PassageEvaluationTests(unittest.TestCase):
         self.assertIn("no human sign-off", bundle)
         self.assertIn("relevance:stale-certificate", bundle)
         self.assertIn("Original offsets", bundle)
+        self.assertIn("in reviews_v4.json", bundle)
+        self.assertNotIn("in reviews_v2.json", bundle)
+        custom_bundle = review_bundle(
+            self.suite, reviews_path=Path("chosen-reviews.json")
+        )
+        self.assertIn("in chosen-reviews.json", custom_bundle)
+        self.assertNotIn("in reviews_v4.json", custom_bundle)
         self.assertEqual(
             bundle.rstrip("\n"),
-            (_ROOT / "evaluation/retrieval/review_bundle_v3.md")
+            (_ROOT / "evaluation/retrieval/review_bundle_v4.md")
             .read_text()
             .rstrip("\n"),
         )
@@ -194,7 +201,7 @@ class PassageEvaluationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             review_summary(self.suite, reviews)
 
-    def test_owner_corrections_bind_relevance_and_question_specific_claims(
+    def test_review_findings_bind_relevance_and_question_specific_claims(
         self,
     ) -> None:
         queries = {q["id"]: q for q in self.suite["queries"]}
@@ -220,6 +227,15 @@ class PassageEvaluationTests(unittest.TestCase):
             "Failed requests and accepted receipts are distinct observations.",
         )
         self.assertEqual(self.suite["relevance_scope"], "eligible_passage_content")
+        for identity in ("exact-code-4", "exact-code-5"):
+            for judgment in queries[identity]["judgments"]:
+                self.assertIn("duration", judgment["claim"])
+                self.assertNotEqual(
+                    judgment["claim"],
+                    "HTTP 504 is a symptom code, not a root-cause label.",
+                )
+        self.assertIn("limitation", queries["saved-permission-5"]["claim"])
+        self.assertIn("revalidation", queries["saved-permission-6"]["claim"])
         self.assertIn("eligible", queries["stale-certificate-3"]["query"])
         old = read_json(_ROOT / "evaluation/retrieval/acceptance_v1.json")
         for field in (

@@ -41,9 +41,10 @@ from trace_app.retrieval_contracts import EncoderFailure, SearchMode, SearchRequ
 from trace_app.retrieval_index import build_index, load_index
 from trace_app.structured_logging import configure_logging
 
-SCORER_VERSION = "passage-retrieval-scorer.v2"
+SCORER_VERSION = "passage-retrieval-scorer.v3"
 _ROOT = Path(__file__).resolve().parents[1]
 _INPUT = _ROOT / "evaluation/retrieval"
+_REVIEW_PATH = _INPUT / "reviews_v4.json"
 _AT = datetime(2026, 10, 12, 12, tzinfo=UTC)
 _READ_AT = _AT + timedelta(minutes=10)
 _CONTEXT = CorpusReadContext(
@@ -259,7 +260,7 @@ def validate_protocol(
     )
     if (
         protocol["schema_version"] != "1"
-        or protocol["protocol_version"] != "retrieval-acceptance.v2"
+        or protocol["protocol_version"] != "retrieval-acceptance.v3"
         or protocol["suite_sha256"] != digest(canonical(suite))
     ):
         raise ValueError("Protocol version or frozen suite hash differs.")
@@ -508,7 +509,7 @@ def _validate_sources(suite: dict[str, Any]) -> CorpusBatch:
     return batch
 
 
-def review_bundle(suite: dict[str, Any]) -> str:
+def review_bundle(suite: dict[str, Any], *, reviews_path: Path = _REVIEW_PATH) -> str:
     batch = _validate_sources(suite)
     chunks = {
         chunk.chunk_id: chunk
@@ -524,7 +525,9 @@ def review_bundle(suite: dict[str, Any]) -> str:
         "",
         "Suite SHA-256: `" + digest(canonical(suite)) + "`.",
         "",
-        "Review every query's proposed relevant set, including empty sets, and each passage/claim verdict against the original quote and metadata. Record supported/unsupported/indeterminate decisions and rationales in reviews_v2.json using the target IDs below. A relevance verdict of supported endorses the complete proposed relevant set; another verdict records a rejection/uncertainty. Claim verdicts concern the stated probe claim, not a generated answer.",
+        "Review every query's proposed relevant set, including empty sets, and each passage/claim verdict against the original quote and metadata. Record supported/unsupported/indeterminate decisions and rationales in "
+        + reviews_path.name
+        + " using the target IDs below. A relevance verdict of supported endorses the complete proposed relevant set; another verdict records a rejection/uncertainty. Claim verdicts concern the question-specific probe, not a generated answer. AI review findings and requests to revise these proposals do not establish human endorsement; actual human decisions must be recorded separately.",
         "",
         "The 100 requests are variants across 15 related development families over six fictional/curated references. They are not 100 independent incidents. Stale-source cases give the certificate reference a fixture freshness deadline of 12:05 UTC, index it at 12:00 and query at 12:10 on 2026-10-12. No held-out material is supplied.",
         "",
@@ -938,9 +941,9 @@ def _write_new(path: Path, content: str) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--suite", type=Path, default=_INPUT / "queries_v3.json")
-    parser.add_argument("--reviews", type=Path, default=_INPUT / "reviews_v3.json")
-    parser.add_argument("--protocol", type=Path, default=_INPUT / "acceptance_v2.json")
+    parser.add_argument("--suite", type=Path, default=_INPUT / "queries_v4.json")
+    parser.add_argument("--reviews", type=Path, default=_REVIEW_PATH)
+    parser.add_argument("--protocol", type=Path, default=_INPUT / "acceptance_v3.json")
     parser.add_argument("--modes", nargs="+", choices=_MODES, default=list(_MODES))
     parser.add_argument("--max-chunks-per-document", type=int, default=20)
     operation = parser.add_mutually_exclusive_group()
@@ -967,7 +970,9 @@ def main(argv: list[str] | None = None) -> int:
         validate_protocol(protocol, suite, run_at=datetime.now(UTC))
         review_summary(suite, reviews)
         if args.review_bundle:
-            _write_new(args.review_bundle, review_bundle(suite))
+            _write_new(
+                args.review_bundle, review_bundle(suite, reviews_path=args.reviews)
+            )
             print(
                 json.dumps(
                     {
