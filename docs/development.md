@@ -114,3 +114,7 @@ References: [CloudWatch agent collection](https://docs.aws.amazon.com/AmazonClou
 ## MVP development fixtures
 
 Replay the four small synthetic cases with `trace-app replay-scenario --environment test --case c01 --seed 17` (also `c02`, `c03`, `c04`). Add `--without-distractor` to remove the unrelated Notification deployment. The [scenario catalog](architecture/development-scenarios.md) defines configuration, typed output, capture gaps/delays, reset and evaluator isolation. Its manifest is developer/evaluator material, outside investigator inputs. No held-out answers, real-source access or operational acceptance is claimed.
+
+## Deterministic timeline demo
+
+`uv run --locked python scripts/demo_timeline.py --case c01 --seed 17` shuffles a development fixture, persists/reopens its temporary SQLite state, constructs the bounded timeline and resolves its citations. Try `--case c03` for source gaps or `--limit 1` for explicit result truncation. The [timeline contract](architecture/incident-timelines.md) defines offset-window input, ordering, duplicate identity and access/error behavior. No causal relationship is inferred from this sequence.

@@ -1,6 +1,6 @@
 # Data contracts and decisions
 
-Status: Sprint 3 local evidence persistence merged; bounded queries proposed, 2026-10-05. Configuration, application logs, synthetic Order records and version 1 synthetic incident evidence have distinct contracts.
+Status: Sprint 3 persistence, queries and scenarios merged; deterministic timelines proposed, 2026-10-12. Configuration, application logs, synthetic Order records and version 1 synthetic incident evidence have distinct contracts.
 
 | Existing record | Current contract | Source |
 | --- | --- | --- |
@@ -11,6 +11,7 @@ Status: Sprint 3 local evidence persistence merged; bounded queries proposed, 20
 | Synthetic incident evidence | Version 1 envelope with stable evidence/source IDs, UTC observed and collected times, provenance, access/redaction status, correlation, window and source availability | [Dependency replay contract](dependency-replay-evidence.md), [ADR 0007](../adr/0007-synthetic-evidence-identity-and-isolation.md) |
 | Local evidence snapshot and execution state | SQLite schema version 1 stores bounded typed log/metric/deployment entries, source availability, attempts, execution, assessment and review status; reads require a trusted scope | [SQLite store contract](sqlite-investigation-store.md), [ADR 0005](../adr/0005-sqlite-local-postgresql-rds-cloud.md) |
 | Bounded local evidence query | Trusted context supplies scope, environment and service grants; caller filters only narrow them; inclusive UTC event-time window, result/read bounds, evidence IDs/provenance and distinct empty/incomplete/failure outcomes | [Query contract](bounded-evidence-queries.md) |
+| Incident timeline (proposed #13) | Parsed UTC observed-time/evidence-ID order; collection/provenance retained; every event is an observation with a scoped citation; missing/truncated/failure outcomes are explicit | [Timeline contract](incident-timelines.md) |
 
 ## Evidence boundary and next increment
 

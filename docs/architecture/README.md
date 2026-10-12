@@ -1,6 +1,6 @@
 # TRACE architecture view
 
-Status: Sprint 3 persistence and bounded queries merged; development scenarios proposed, 2026-10-12. This view describes implemented code and approved direction; it does not claim an incident investigation is implemented.
+Status: Sprint 3 persistence, queries and scenarios merged; deterministic timelines proposed, 2026-10-12. This view describes implemented code and approved direction; it does not claim an incident investigation is implemented.
 
 ```mermaid
 flowchart LR
@@ -32,6 +32,7 @@ The Local/Cloud MVP investigation remains read-only. The final capstone's [appro
 - [Development scenarios](development-scenarios.md) describe regression, degradation, missing/late telemetry, noncausal deployments and evaluator split/isolation rules.
 - [SQLite investigation store](sqlite-investigation-store.md) defines persistence, retry/recovery, access and deletion rules.
 - [Bounded evidence queries](bounded-evidence-queries.md) define local service/time filters, trusted scope and distinct incomplete/empty/failure results.
+- [Incident timelines](incident-timelines.md) define UTC normalization, deterministic observation ordering, duplicate policy and scoped citation resolution.
 - [Interfaces and API contracts](interfaces.md) describe the current CLI and the deferred application/source APIs.
 - [Development guide](../development.md) gives runnable local commands and the current quality gate.
 - [Reuse review](../planning/production-usefulness-review.md) and [approved amendment](../planning/production-roadmap-amendment.md) explain why educational components must enter through TRACE-owned contracts.
