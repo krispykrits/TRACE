@@ -1,6 +1,6 @@
 # ADR 0009: Pinned local embedding and exact knowledge retrieval
 
-- **Status:** Proposed in issue #16; owner review pending
+- **Status:** Proposed in [PR #44](https://github.com/krispykrits/TRACE/pull/44) for issue #16; owner review pending
 - **Date:** 2026-10-12
 - **Decision owner:** Project owner, through scoped implementation review
 - **Scope:** Local MVP read-only retrieval; cloud direction remains ADR 0006

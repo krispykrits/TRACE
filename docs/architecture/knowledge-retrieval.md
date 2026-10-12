@@ -1,6 +1,6 @@
 # Authorized knowledge retrieval
 
-Status: proposed implementation for [#16](https://github.com/krispykrits/TRACE/issues/16), 2026-10-12. [ADR 0009](../adr/0009-local-exact-knowledge-retrieval.md) records the embedding, dependency and storage decision. This read-only use case searches the [versioned corpus](knowledge-corpus.md); it does not diagnose an incident or authorize an action.
+Status: proposed implementation for [#16](https://github.com/krispykrits/TRACE/issues/16), in review via [PR #44](https://github.com/krispykrits/TRACE/pull/44), 2026-10-12. [ADR 0009](../adr/0009-local-exact-knowledge-retrieval.md) records the embedding, dependency and storage decision. This read-only use case searches the [versioned corpus](knowledge-corpus.md); it does not diagnose an incident or authorize an action.
 
 ## Contract and bounds
 
