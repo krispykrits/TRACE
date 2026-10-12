@@ -7,16 +7,16 @@ run:
 	uv run --locked trace-app
 
 check:
-	uv run --locked python -m compileall -q src tests scripts
+	uv run --locked python -m compileall -q src tests scripts evaluation
 
 lint:
-	uv run --locked ruff check src tests scripts
+	uv run --locked ruff check src tests scripts evaluation
 
 format-check:
-	uv run --locked ruff format --check src tests scripts
+	uv run --locked ruff format --check src tests scripts evaluation
 
 type-check:
-	uv run --locked mypy src tests
+	uv run --locked mypy src tests evaluation
 
 test:
 	uv run --locked python -m unittest discover -s tests -v

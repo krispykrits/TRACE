@@ -94,6 +94,7 @@ The formatter redacts values under fields named for passwords, secrets, tokens, 
 ## Repository map
 
 - src/trace_app/ — TRACE-owned application package and CLI entry point
+- evaluation/ — evaluator-only manifests, candidate fixtures and offline scorer tooling
 - tests/ — deterministic, credential-free unit and process-boundary tests
 - docs/ — project decisions, plans, and development notes
 - pyproject.toml — package metadata, script entry point, and dependency groups
@@ -118,3 +119,14 @@ Replay the four small synthetic cases with `trace-app replay-scenario --environm
 ## Deterministic timeline demo
 
 `uv run --locked python scripts/demo_timeline.py --case c01 --seed 17` shuffles a development fixture, persists/reopens its temporary SQLite state, constructs the bounded timeline and resolves its citations. Try `--case c03` for source gaps or `--limit 1` for explicit result truncation. The [timeline contract](architecture/incident-timelines.md) defines offset-window input, ordering, duplicate identity and access/error behavior. No causal relationship is inferred from this sequence.
+
+## Early development scoring
+
+From the repository root, run the offline hand-authored candidates against the four development cases using a new directory:
+
+```sh
+uv run --locked python -m evaluation.runner run --output /tmp/trace-s3-evaluation
+uv run --locked python -m evaluation.runner rescore --run-dir /tmp/trace-s3-evaluation
+```
+
+The [evaluation contract](architecture/development-evaluation.md) defines metrics, expected scores, schemas, artifact isolation and support-review/baseline protocols. Saved runs are exclusive and version/hash checked; input errors exit 2. Successful scoring exits 0 even when candidate fixtures fail checks. Application and evaluator code are included in the documented quality commands. No model usage, actual human review, operator timing or operational acceptance is claimed. Only the operational files under a saved run's `inputs/` may be supplied to an investigator; keep evaluator manifests, candidate fixtures and labels out of its context.
