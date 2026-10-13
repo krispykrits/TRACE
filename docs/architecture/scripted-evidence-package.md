@@ -1,6 +1,6 @@
 # Scripted Sprint 4 evidence package
 
-Proposed integration gate for [#19](https://github.com/krispykrits/TRACE/issues/19), 2026-10-13. The [Sprint 4 review](../sprints/sprint-04-review.md) records evidence and the Sprint 5 handoff. This uses the accepted [tool catalog](investigation-tools.md), [timeline](incident-timelines.md), [retrieval/context](retrieval-evaluation-context.md) and [capability boundaries](package-layout.md).
+Proposed integration gate for [#19](https://github.com/krispykrits/TRACE/issues/19) in [PR #49](https://github.com/krispykrits/TRACE/pull/49), 2026-10-13. The [Sprint 4 review](../sprints/sprint-04-review.md) records evidence and the Sprint 5 handoff. This uses the accepted [tool catalog](investigation-tools.md), [timeline](incident-timelines.md), [retrieval/context](retrieval-evaluation-context.md) and [capability boundaries](package-layout.md).
 
 ## Fixed read sequence
 

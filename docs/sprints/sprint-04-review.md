@@ -1,6 +1,6 @@
 # Sprint 4 review — knowledge, retrieval and controlled tools
 
-Date: 2026-10-13 (America/New_York). Prepared by: Codex. Intended reviewer: project owner. Scope: [roadmap S4](../planning/capstone-project-plan.md), integration gate [#19](https://github.com/krispykrits/TRACE/issues/19). **Draft for owner review; gate acceptance follows review and merge of the #19 PR.** Sprint numbers denote scope increments, not dates or capacity commitments.
+Date: 2026-10-13 (America/New_York). Prepared by: Codex. Intended reviewer: project owner. Scope: [roadmap S4](../planning/capstone-project-plan.md), integration gate [#19](https://github.com/krispykrits/TRACE/issues/19). **Draft for owner review; gate acceptance follows review and merge of [PR #49](https://github.com/krispykrits/TRACE/pull/49).** Sprint numbers denote scope increments, not dates or capacity commitments.
 
 ## Completion and acceptance evidence
 
