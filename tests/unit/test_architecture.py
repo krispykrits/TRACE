@@ -45,6 +45,19 @@ class ArchitectureTests(unittest.TestCase):
                 "from scripts.demo_integration import integration_fixture",
                 "from trace_app.adapters.tools.local import LocalToolBackend",
             ],
+            "investigation/provider.py": [
+                "from trace_app.adapters.models.process import ProcessModelProvider",
+                "from tests.fixtures.model_provider import FakeModelTransport",
+                "import openai",
+            ],
+            "adapters/models/provider.py": [
+                "from trace_app.investigation.tools import ToolSession",
+                "from trace_app.adapters.tools.local import LocalToolBackend",
+                "from trace_app.adapters.storage.sqlite import investigations",
+                "from trace_app.knowledge.ports import CorpusReader",
+                "from trace_app.bootstrap import create_search_service",
+                "from tests.fixtures.model_provider import FakeModelTransport",
+            ],
             "cli/commands.py": ["from trace_app.adapters.storage import sqlite"],
             "runtime/settings.py": ["import sklearn"],
             "demo/replay.py": ["import evaluation"],
@@ -68,6 +81,7 @@ class ArchitectureTests(unittest.TestCase):
                 "knowledge/service.py": "from .ports import Encoder\nfrom trace_app.evidence.models import EvidenceRecord",
                 "bootstrap.py": "from trace_app.adapters.retrieval.exact_scoring import LocalExactScorer",
                 "cli/commands.py": "from trace_app.bootstrap import create_search_service",
+                "adapters/models/process.py": "from trace_app.investigation.provider import ModelRequest\nfrom trace_app.runtime.logging import configure_logging",
             }
             for filename, source in files.items():
                 path = root / filename

@@ -15,6 +15,7 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0009](0009-local-exact-knowledge-retrieval.md) | Pinned optional CPU embeddings, exact retrieval and development-selected lexical default | Accepted with merged issue #16 implementation |
 | [0010](0010-capability-packages-and-adapter-boundaries.md) | Capability packages, adapters/composition and automatic import/wheel verification | Accepted in #46 / PR #47 |
 | [0011](0011-read-only-tool-execution.md) | Fixed read-only tool catalog, readonly sources and deadline-isolated execution | Accepted in #18 / PR #48 |
+| [0012](0012-model-provider-contract-and-bounded-call.md) | Provider-neutral model contract, test-only fake and bounded single-call execution | Proposed in #34 offline subtask #50; hosted provider/model and live acceptance pending |
 
 ## Open decision register
 

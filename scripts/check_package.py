@@ -41,6 +41,8 @@ def main() -> int:
                 "trace_app/investigation/tools.py",
                 "trace_app/investigation/bundle.py",
                 "trace_app/adapters/tools/local.py",
+                "trace_app/investigation/provider.py",
+                "trace_app/adapters/models/process.py",
             } <= set(names):
                 raise RuntimeError("Wheel is missing nested runtime modules.")
         requirements = temporary / "requirements.txt"

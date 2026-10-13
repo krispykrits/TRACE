@@ -2,6 +2,8 @@
 
 TRACE currently provides an importable CLI, configuration check, synthetic Order–Payment demo and a local SQLite evidence-store demo. It also provides authorized local knowledge search with optional cached CPU embeddings. It has no incident investigator, hosted model API, operational source integration or deployed cloud runtime.
 
+The [model-provider contract](architecture/model-provider.md) adds provider-neutral interfaces and bounded single-call execution for #34's offline subtask #50. Its fake is explicitly selected in tests only. No hosted provider/model, credentials, budget or data-transmission permission is selected; a passed offline check does not establish model readiness. See the contract for configuration, content handling, error categories, reproduction and the blocked live acceptance procedure.
+
 ## Supported setup
 
 The supported development and CI runtime is CPython 3.12 on Linux. Install Python 3.12, uv 0.12.17 and GNU make, then run these commands from the repository root. The project rejects other Python minor versions and other uv versions so local setup and CI use the same toolchain:

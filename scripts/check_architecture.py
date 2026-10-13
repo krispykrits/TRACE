@@ -89,6 +89,16 @@ def collect_violations(root: Path) -> list[str]:
                 )
             elif layer == "adapters":
                 forbidden |= target in {"bootstrap", "cli", "demo"}
+                if relative.parts[:2] == ("adapters", "models"):
+                    # Model transports receive scoped text, not source/tool handles.
+                    forbidden |= target not in (None, "investigation", "runtime")
+                    if target == "investigation":
+                        forbidden |= not (
+                            dependency == "trace_app.investigation.provider"
+                            or dependency.startswith(
+                                "trace_app.investigation.provider."
+                            )
+                        )
             elif layer == "demo":
                 forbidden |= target in {"adapters", "bootstrap", "cli"}
             elif layer == "cli":

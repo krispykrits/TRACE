@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable
 
+from trace_app.adapters.models.process import ProcessModelProvider
 from trace_app.adapters.retrieval.exact_scoring import LocalExactScorer
 from trace_app.adapters.tools.local import (
     LocalToolBackend,
@@ -14,10 +15,28 @@ from trace_app.adapters.tools.local import (
 )
 from trace_app.demo.fixtures import CustomerFixture, NotificationFixture, PaymentFixture
 from trace_app.demo.order_workflow import OrderWorkflow
+from trace_app.investigation.provider import (
+    ModelCapabilities,
+    ModelConfiguration,
+    ModelTransport,
+)
 from trace_app.investigation.tools import ToolPolicy, ToolScope, ToolSession
 from trace_app.knowledge.index import IndexGeneration
 from trace_app.knowledge.ports import CorpusReader, Encoder
 from trace_app.knowledge.search import SearchService
+
+
+def create_model_provider(
+    configuration: ModelConfiguration,
+    capabilities: ModelCapabilities,
+    transport: ModelTransport,
+    *,
+    credential_present: bool,
+) -> ProcessModelProvider:
+    """Explicit composition only; hosted transport selection remains gated in #34."""
+    return ProcessModelProvider(
+        configuration, capabilities, transport, credential_present=credential_present
+    )
 
 
 def create_tool_session(
