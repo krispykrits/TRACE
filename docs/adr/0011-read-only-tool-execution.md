@@ -1,6 +1,6 @@
 # ADR 0011: Read-only tools with bounded local worker execution
 
-- **Status:** Proposed implementation for #18; awaiting owner PR review/merge
+- **Status:** Accepted for #18 in merged PR #48 (`f1d3923`); owner merge verified during #19
 - **Date:** 2026-10-12
 - **Owner:** Project owner
 - **Scope:** Local MVP investigation tool authority, execution and audit boundary

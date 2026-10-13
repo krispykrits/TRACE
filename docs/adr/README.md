@@ -14,7 +14,7 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0008](0008-local-corpus-generations-and-source-policy.md) | Local corpus generations, adapted chunk provenance and current source policy | Accepted with merged issue #15 implementation |
 | [0009](0009-local-exact-knowledge-retrieval.md) | Pinned optional CPU embeddings, exact retrieval and development-selected lexical default | Accepted with merged issue #16 implementation |
 | [0010](0010-capability-packages-and-adapter-boundaries.md) | Capability packages, adapters/composition and automatic import/wheel verification | Accepted in #46 / PR #47 |
-| [0011](0011-read-only-tool-execution.md) | Fixed read-only tool catalog, readonly sources and deadline-isolated execution | Proposed in #18; awaiting PR review |
+| [0011](0011-read-only-tool-execution.md) | Fixed read-only tool catalog, readonly sources and deadline-isolated execution | Accepted in #18 / PR #48 |
 
 ## Open decision register
 

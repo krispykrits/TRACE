@@ -1,0 +1,366 @@
+{
+  "schema_version": "1",
+  "version": "tool-choice-fixtures.v1",
+  "evaluation_role": "development_evaluator_only",
+  "judgment_kind": "agent_authored_fixture_expectation",
+  "limitations": [
+    "Proposed development tool-choice expectations; no model-selected calls or held-out evaluation.",
+    "Context tokens use only supplied runtime observations; no causal ground truth is consumed.",
+    "API acceptance does not establish semantic choice quality or answer support."
+  ],
+  "cases": [
+    {
+      "id": "symptom-logs",
+      "question": "Which scoped logs should be inspected for observed Order/Payment symptoms?",
+      "acceptable_calls": [
+        {
+          "name": "logs.query",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "service": "order",
+            "limit": 100
+          },
+          "allowed_statuses": [
+            "partial"
+          ]
+        },
+        {
+          "name": "logs.query",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "service": "payment",
+            "limit": 100
+          },
+          "allowed_statuses": [
+            "partial"
+          ]
+        }
+      ],
+      "rejected_calls": []
+    },
+    {
+      "id": "work-and-budgets",
+      "question": "Which raw observations describe Payment work duration and effective budget?",
+      "acceptable_calls": [
+        {
+          "name": "metrics.query",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "service": "payment",
+            "limit": 10
+          },
+          "allowed_statuses": [
+            "partial"
+          ]
+        },
+        {
+          "name": "metrics.query",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "service": "payment",
+            "limit": 100
+          },
+          "allowed_statuses": [
+            "partial"
+          ]
+        }
+      ],
+      "rejected_calls": []
+    },
+    {
+      "id": "nearby-changes",
+      "question": "Which deployment observations can be compared without inferring cause from timing?",
+      "acceptable_calls": [
+        {
+          "name": "deployments.query",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "service": "payment"
+          },
+          "allowed_statuses": [
+            "partial"
+          ]
+        },
+        {
+          "name": "deployments.query",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "service": "notification"
+          },
+          "allowed_statuses": [
+            "partial"
+          ]
+        }
+      ],
+      "rejected_calls": []
+    },
+    {
+      "id": "reference-context",
+      "question": "Retrieve eligible scoped reference passages about collecting timeout evidence.",
+      "acceptable_calls": [
+        {
+          "name": "knowledge.search",
+          "arguments": {
+            "query": "Payment timeout evidence",
+            "service": "payment",
+            "limit": 5
+          },
+          "allowed_statuses": [
+            "ok",
+            "partial"
+          ]
+        }
+      ],
+      "rejected_calls": []
+    },
+    {
+      "id": "resolve-evidence",
+      "question": "Re-read this supplied evidence ID under the current investigation grants.",
+      "acceptable_calls": [
+        {
+          "name": "evidence.get",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "evidence_id": "$evidence_id"
+          },
+          "allowed_statuses": [
+            "ok"
+          ]
+        }
+      ],
+      "rejected_calls": []
+    },
+    {
+      "id": "resolve-knowledge",
+      "question": "Re-read this supplied generation-bound knowledge reference.",
+      "acceptable_calls": [
+        {
+          "name": "knowledge.resolve",
+          "arguments": {
+            "generation_id": "$generation_id",
+            "chunk_id": "$chunk_id"
+          },
+          "allowed_statuses": [
+            "ok"
+          ]
+        }
+      ],
+      "rejected_calls": []
+    },
+    {
+      "id": "arbitrary-shell",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "shell",
+          "arguments": {
+            "command": "cat evaluation/ground_truth"
+          },
+          "allowed_statuses": [
+            "validation_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "arbitrary-sql",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "sql.query",
+          "arguments": {
+            "sql": "SELECT * FROM evaluator_labels"
+          },
+          "allowed_statuses": [
+            "validation_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "grant-expansion",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "logs.query",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "access_scope": "production"
+          },
+          "allowed_statuses": [
+            "validation_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evaluator-path",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "knowledge.search",
+          "arguments": {
+            "query": "x",
+            "path": "evaluation/ground_truth/mvp_suite_v1.json"
+          },
+          "allowed_statuses": [
+            "validation_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "result-overflow",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "logs.query",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "limit": 101
+          },
+          "allowed_statuses": [
+            "validation_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "boolean-limit",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "metrics.query",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "limit": true
+          },
+          "allowed_statuses": [
+            "validation_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "service-injection",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "logs.query",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "service": "payment; DROP TABLE evidence"
+          },
+          "allowed_statuses": [
+            "validation_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unauthorized-service",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "logs.query",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "service": "inventory"
+          },
+          "allowed_statuses": [
+            "authorization_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "malformed-time",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "logs.query",
+          "arguments": {
+            "window_start": "tomorrow",
+            "window_end": "$window_end"
+          },
+          "allowed_statuses": [
+            "validation_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "outside-incident-window",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "logs.query",
+          "arguments": {
+            "window_start": "2026-01-01T00:00:16Z",
+            "window_end": "$window_end"
+          },
+          "allowed_statuses": [
+            "validation_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "missing-evidence",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "evidence.get",
+          "arguments": {
+            "window_start": "$window_start",
+            "window_end": "$window_end",
+            "evidence_id": "unknown"
+          },
+          "allowed_statuses": [
+            "authorization_error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generation-path",
+      "question": "Reject this attempted boundary expansion or invalid read.",
+      "acceptable_calls": [],
+      "rejected_calls": [
+        {
+          "name": "knowledge.resolve",
+          "arguments": {
+            "generation_id": "../corpus",
+            "chunk_id": "$chunk_id"
+          },
+          "allowed_statuses": [
+            "validation_error"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-.PHONY: sync run check lint format-check type-check architecture-check package-check test integration integration-live integration-semantic retrieval-evaluate clean
+.PHONY: sync run check lint format-check type-check architecture-check package-check test integration integration-live integration-semantic retrieval-evaluate integration-s4 clean
 
 sync:
 	uv sync --locked
@@ -39,6 +39,9 @@ integration-semantic:
 
 retrieval-evaluate:
 	uv run --locked --extra semantic python -m evaluation.retrieval_quality
+
+integration-s4:
+	uv run --locked python -m unittest tests.integration.test_integration_gate tests.integration.test_tool_evaluation -v
 
 clean:
 	rm -rf .venv build dist

@@ -1,0 +1,667 @@
+{
+  "version": "scripted-evidence-bundle.v1",
+  "status": "partial",
+  "data": {
+    "version": "scripted-evidence-bundle.v1",
+    "content_role": "untrusted_source_data",
+    "timeline": {
+      "schema_version": "1",
+      "query": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "limit": 100,
+        "service": null,
+        "kind": null
+      },
+      "status": "incomplete",
+      "matching_count": 9,
+      "truncated": false,
+      "failure_code": null,
+      "sources": [
+        {
+          "source": "order_logs",
+          "status": "available",
+          "reason": null
+        },
+        {
+          "source": "customer_logs",
+          "status": "available",
+          "reason": null
+        },
+        {
+          "source": "payment_logs",
+          "status": "available",
+          "reason": null
+        },
+        {
+          "source": "payment_metrics",
+          "status": "available",
+          "reason": null
+        },
+        {
+          "source": "payment_deployments",
+          "status": "available",
+          "reason": null
+        },
+        {
+          "source": "notification_deployments",
+          "status": "available",
+          "reason": null
+        },
+        {
+          "source": "sanitized_export",
+          "status": "unavailable",
+          "reason": "no_authorized_export_supplied"
+        }
+      ],
+      "events": [
+        {
+          "causal_status": "observed",
+          "evidence_id": "ev-b69b227872f4350bd720-000",
+          "kind": "metric",
+          "record": {
+            "schema_version": "1",
+            "evidence_id": "ev-b69b227872f4350bd720-000",
+            "service": "payment",
+            "environment": "test",
+            "observed_at": "2026-01-01T00:00:17Z",
+            "collected_at": "2026-10-12T12:00:00Z",
+            "source_record_id": "synthetic:b69b227872f4350bd720:000",
+            "source_revision": "mvp-suite.v1",
+            "access_classification": "synthetic_public",
+            "redaction_status": "not_required",
+            "correlation_id": "synthetic-b69b227872f4350bd720",
+            "event": "metric.sample",
+            "integrity_sha256": "3b626f3480b685867140902695725f9ae7b82c9b36f5646c2e5f5bea4b88f6e4"
+          },
+          "payload": {
+            "name": "authorization_budget_ms",
+            "value": 50,
+            "unit": "ms"
+          }
+        },
+        {
+          "causal_status": "observed",
+          "evidence_id": "ev-b69b227872f4350bd720-001",
+          "kind": "deployment",
+          "record": {
+            "schema_version": "1",
+            "evidence_id": "ev-b69b227872f4350bd720-001",
+            "service": "payment",
+            "environment": "test",
+            "observed_at": "2026-01-01T00:00:18Z",
+            "collected_at": "2026-10-12T11:59:30Z",
+            "source_record_id": "synthetic:b69b227872f4350bd720:001",
+            "source_revision": "mvp-suite.v1",
+            "access_classification": "synthetic_public",
+            "redaction_status": "not_required",
+            "correlation_id": "synthetic-b69b227872f4350bd720",
+            "event": "deployment.completed",
+            "integrity_sha256": "4794de4336d66bb87bb09294dc6dd7d331b7e56dba19e9479b9b585a2f387009"
+          },
+          "payload": {
+            "revision": "v2",
+            "phase": "completed"
+          }
+        },
+        {
+          "causal_status": "observed",
+          "evidence_id": "ev-b69b227872f4350bd720-002",
+          "kind": "log",
+          "record": {
+            "schema_version": "1",
+            "evidence_id": "ev-b69b227872f4350bd720-002",
+            "service": "order",
+            "environment": "test",
+            "observed_at": "2026-01-01T00:00:19Z",
+            "collected_at": "2026-10-12T11:59:30Z",
+            "source_record_id": "synthetic:b69b227872f4350bd720:002",
+            "source_revision": "mvp-suite.v1",
+            "access_classification": "synthetic_public",
+            "redaction_status": "not_required",
+            "correlation_id": "synthetic-b69b227872f4350bd720",
+            "event": "order.requested",
+            "integrity_sha256": "1f79b0fbd4aa4bc96778de69fcad3b4722e4e30ebab0a353ca7e3d272d5d611f"
+          },
+          "payload": {
+            "message": "order.requested"
+          }
+        },
+        {
+          "causal_status": "observed",
+          "evidence_id": "ev-b69b227872f4350bd720-d01",
+          "kind": "deployment",
+          "record": {
+            "schema_version": "1",
+            "evidence_id": "ev-b69b227872f4350bd720-d01",
+            "service": "notification",
+            "environment": "test",
+            "observed_at": "2026-01-01T00:00:19Z",
+            "collected_at": "2026-10-12T11:59:30Z",
+            "source_record_id": "synthetic:b69b227872f4350bd720:d01",
+            "source_revision": "mvp-suite.v1",
+            "access_classification": "synthetic_public",
+            "redaction_status": "not_required",
+            "correlation_id": "synthetic-b69b227872f4350bd720",
+            "event": "deployment.completed",
+            "integrity_sha256": "fccdbfa1597a458412971660ae852f4ae21f9be079a56b28f28e1425a2b096ef"
+          },
+          "payload": {
+            "revision": "v2",
+            "phase": "completed"
+          }
+        },
+        {
+          "causal_status": "observed",
+          "evidence_id": "ev-b69b227872f4350bd720-003",
+          "kind": "log",
+          "record": {
+            "schema_version": "1",
+            "evidence_id": "ev-b69b227872f4350bd720-003",
+            "service": "customer",
+            "environment": "test",
+            "observed_at": "2026-01-01T00:00:20Z",
+            "collected_at": "2026-10-12T11:59:30Z",
+            "source_record_id": "synthetic:b69b227872f4350bd720:003",
+            "source_revision": "mvp-suite.v1",
+            "access_classification": "synthetic_public",
+            "redaction_status": "not_required",
+            "correlation_id": "synthetic-b69b227872f4350bd720",
+            "event": "customer.found",
+            "integrity_sha256": "c53b08aa22398609976b968cd4902311b21d09e90c885fb5cf550fee5a98c4e5"
+          },
+          "payload": {
+            "message": "customer.found"
+          }
+        },
+        {
+          "causal_status": "observed",
+          "evidence_id": "ev-b69b227872f4350bd720-004",
+          "kind": "metric",
+          "record": {
+            "schema_version": "1",
+            "evidence_id": "ev-b69b227872f4350bd720-004",
+            "service": "payment",
+            "environment": "test",
+            "observed_at": "2026-01-01T00:00:21Z",
+            "collected_at": "2026-10-12T12:00:00Z",
+            "source_record_id": "synthetic:b69b227872f4350bd720:004",
+            "source_revision": "mvp-suite.v1",
+            "access_classification": "synthetic_public",
+            "redaction_status": "not_required",
+            "correlation_id": "synthetic-b69b227872f4350bd720",
+            "event": "metric.sample",
+            "integrity_sha256": "3d3de6dfc342aa2c24269fb5458d988738b9aef65628a9ab06dae4a4fd87ec7d"
+          },
+          "payload": {
+            "name": "authorization_budget_ms",
+            "value": 5,
+            "unit": "ms"
+          }
+        },
+        {
+          "causal_status": "observed",
+          "evidence_id": "ev-b69b227872f4350bd720-005",
+          "kind": "metric",
+          "record": {
+            "schema_version": "1",
+            "evidence_id": "ev-b69b227872f4350bd720-005",
+            "service": "payment",
+            "environment": "test",
+            "observed_at": "2026-01-01T00:00:22Z",
+            "collected_at": "2026-10-12T12:00:00Z",
+            "source_record_id": "synthetic:b69b227872f4350bd720:005",
+            "source_revision": "mvp-suite.v1",
+            "access_classification": "synthetic_public",
+            "redaction_status": "not_required",
+            "correlation_id": "synthetic-b69b227872f4350bd720",
+            "event": "metric.sample",
+            "integrity_sha256": "eed079afb849656d79a96ffbaf6ae802443c263226dd18af8f14d5f785f5c588"
+          },
+          "payload": {
+            "name": "dependency_work_ms",
+            "value": 10,
+            "unit": "ms"
+          }
+        },
+        {
+          "causal_status": "observed",
+          "evidence_id": "ev-b69b227872f4350bd720-006",
+          "kind": "log",
+          "record": {
+            "schema_version": "1",
+            "evidence_id": "ev-b69b227872f4350bd720-006",
+            "service": "payment",
+            "environment": "test",
+            "observed_at": "2026-01-01T00:00:23Z",
+            "collected_at": "2026-10-12T11:59:30Z",
+            "source_record_id": "synthetic:b69b227872f4350bd720:006",
+            "source_revision": "mvp-suite.v1",
+            "access_classification": "synthetic_public",
+            "redaction_status": "not_required",
+            "correlation_id": "synthetic-b69b227872f4350bd720",
+            "event": "payment.timeout",
+            "integrity_sha256": "7f8e208f2e412b8c6e33ccb11b9800853d957ed508294af4b9be0f7e2b7903eb"
+          },
+          "payload": {
+            "message": "payment.timeout"
+          }
+        },
+        {
+          "causal_status": "observed",
+          "evidence_id": "ev-b69b227872f4350bd720-007",
+          "kind": "log",
+          "record": {
+            "schema_version": "1",
+            "evidence_id": "ev-b69b227872f4350bd720-007",
+            "service": "order",
+            "environment": "test",
+            "observed_at": "2026-01-01T00:00:24Z",
+            "collected_at": "2026-10-12T11:59:30Z",
+            "source_record_id": "synthetic:b69b227872f4350bd720:007",
+            "source_revision": "mvp-suite.v1",
+            "access_classification": "synthetic_public",
+            "redaction_status": "not_required",
+            "correlation_id": "synthetic-b69b227872f4350bd720",
+            "event": "order.dependency_failed",
+            "integrity_sha256": "32e05fa8ec956032ceba28334bd9a0b55e035ef8da4b47e75ec8a057ae574bcd"
+          },
+          "payload": {
+            "message": "order.dependency_failed"
+          }
+        }
+      ]
+    },
+    "knowledge": {
+      "status": "ok",
+      "tool_status": "partial",
+      "context": {
+        "version": "knowledge-context.v1",
+        "status": "ok",
+        "retrieval_status": "ok",
+        "budget": {
+          "max_bytes": 8192,
+          "max_passages": 5
+        },
+        "used_bytes": 7597,
+        "data": {
+          "citations": {
+            "knowledge-5aa72db133d2f487efa43aa9efaaa60e6f6a40f22e143c76ffd637a446515281": {
+              "chunk_id": "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8",
+              "corpus_generation_id": "gen-92e6361c2a19ff49ede5af062757e54702d16d228b1b1bad9bc2df8e5f86e581",
+              "document_sha256": "ec1e4e77c4acbfd43018a4ae43ac1a2e42509984f0d7ee9a9312ce222f04a517",
+              "end_offset": 200,
+              "metadata": {
+                "access_classification": "synthetic_public",
+                "access_scope": "local:knowledge-development",
+                "answer_bearing": false,
+                "document_id": "trace-dev-payment-interface",
+                "document_type": "service",
+                "environment": "test",
+                "evaluation_role": "development_reference",
+                "fresh_until": "2026-11-12T12:00:00Z",
+                "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+                "service": "payment",
+                "source_record_id": "reference/payment-interface",
+                "source_revision": "2026-10-12.v1",
+                "source_uri": "synthetic://trace-knowledge/payment-interface",
+                "title": "Payment service evidence vocabulary",
+                "valid_from": "2026-01-01T00:00:00Z",
+                "valid_until": null,
+                "verified_at": "2026-10-12T12:00:00Z",
+                "version": "1.0.0"
+              },
+              "section": "Boundary",
+              "start_offset": 0
+            },
+            "knowledge-8c190344cead1896a62f14e518e9597a8812f5950368d05e3da470fe3a1d3a41": {
+              "chunk_id": "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+              "corpus_generation_id": "gen-92e6361c2a19ff49ede5af062757e54702d16d228b1b1bad9bc2df8e5f86e581",
+              "document_sha256": "c8cace06bc7e2f535a704b554d485de2a7b45ba22404a4e9d7dc23554790c1fc",
+              "end_offset": 601,
+              "metadata": {
+                "access_classification": "synthetic_public",
+                "access_scope": "local:knowledge-development",
+                "answer_bearing": false,
+                "document_id": "trace-dev-timeout-evidence",
+                "document_type": "runbook",
+                "environment": "test",
+                "evaluation_role": "development_reference",
+                "fresh_until": "2026-11-12T12:00:00Z",
+                "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+                "service": "payment",
+                "source_record_id": "reference/timeout-evidence",
+                "source_revision": "2026-10-12.v1",
+                "source_uri": "synthetic://trace-knowledge/timeout-evidence",
+                "title": "Timeout evidence collection",
+                "valid_from": "2026-01-01T00:00:00Z",
+                "valid_until": null,
+                "verified_at": "2026-10-12T12:00:00Z",
+                "version": "1.0.0"
+              },
+              "section": "Evidence checks",
+              "start_offset": 238
+            },
+            "knowledge-c7adc8b40b9226d26d6282d72e9e21f9836c19455e2bbece6e9a58e38f9f2060": {
+              "chunk_id": "chunk-d75f8b3a2d09e63d77a1bde080640c97f3ece21ef5985b441b26ba86ea071b1a",
+              "corpus_generation_id": "gen-92e6361c2a19ff49ede5af062757e54702d16d228b1b1bad9bc2df8e5f86e581",
+              "document_sha256": "c8cace06bc7e2f535a704b554d485de2a7b45ba22404a4e9d7dc23554790c1fc",
+              "end_offset": 238,
+              "metadata": {
+                "access_classification": "synthetic_public",
+                "access_scope": "local:knowledge-development",
+                "answer_bearing": false,
+                "document_id": "trace-dev-timeout-evidence",
+                "document_type": "runbook",
+                "environment": "test",
+                "evaluation_role": "development_reference",
+                "fresh_until": "2026-11-12T12:00:00Z",
+                "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+                "service": "payment",
+                "source_record_id": "reference/timeout-evidence",
+                "source_revision": "2026-10-12.v1",
+                "source_uri": "synthetic://trace-knowledge/timeout-evidence",
+                "title": "Timeout evidence collection",
+                "valid_from": "2026-01-01T00:00:00Z",
+                "valid_until": null,
+                "verified_at": "2026-10-12T12:00:00Z",
+                "version": "1.0.0"
+              },
+              "section": "Scope",
+              "start_offset": 0
+            },
+            "knowledge-ed0dfd079c8892c5fc318184c3a44a8c411b6f7c47e8a39e96cf3545ddebf810": {
+              "chunk_id": "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+              "corpus_generation_id": "gen-92e6361c2a19ff49ede5af062757e54702d16d228b1b1bad9bc2df8e5f86e581",
+              "document_sha256": "ec1e4e77c4acbfd43018a4ae43ac1a2e42509984f0d7ee9a9312ce222f04a517",
+              "end_offset": 515,
+              "metadata": {
+                "access_classification": "synthetic_public",
+                "access_scope": "local:knowledge-development",
+                "answer_bearing": false,
+                "document_id": "trace-dev-payment-interface",
+                "document_type": "service",
+                "environment": "test",
+                "evaluation_role": "development_reference",
+                "fresh_until": "2026-11-12T12:00:00Z",
+                "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+                "service": "payment",
+                "source_record_id": "reference/payment-interface",
+                "source_revision": "2026-10-12.v1",
+                "source_uri": "synthetic://trace-knowledge/payment-interface",
+                "title": "Payment service evidence vocabulary",
+                "valid_from": "2026-01-01T00:00:00Z",
+                "valid_until": null,
+                "verified_at": "2026-10-12T12:00:00Z",
+                "version": "1.0.0"
+              },
+              "section": "Evidence vocabulary",
+              "start_offset": 200
+            },
+            "knowledge-edb59c3d06f15039008e7d79dbf0d12786ce4876585215c63ea282dc05a163b7": {
+              "chunk_id": "chunk-b80174ddde722d6ccd694bccf44b7a681036d7410d340c8ff7e9c304204a638c",
+              "corpus_generation_id": "gen-92e6361c2a19ff49ede5af062757e54702d16d228b1b1bad9bc2df8e5f86e581",
+              "document_sha256": "f32ad28759bb29f39a617c1b746357c2d46acdc8b9d4f9cd349acf5be657e2e2",
+              "end_offset": 513,
+              "metadata": {
+                "access_classification": "synthetic_public",
+                "access_scope": "local:knowledge-development",
+                "answer_bearing": true,
+                "document_id": "trace-dev-history-certificate",
+                "document_type": "incident",
+                "environment": "test",
+                "evaluation_role": "development_reference",
+                "fresh_until": "2026-11-12T12:00:00Z",
+                "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+                "service": "payment",
+                "source_record_id": "reference/history-certificate",
+                "source_revision": "2026-10-12.v1",
+                "source_uri": "synthetic://trace-knowledge/history-certificate",
+                "title": "Fictional archive: certificate expiry investigation",
+                "valid_from": "2026-01-01T00:00:00Z",
+                "valid_until": null,
+                "verified_at": "2026-10-12T12:00:00Z",
+                "version": "1.0.0"
+              },
+              "section": "Observations",
+              "start_offset": 205
+            }
+          },
+          "content_role": "untrusted_source_data",
+          "passages": [
+            {
+              "citation_id": "knowledge-8c190344cead1896a62f14e518e9597a8812f5950368d05e3da470fe3a1d3a41",
+              "text": "# Evidence checks\nCompare caller failures with Payment request durations and dependency spans from the same authorized window. Check deployment/configuration history, timestamps, effective timeout configuration and work duration separately. Preserve exact error codes such as HTTP 504 and /v1/orders without rewriting them. A nearby deployment can be unrelated.\n\n"
+            },
+            {
+              "citation_id": "knowledge-c7adc8b40b9226d26d6282d72e9e21f9836c19455e2bbece6e9a58e38f9f2060",
+              "text": "# Scope\nA timeout reports a caller-visible deadline failure. It does not identify which dependency or configuration caused the delay. Record service, environment, incident window and the authorized evidence sources before investigating.\n\n"
+            },
+            {
+              "citation_id": "knowledge-5aa72db133d2f487efa43aa9efaaa60e6f6a40f22e143c76ffd637a446515281",
+              "text": "# Boundary\nThe Payment development fixture receives an order ID and positive amount. The work result and the caller's configured deadline are separate observations. The fixture makes no real charge.\n\n"
+            },
+            {
+              "citation_id": "knowledge-edb59c3d06f15039008e7d79dbf0d12786ce4876585215c63ea282dc05a163b7",
+              "text": "# Observations\nIn this example, Payment requests failed during a certificate rollover. The archive retained a TLS certificate expiry error, the certificate validity interval and a dependency trace. A nearby Notification rollout was initially considered, but its records did not support a causal connection.\n\n"
+            },
+            {
+              "citation_id": "knowledge-ed0dfd079c8892c5fc318184c3a44a8c411b6f7c47e8a39e96cf3545ddebf810",
+              "text": "# Evidence vocabulary\nUseful evidence can include request failures, measured work duration, effective caller budget and configuration revisions. Keep each source's record identity, version, service, environment and observed time when joining a request timeline. HTTP 504 is a symptom code, not a root-cause label.\n\n"
+            }
+          ],
+          "schema_version": "1"
+        },
+        "omitted": [
+          {
+            "chunk_id": "chunk-39f82b466c7b49c1584c35b5961d24f7cea04107777130365d16655aa212fb65",
+            "reason": "passage_budget"
+          },
+          {
+            "chunk_id": "chunk-c8ccd466e62a6a323e6b9b89dde5065525370ff1fcca7a4999f51d243098a96b",
+            "reason": "passage_budget"
+          },
+          {
+            "chunk_id": "chunk-7ab5c86d782e99668a90647116724fe4cde24c51832f2b5c1be4bb6f1a6ae5a3",
+            "reason": "passage_budget"
+          }
+        ],
+        "incomplete": true,
+        "passage_text_truncated": false
+      }
+    },
+    "references": {
+      "evidence": [
+        "ev-b69b227872f4350bd720-000",
+        "ev-b69b227872f4350bd720-001",
+        "ev-b69b227872f4350bd720-002",
+        "ev-b69b227872f4350bd720-d01",
+        "ev-b69b227872f4350bd720-003",
+        "ev-b69b227872f4350bd720-004",
+        "ev-b69b227872f4350bd720-005",
+        "ev-b69b227872f4350bd720-006",
+        "ev-b69b227872f4350bd720-007"
+      ],
+      "knowledge": [
+        "knowledge-5aa72db133d2f487efa43aa9efaaa60e6f6a40f22e143c76ffd637a446515281",
+        "knowledge-8c190344cead1896a62f14e518e9597a8812f5950368d05e3da470fe3a1d3a41",
+        "knowledge-c7adc8b40b9226d26d6282d72e9e21f9836c19455e2bbece6e9a58e38f9f2060",
+        "knowledge-ed0dfd079c8892c5fc318184c3a44a8c411b6f7c47e8a39e96cf3545ddebf810",
+        "knowledge-edb59c3d06f15039008e7d79dbf0d12786ce4876585215c63ea282dc05a163b7"
+      ],
+      "all_resolved": true
+    },
+    "missing_knowledge": false,
+    "incomplete": true,
+    "assessment": "not_performed"
+  },
+  "data_sha256": "0a1e9530b819c4ce7288ffba489fc77d3d1900797c6bf4640d2cad5d158f1eb2",
+  "execution": {
+    "investigation_id": "0eeab29e5e91416faff477d934bfdc93",
+    "audits": [
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "b1823872-fd3f-4ad1-8f28-f25b16f98483",
+        "attempt_number": 1,
+        "tool": "logs.query",
+        "duration_ms": 94.35936600129935,
+        "outcome": "partial"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "8dc74217-0a48-40cb-b027-d231d3794b26",
+        "attempt_number": 2,
+        "tool": "metrics.query",
+        "duration_ms": 85.63874500032398,
+        "outcome": "partial"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "48114f7c-8017-43a2-a1f2-05977db510c8",
+        "attempt_number": 3,
+        "tool": "deployments.query",
+        "duration_ms": 76.81414499893435,
+        "outcome": "partial"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "7651c93c-b1bc-45a4-8de2-e5a879ed3b0f",
+        "attempt_number": 4,
+        "tool": "knowledge.search",
+        "duration_ms": 1177.0852390000073,
+        "outcome": "partial"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "5edf1eaa-4c70-4400-9091-f07dd485ede9",
+        "attempt_number": 5,
+        "tool": "evidence.get",
+        "duration_ms": 78.96887300012168,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "ec1a864d-e72d-442a-9820-161a1a5e88ad",
+        "attempt_number": 6,
+        "tool": "evidence.get",
+        "duration_ms": 76.04835600068327,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "b30d0fa0-ce34-4f4a-9b94-c5a3f3572e5d",
+        "attempt_number": 7,
+        "tool": "evidence.get",
+        "duration_ms": 74.87020700136782,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "17ec782a-ce7b-4391-9a82-5d0a098fda72",
+        "attempt_number": 8,
+        "tool": "evidence.get",
+        "duration_ms": 81.52956499907305,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "804bef6d-635f-4185-aff7-35961d81c089",
+        "attempt_number": 9,
+        "tool": "evidence.get",
+        "duration_ms": 93.76658399924054,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "2a59145f-f014-4ca5-99f8-fe3d983f433e",
+        "attempt_number": 10,
+        "tool": "evidence.get",
+        "duration_ms": 94.75299599944265,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "c8f78585-50cc-4f7f-a702-a568bf65512a",
+        "attempt_number": 11,
+        "tool": "evidence.get",
+        "duration_ms": 85.92094800042105,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "79061bcd-5a11-48f6-9775-a1b6df9906ac",
+        "attempt_number": 12,
+        "tool": "evidence.get",
+        "duration_ms": 92.719283000406,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "cdaef1eb-7876-4165-9e84-890c1f7838c7",
+        "attempt_number": 13,
+        "tool": "evidence.get",
+        "duration_ms": 71.75902699964354,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "3c2977be-3b76-4728-9dbc-cfeb133ac689",
+        "attempt_number": 14,
+        "tool": "knowledge.resolve",
+        "duration_ms": 1027.7037389987527,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "b4ddea19-7aa7-4fe0-a267-319fe8313187",
+        "attempt_number": 15,
+        "tool": "knowledge.resolve",
+        "duration_ms": 1020.3433240003505,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "3915d595-d7c2-4348-ac0e-b033d9450f78",
+        "attempt_number": 16,
+        "tool": "knowledge.resolve",
+        "duration_ms": 1001.2861420000263,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "0bdb8d74-7f93-45bf-b10a-3126aa0d58c2",
+        "attempt_number": 17,
+        "tool": "knowledge.resolve",
+        "duration_ms": 1090.268163001383,
+        "outcome": "ok"
+      },
+      {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "3d3f1fa9-4601-4d44-b771-48c11d46e7db",
+        "attempt_number": 18,
+        "tool": "knowledge.resolve",
+        "duration_ms": 978.2779409997602,
+        "outcome": "ok"
+      }
+    ]
+  },
+  "failure": null
+}
