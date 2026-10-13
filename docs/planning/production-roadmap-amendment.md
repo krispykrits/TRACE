@@ -53,3 +53,7 @@ Open decisions: pilot operator/team, accessible operational sources and permissi
 ## Subsequent approved scope extension
 
 The owner explicitly requested real production remediation. Apply the [production remediation gates](production-remediation-scope.md) to S14-S18 and charter/access planning. This supersedes simulated-only completion; the operational investigation pilot remains a separate gate.
+
+## Production provider enforcement addition — 2026-10-13
+
+The owner approved the [transmission categories and per-request production controls](../architecture/model-provider.md), recorded as `trace-provider-data-policy.v1`. Before every provider request, including later tool results/history/retries, independently check source access and transmission permission; select bounded evidence, redact and block unresolved violations; preserve citation IDs/local redaction provenance; audit content-free policy/evidence/model/deployment/usage/outcome metadata; and protect generated responses according to their inputs' sensitivity. This sharpens S5–S6/#34–#38 implementation and acceptance, without changing release order, source permissions, calendar commitments or production-remediation authority. Initial synthetic checks cannot prove production enforcement or Operational Pilot usefulness. Provider admission/bypass, revocation, redaction/provenance, output-disclosure and audit-leakage tests accompany the actual boundary implementation. The current offline provider contracts are not that evidence.

@@ -22,9 +22,37 @@ Apply source access scope and this transmission policy separately. The table doe
 
 Start the initial live contract check with a bounded synthetic incident packet: service/environment/window, selected observations, event/collection timestamps, evidence IDs/provenance, source gaps and relevant permitted runbook excerpts with citation/revision metadata. Supply TRACE-owned workflow instructions and the output schema separately from untrusted evidence text. Minimize content to what the current investigation needs; do not upload a whole repository or evidence database. Trace data is an allowed policy category, not a claim of an implemented trace-source adapter.
 
+## Required production enforcement — 2026-10-13
+
+The owner requires the following before **every provider request**, including requests containing later tool results. Record the approved policy and these requirements as `trace-provider-data-policy.v1`; this identifies the policy, not implemented software or a completed acceptance result.
+
+1. Check source access **and** permission to transmit the content.
+2. Select bounded evidence, redact sensitive fields and reject unresolved policy violations.
+3. Preserve citation IDs and record redaction provenance locally.
+4. Log content-free metadata—policy version, evidence IDs, model/deployment, usage and outcome—without raw prompts or responses.
+5. Treat retrieved text as untrusted evidence and protect generated responses according to the sensitivity of their inputs.
+
+Apply admission to the complete outgoing request, including retained context/history, prior generated content, newly collected tool results and any retry/correction call. A check on the initial incident brief does not cover subsequent content. Revalidate current source and transmission permissions against the content/revision being sent; a successful tool read, citation resolution or past request is not standing transmission authorization. The deterministic application boundary owns these decisions; retrieved text and model output cannot supply grants or change policy/provider/budgets.
+
+If authorization, policy, redaction or provenance cannot be resolved, block dispatch and return an explicit content-free rejection/failure. Redact before transmission; a log formatter alone does not protect a network payload. Preserve evidence/citation identities, with an access-controlled local mapping of source revision, policy version, redacted/withheld field locations, transformation and outcome. Do not place removed sensitive values in that ledger. Sensitive correlation identifiers are reviewed/redacted independently of stable citation identity.
+
+Audit each attempt with approved metadata only: correlated request/attempt identifiers, policy version, authorized evidence IDs, actual model/version/deployment, usage availability and outcome. Missing usage remains unknown; numeric token counts are metrics, while credential tokens remain secrets. Generated responses inherit the sensitivity and access/retention/transmission restrictions of contributing inputs for validation, storage, display, export and later reuse. Redaction does not itself authorize declassification or a wider audience. Citation-ID validity still does not establish claim support.
+
+| Story | Required implementation responsibility |
+| --- | --- |
+| #34 provider boundary | Enforced admission before transport, policy-bound prepared content/provenance and explicit blocked dispatch; no alternate direct SDK path |
+| #35 assessment | Preserve cited redaction/provenance mapping; carry input-derived response sensitivity through validation |
+| #36 execution/audit | Policy/evidence/model/deployment/usage/outcome metadata for each attempt, including failed/uncertain calls, without content or credentials |
+| #37 workflow | Repeat admission for every request and later tool result/history/retry; keep grants independent of source prose and preserve local provenance under investigation scope |
+| #38 inspection/export | Enforce inherited sensitivity and current permissions for generated response reads/exports |
+
+Acceptance needs deterministic negative cases for missing/denied/revoked transmission permission after a tool read, secret/PII-bearing later tool results, unresolved redaction/provenance, citation identity preservation, prompt injection, policy/history bypass, sensitive output disclosure and raw-content leakage into errors/logs. Rejected input must cause zero provider dispatches, and usage metrics must remain distinct from secret-token redaction. Separately authorized live evidence is required for hosted acceptance; production/Operational Pilot claims require the applicable release gates.
+
+**Current state:** these are recorded production requirements. The offline `ModelRequest`/process adapter has no enforced source/transmission admission, redaction ledger, policy/evidence audit fields or input-derived response classification. Its existing bounds/error/metadata tests do not satisfy this enforcement gate. The hosted adapter and assembled workflow must implement and verify it before production use; no provider call or production acceptance follows from this document.
+
 ## Proposed request and retention defaults
 
-Prefer synchronous, stateless Responses calls with `store=false`, no provider file/vector-store uploads and no raw prompt/response content in TRACE logs/default evaluation metadata. Persist only deliberately validated/redacted assessments and authorized citation mappings under TRACE's scope. These are proposed adapter requirements; they are not implemented by the offline process contract.
+Prefer synchronous, stateless Responses calls with `store=false` and no provider file/vector-store uploads. These request/storage defaults remain proposed. Content-free logging and input-derived response protection are mandatory under the enforcement requirements above. Persist only deliberately validated/redacted assessments and authorized citation mappings under TRACE's scope and inherited sensitivity restrictions; neither a schema-valid response nor this proposal supplies wider retention/transmission permission. The full policy boundary is not implemented by the offline process contract.
 
 Microsoft documents stateless Responses mode with `store=false`; it does not establish absence of all service-side processing/storage. The standard abuse-monitoring process can store flagged prompts/completions for human review. Global deployments can process prompts outside the resource's geography; Data Zone deployments constrain processing to the selected zone. Confirm the deployment type and applicable monitoring settings before the live check. Sources: [Responses API](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/responses), [Foundry data privacy](https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/openai/data-privacy).
 
