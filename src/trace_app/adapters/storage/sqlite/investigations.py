@@ -157,7 +157,10 @@ class SQLiteInvestigationStore:
         *,
         max_records: int = 1_000,
         max_snapshot_bytes: int = 1_000_000,
+        read_only: bool = False,
     ) -> None:
+        if type(read_only) is not bool:
+            raise StoreInputError("read_only requires a boolean.")
         if type(max_records) is not int or max_records <= 0:
             raise StoreInputError("max_records must be a positive integer.")
         if type(max_snapshot_bytes) is not int or max_snapshot_bytes <= 0:
@@ -176,15 +179,28 @@ class SQLiteInvestigationStore:
                     "path must be a private regular file (mode 0600)."
                 )
         else:
+            if read_only:
+                raise StoreInputError("Read-only evidence database must exist.")
             descriptor = os.open(
                 self.path, os.O_CREAT | os.O_EXCL | os.O_RDWR | os.O_NOFOLLOW, 0o600
             )
             os.close(descriptor)
-        self._db = sqlite3.connect(self.path, timeout=5, isolation_level=None)
+        target = (
+            self.path.resolve().as_uri() + "?mode=ro" if read_only else str(self.path)
+        )
+        self._db = sqlite3.connect(
+            target, uri=read_only, timeout=5, isolation_level=None
+        )
         self._db.row_factory = sqlite3.Row
         self._db.execute("PRAGMA foreign_keys = ON")
-        self._db.execute("PRAGMA secure_delete = ON")
-        self.initialize()
+        if read_only:
+            self._db.execute("PRAGMA query_only = ON")
+            if self._db.execute("PRAGMA user_version").fetchone()[0] != _SCHEMA_VERSION:
+                self._db.close()
+                raise StoreSchemaError("Read-only evidence schema is incompatible.")
+        else:
+            self._db.execute("PRAGMA secure_delete = ON")
+            self.initialize()
 
     def __enter__(self) -> SQLiteInvestigationStore:
         return self

@@ -1,6 +1,6 @@
 # Package layout and dependency boundaries
 
-Owner-authorized direction for [#46](https://github.com/krispykrits/TRACE/issues/46); implementation proposed for review. [ADR 0010](../adr/0010-capability-packages-and-adapter-boundaries.md) records this change. TRACE remains one installable `trace_app` application. Its public `trace-app` and `python -m trace_app.cli` entry points, serialized schemas and retrieval defaults are preserved.
+Accepted direction for [#46](https://github.com/krispykrits/TRACE/issues/46), merged in [PR #47](https://github.com/krispykrits/TRACE/pull/47). [ADR 0010](../adr/0010-capability-packages-and-adapter-boundaries.md) records this change. TRACE remains one installable `trace_app` application. Its public `trace-app` and `python -m trace_app.cli` entry points, serialized schemas and retrieval defaults are preserved.
 
 ## Runtime placement
 
@@ -8,11 +8,12 @@ Owner-authorized direction for [#46](https://github.com/krispykrits/TRACE/issues
 | --- | --- |
 | `evidence` | Source-neutral records, bounded queries, reader contracts and deterministic timelines |
 | `knowledge` | Documents/chunks, corpus/index identities, ports, vector validation, authorized search and bounded context |
-| `investigation` | Request/execution/assessment contracts; future bounded investigator and budget policies |
+| `investigation` | Request/execution/assessment contracts, fixed read-only tool arguments/grants/session budgets; future bounded investigator |
 | `adapters/storage/sqlite` | Existing database implementations; storage-specific schema and mapping stay here |
 | `adapters/retrieval` | Exact numerical scoring and local artifact publication/loading |
 | `adapters/embeddings` | Cached Sentence Transformers implementation |
 | `adapters/sources` | Curated-file ingestion implementation |
+| `adapters/tools` | Fixed local read worker, deadline termination and metadata-only logging audit, selected by bootstrap |
 | `runtime` | Configuration and correlated structured logging |
 | `demo` | Explicit synthetic Order fixtures, replay and development scenario generation |
 | `cli` | Argument handling, presentation and exit behavior |

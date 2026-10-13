@@ -49,3 +49,5 @@ The Local/Cloud MVP investigation remains read-only. The final capstone's [appro
 - [Reuse review](../planning/production-usefulness-review.md) and [approved amendment](../planning/production-roadmap-amendment.md) explain why educational components must enter through TRACE-owned contracts.
 
 The [passage evaluation and context contract](retrieval-evaluation-context.md) records #17's configured candidate limits, current source revalidation, exact byte budget and separate citation map. Evaluator-only labels/reviews remain outside runtime imports; human review gates acceptance.
+
+The [read-only tool catalog](investigation-tools.md) describes #18 typed schemas, trusted authorization, externally enforced bounds, worker termination, partial/error outcomes and audit; [ADR 0011](../adr/0011-read-only-tool-execution.md) records the execution boundary.

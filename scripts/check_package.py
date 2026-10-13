@@ -38,6 +38,8 @@ def main() -> int:
             if not {
                 "trace_app/cli/__main__.py",
                 "trace_app/knowledge/search.py",
+                "trace_app/investigation/tools.py",
+                "trace_app/adapters/tools/local.py",
             } <= set(names):
                 raise RuntimeError("Wheel is missing nested runtime modules.")
         requirements = temporary / "requirements.txt"
@@ -150,6 +152,20 @@ def main() -> int:
             env=child_env,
             check=True,
         )
+        # The deadline worker must also run from the wheel outside the checkout.
+        worker = subprocess.run(
+            [str(python), "-I", "-m", "trace_app.adapters.tools.local"],
+            input="{}",
+            cwd=temporary,
+            env=child_env,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        if json.loads(worker.stdout)["status"] != "dependency_failure":
+            raise RuntimeError(
+                "Installed tool worker failed closed-protocol verification."
+            )
         print(
             "Built wheel, installed entry points, synthetic workflow and evaluator exclusion passed."
         )

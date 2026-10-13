@@ -27,3 +27,7 @@ Issue #7 defines the synthetic Order workflow; issue #8 defines the source-neutr
 ## Bounded knowledge context
 
 `uv run --locked python scripts/demo_context.py` searches with an explicit 20-candidate request, then assembles at most five quoted passages within 8,192 canonical JSON bytes and resolves the emitted citation map. `--max-passages` and `--max-bytes` demonstrate omissions. The [context contract](retrieval-evaluation-context.md) separates untrusted quotes, source mappings and omission diagnostics, with current authorization checks and explicit failures. This remains a developer command; model tools belong to #18.
+
+## Read-only investigation catalog
+
+The [#18 catalog](investigation-tools.md) wraps log, metric, deployment and knowledge readers in `ToolSession.invoke`. Closed typed argument objects cannot select grants, files, SQL, shell or publisher methods. Trusted composition fixes source scope and an investigation; direct evidence and saved citations receive source-policy checks. Bounded attempts, monotonic deadlines, read-only SQLite connections, whole-result omission diagnostics and metadata-only audit are enforced in code. This is an internal Local MVP API with a synthetic developer demonstration; no HTTP endpoint, hosted authentication or remediation capability is added.

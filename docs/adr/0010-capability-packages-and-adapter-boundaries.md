@@ -1,6 +1,6 @@
 # ADR 0010: Capability packages and explicit adapter composition
 
-- **Status:** Owner-authorized direction; implementation proposed in #46, awaiting PR review/merge
+- **Status:** Accepted and merged for #46 in PR #47; owner merge verified 2026-10-12 (America/New_York)
 - **Date:** 2026-10-12
 - **Owner:** Project owner
 - **Scope:** Structural refactor of the modular Python application; no new product capability

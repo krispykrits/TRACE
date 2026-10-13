@@ -31,6 +31,15 @@ class ArchitectureTests(unittest.TestCase):
             "adapters/store.py": [
                 "from trace_app.bootstrap import create_search_service"
             ],
+            "adapters/tools/worker.py": [
+                "import evaluation.scoring",
+                "from trace_app.cli import main",
+                "from trace_app.bootstrap import create_tool_session",
+            ],
+            "investigation/tools.py": [
+                "from trace_app.adapters.tools.local import LocalToolBackend",
+                "from trace_app.demo.replay import ReplaySession",
+            ],
             "cli/commands.py": ["from trace_app.adapters.storage import sqlite"],
             "runtime/settings.py": ["import sklearn"],
             "demo/replay.py": ["import evaluation"],

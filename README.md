@@ -43,3 +43,5 @@ TRACE will use this repository for a modular Python application. Volume 5/6 capa
 ## Controlled production response
 
 TRACE is an incident intelligence and controlled-response platform. The first investigation releases are read-only; the final capstone includes at least one real, explicitly approved production remediation. See the [approved remediation scope](docs/planning/production-remediation-scope.md) for staging-to-production promotion, approval binding, execution limits and outcome verification. Production access and an appropriate target are required; a simulated or staging-only action does not satisfy the final production gate.
+
+Run `uv run --locked python scripts/demo_tools.py` for the synthetic six-tool demonstration plus rejected unauthorized, over-limit and shell requests. The [tool catalog](docs/architecture/investigation-tools.md) describes typed inputs, read-only source grants, time/result bounds, audit and current operational limits.

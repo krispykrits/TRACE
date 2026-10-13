@@ -13,10 +13,12 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0007](0007-synthetic-evidence-identity-and-isolation.md) | Stable synthetic evidence identity and evaluator isolation | Accepted with merged issue #8 implementation |
 | [0008](0008-local-corpus-generations-and-source-policy.md) | Local corpus generations, adapted chunk provenance and current source policy | Accepted with merged issue #15 implementation |
 | [0009](0009-local-exact-knowledge-retrieval.md) | Pinned optional CPU embeddings, exact retrieval and development-selected lexical default | Accepted with merged issue #16 implementation |
+| [0010](0010-capability-packages-and-adapter-boundaries.md) | Capability packages, adapters/composition and automatic import/wheel verification | Accepted in #46 / PR #47 |
+| [0011](0011-read-only-tool-execution.md) | Fixed read-only tool catalog, readonly sources and deadline-isolated execution | Proposed in #18; awaiting PR review |
 
 ## Open decision register
 
-[ADR 0010](0010-capability-packages-and-adapter-boundaries.md) records the owner-authorized capability layout, adapter composition, test categories and automated import/package checks; implementation is proposed in #46.
+[ADR 0010](0010-capability-packages-and-adapter-boundaries.md) records the owner-authorized capability layout, adapter composition, test categories and automated import/package checks; implementation is merged in #46 / PR #47.
 
 These are gates, not inferred decisions. The [charter](../charter.md) is the full owner/input register; update the relevant ADR when a design choice is made.
 
