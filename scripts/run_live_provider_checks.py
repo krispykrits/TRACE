@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import sys
 import unittest
 from pathlib import Path
@@ -22,6 +23,12 @@ def discover_live_provider_suite(test_directory: Path) -> unittest.TestSuite | N
 def main() -> int:
     """Run tests/live and fail closed until it contains real tests."""
     test_directory = Path(__file__).resolve().parents[1] / "tests" / "live"
+    if os.environ.get("TRACE_ALLOW_PAID_LIVE") != "1":
+        print(
+            "Live provider verification requires TRACE_ALLOW_PAID_LIVE=1; no paid call was made.",
+            file=sys.stderr,
+        )
+        return 2
     suite = discover_live_provider_suite(test_directory)
     if suite is None:
         if test_directory.is_dir():
@@ -35,6 +42,9 @@ def main() -> int:
         return 2
 
     result = unittest.TextTestRunner(verbosity=2).run(suite)
+    if result.skipped:
+        print("Skipped live tests cannot count as verified.", file=sys.stderr)
+        return 2
     return 0 if result.wasSuccessful() else 1
 
 

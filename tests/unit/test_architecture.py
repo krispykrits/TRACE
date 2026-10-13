@@ -45,7 +45,29 @@ class ArchitectureTests(unittest.TestCase):
                 "from scripts.demo_integration import integration_fixture",
                 "from trace_app.adapters.tools.local import LocalToolBackend",
             ],
-            "cli/commands.py": ["from trace_app.adapters.storage import sqlite"],
+            "investigation/provider.py": [
+                "from trace_app.adapters.models.process import ProcessModelProvider",
+                "from tests.fixtures.model_provider import FakeModelTransport",
+                "import openai",
+            ],
+            "investigation/provider_policy.py": [
+                "import http.client",
+                "from urllib.request import urlopen",
+                "from trace_app.adapters.models.azure import AzureResponsesTransport",
+                "from evaluation.scoring import evaluate",
+            ],
+            "adapters/models/provider.py": [
+                "from trace_app.investigation.tools import ToolSession",
+                "from trace_app.adapters.tools.local import LocalToolBackend",
+                "from trace_app.adapters.storage.sqlite import investigations",
+                "from trace_app.knowledge.ports import CorpusReader",
+                "from trace_app.bootstrap import create_search_service",
+                "from tests.fixtures.model_provider import FakeModelTransport",
+            ],
+            "cli/commands.py": [
+                "from trace_app.adapters.storage import sqlite",
+                "import http.client",
+            ],
             "runtime/settings.py": ["import sklearn"],
             "demo/replay.py": ["import evaluation"],
             "new_feature.py": ["import os"],
@@ -68,6 +90,9 @@ class ArchitectureTests(unittest.TestCase):
                 "knowledge/service.py": "from .ports import Encoder\nfrom trace_app.evidence.models import EvidenceRecord",
                 "bootstrap.py": "from trace_app.adapters.retrieval.exact_scoring import LocalExactScorer",
                 "cli/commands.py": "from trace_app.bootstrap import create_search_service",
+                "adapters/models/process.py": "from trace_app.investigation.provider import ModelRequest\nfrom trace_app.runtime.logging import configure_logging",
+                "adapters/models/journal.py": "from trace_app.investigation.provider_policy import Redaction",
+                "adapters/models/azure.py": "import http.client\nimport ssl",
             }
             for filename, source in files.items():
                 path = root / filename

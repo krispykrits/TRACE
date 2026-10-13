@@ -1,6 +1,6 @@
 # Sprint 4 review — knowledge, retrieval and controlled tools
 
-Date: 2026-10-13 (America/New_York). Prepared by: Codex. Intended reviewer: project owner. Scope: [roadmap S4](../planning/capstone-project-plan.md), integration gate [#19](https://github.com/krispykrits/TRACE/issues/19). **Draft for owner review; gate acceptance follows review and merge of [PR #49](https://github.com/krispykrits/TRACE/pull/49).** Sprint numbers denote scope increments, not dates or capacity commitments.
+Date: 2026-10-13 (America/New_York). Prepared by: Codex. Reviewer: project owner. Scope: [roadmap S4](../planning/capstone-project-plan.md), integration gate [#19](https://github.com/krispykrits/TRACE/issues/19). **Scoped gate accepted through owner merge of [PR #49](https://github.com/krispykrits/TRACE/pull/49) at `a9db329`; live merge/Project Done verified 2026-10-13.** Sprint numbers denote scope increments, not dates or capacity commitments.
 
 ## Completion and acceptance evidence
 
@@ -13,7 +13,7 @@ Live GitHub issue/Project status and merges were verified at the start of #19. A
 | #17 | Done, PR #45 merged | Owner's 211 blanket human endorsements with correct provenance; frozen lexical Recall@5 **0.9544**, MRR@5 **0.9137**, Recall@10 **0.9881** on 100 related queries; [acceptance](../../evaluation/reports/retrieval_passage_acceptance_v4.json), [revision record](../../evaluation/retrieval/judgment-revisions.md) | Development-only related variants; no independent held-out or Operational Pilot claim |
 | #46 | Done, PR #47 merged | Capability/adapters/composition, import and installed-wheel gates; [layout](../architecture/package-layout.md), ADR 0010 | Structural checks complement source/security review; they are not a sandbox |
 | #18 | Done, PR #48 merged at `f1d3923` | Six typed readonly tools, scope/citation checks, budgets/deadlines, read-only DB connections and correlated redacted audit; [catalog](../architecture/investigation-tools.md), ADR 0011 | No real operational adapter/authentication, hosted audit or mutation capability |
-| #19 | Implementation submitted for owner review | [Integration contract](../architecture/scripted-evidence-package.md), [saved package](../../evaluation/reports/sprint_04_evidence_package_v1.json), [tool fixture report](../../evaluation/reports/tool_choices_development_v1.json) and actual assembled boundary tests | Owner review/merge; no LLM investigator implemented |
+| #19 | Done, PR #49 merged at `a9db329` | [Integration contract](../architecture/scripted-evidence-package.md), [saved package](../../evaluation/reports/sprint_04_evidence_package_v1.json), [tool fixture report](../../evaluation/reports/tool_choices_development_v1.json) and actual assembled boundary tests | No LLM investigator implemented; provider/live acceptance remains #34 |
 
 ## Demonstration and verification
 
@@ -55,4 +55,4 @@ Real source/data access, independent operator study, hosted logging acceptance, 
 
 Prepared recommendation: accept the scoped Sprint 4 integration gate after owner PR review/merge and recorded green final checks; proceed to #34's allowed offline contract work, retaining its explicit live-provider decision blockers. No unresolved critical boundary failure is known in the exercised local integration cases. This is not a Local MVP release or production-usefulness decision.
 
-Owner decision/date: **pending PR review and merge**. Human retrieval endorsement in #17 is a distinct recorded event and is not reused as approval of this sprint review.
+Owner decision/date: **accepted scoped gate by PR #49 merge on 2026-10-13 at 00:17 America/New_York (`a9db329`)**, with live Project Done verified during the #34 handoff. Human retrieval endorsement in #17 is a distinct recorded event and is not reused as approval of this sprint review. The next allowed offline work is #34 / subtask #50; its live-provider gates remain open.

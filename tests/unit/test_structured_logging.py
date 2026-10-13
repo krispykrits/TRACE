@@ -64,6 +64,35 @@ class StructuredLoggingTests(unittest.TestCase):
         self.assertEqual(record["nested"]["api_key"], "[REDACTED]")
         self.assertIn("[REDACTED]", record["exception"])
 
+    def test_token_metrics_are_numeric_and_credential_tokens_remain_redacted(
+        self,
+    ) -> None:
+        logging.getLogger("trace_app.models").info(
+            "Provider usage.",
+            extra={
+                "usage": {
+                    "input_tokens": 23,
+                    "output_tokens": None,
+                    "total_tokens": 23,
+                },
+                "untrusted": {
+                    "input_tokens": "fixture-secret-123",
+                    "output_tokens": True,
+                },
+                "access_token": "fixture-secret-123",
+            },
+        )
+        record = json.loads(self.output.getvalue())
+        self.assertEqual(
+            record["usage"],
+            {"input_tokens": 23, "output_tokens": None, "total_tokens": 23},
+        )
+        self.assertEqual(
+            record["untrusted"],
+            {"input_tokens": "[REDACTED]", "output_tokens": "[REDACTED]"},
+        )
+        self.assertEqual(record["access_token"], "[REDACTED]")
+
 
 if __name__ == "__main__":
     unittest.main()

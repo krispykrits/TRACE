@@ -2,6 +2,8 @@
 
 TRACE currently provides an importable CLI, configuration check, synthetic Order–Payment demo and a local SQLite evidence-store demo. It also provides authorized local knowledge search with optional cached CPU embeddings. It has no incident investigator, hosted model API, operational source integration or deployed cloud runtime.
 
+The [Azure model connector and policy guide](architecture/model-provider.md) records explicit private-file configuration, evidence-authority composition, registered prompts, per-call admission, protected responses and the local $20 spending journal. All requests, including later evidence/history, require fresh source access and Azure transmission permission. Runtime fakes/default source grants are absent. The actual opted-in synthetic connector check passed; operational identity/source/retention and assessment/workflow acceptance remain separate.
+
 ## Supported setup
 
 The supported development and CI runtime is CPython 3.12 on Linux. Install Python 3.12, uv 0.12.17 and GNU make, then run these commands from the repository root. The project rejects other Python minor versions and other uv versions so local setup and CI use the same toolchain:
@@ -67,7 +69,7 @@ Re-running `ingest` with the same submission key and scenario returns zero new r
 
 Pull requests and pushes to `main` run the `Quality checks` workflow on `ubuntu-24.04`. It uses CPython 3.12, uv 0.12.17 and the committed `uv.lock`; `uv sync --locked` fails if dependency metadata and the lock disagree. The job records the Python and uv versions and the resolved dependency tree in its log. It runs the same syntax, lint, format, type, unit and process-integration commands listed above. Any failed command fails the job. These checks are deterministic and require no credentials, network-backed application service, AWS access or paid model call; model benchmarks are not part of this workflow.
 
-The manual workflow has a separate **Run live provider integration checks** input, off by default. Enabling it runs a distinct job and cannot change or skip the fast quality job. That job fails with an explicit message until real checks are added under `tests/live`; a missing or empty suite cannot pass as verified. No provider checks currently exist and no credentials are configured for the job, so it is not live-provider acceptance evidence. Record an enabled, passing run before describing such checks as verified.
+The manual workflow has a separate **Run live provider integration checks** input, off by default, and cannot weaken the fast job. Local `tests/live` now has one actual Azure synthetic connector check. Running it requires `TRACE_ALLOW_PAID_LIVE=1` and explicit private setup/secret/journal/report paths plus the known initial spending estimate; see the provider guide. Missing opt-in, missing/empty tests and skips fail closed. The hosted manual job has no private files/budget ownership configured and is not live acceptance evidence. Never enable paid calls in deterministic CI or copy a historical smoke result as current verification.
 
 ## Configuration
 
@@ -95,7 +97,7 @@ uv run --locked trace-app check-config --env-file .env.example
 
 check-config emits one JSON record on stderr. Records include an RFC 3339 UTC timestamp, level, component, correlation_id, event, message, and application_version. The correlation ID is generated once per CLI invocation and can be propagated through a future investigation. Add investigation_id, tool_attempt_id, model_attempt_id, and source/model/prompt/configuration version fields when those operations exist. Only record usage or cost after measuring a real invocation; this scaffold emits no fabricated metrics.
 
-The formatter redacts values under fields named for passwords, secrets, tokens, API keys, authorization, credentials, or private keys. Callers can also register known secret values for removal from messages and exception text. Do not place secrets in application errors, and do not log unredacted provider payloads.
+Exact token-usage metric fields preserve only nonnegative integers or null; string/bool values remain redacted. The formatter redacts values under fields named for passwords, secrets, tokens, API keys, authorization, credentials, or private keys. Callers can also register known secret values for removal from messages and exception text. Do not place secrets in application errors, and do not log unredacted provider payloads.
 
 ## Repository map
 
