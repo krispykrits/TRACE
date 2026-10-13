@@ -1,6 +1,6 @@
 # Typed read-only investigation tools
 
-Proposed implementation for [#18](https://github.com/krispykrits/TRACE/issues/18), 2026-10-12. [ADR 0011](../adr/0011-read-only-tool-execution.md) records the authority and deadline boundary. This wraps the existing [evidence queries](bounded-evidence-queries.md), [knowledge search](knowledge-retrieval.md) and [bounded context](retrieval-evaluation-context.md), within the accepted [package layout](package-layout.md).
+Proposed implementation for [#18](https://github.com/krispykrits/TRACE/issues/18) in [PR #48](https://github.com/krispykrits/TRACE/pull/48), 2026-10-12. [ADR 0011](../adr/0011-read-only-tool-execution.md) records the authority and deadline boundary. This wraps the existing [evidence queries](bounded-evidence-queries.md), [knowledge search](knowledge-retrieval.md) and [bounded context](retrieval-evaluation-context.md), within the accepted [package layout](package-layout.md).
 
 ## Catalog and input schemas
 
