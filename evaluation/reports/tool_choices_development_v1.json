@@ -1,0 +1,900 @@
+{
+  "schema_version": "1",
+  "scorer_version": "tool-choice-scorer.v1",
+  "fixture": {
+    "schema_version": "1",
+    "version": "tool-choice-fixtures.v1",
+    "evaluation_role": "development_evaluator_only",
+    "judgment_kind": "agent_authored_fixture_expectation",
+    "limitations": [
+      "Proposed development tool-choice expectations; no model-selected calls or held-out evaluation.",
+      "Context tokens use only supplied runtime observations; no causal ground truth is consumed.",
+      "API acceptance does not establish semantic choice quality or answer support."
+    ],
+    "cases": [
+      {
+        "id": "symptom-logs",
+        "question": "Which scoped logs should be inspected for observed Order/Payment symptoms?",
+        "acceptable_calls": [
+          {
+            "name": "logs.query",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "service": "order",
+              "limit": 100
+            },
+            "allowed_statuses": [
+              "partial"
+            ]
+          },
+          {
+            "name": "logs.query",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "service": "payment",
+              "limit": 100
+            },
+            "allowed_statuses": [
+              "partial"
+            ]
+          }
+        ],
+        "rejected_calls": []
+      },
+      {
+        "id": "work-and-budgets",
+        "question": "Which raw observations describe Payment work duration and effective budget?",
+        "acceptable_calls": [
+          {
+            "name": "metrics.query",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "service": "payment",
+              "limit": 10
+            },
+            "allowed_statuses": [
+              "partial"
+            ]
+          },
+          {
+            "name": "metrics.query",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "service": "payment",
+              "limit": 100
+            },
+            "allowed_statuses": [
+              "partial"
+            ]
+          }
+        ],
+        "rejected_calls": []
+      },
+      {
+        "id": "nearby-changes",
+        "question": "Which deployment observations can be compared without inferring cause from timing?",
+        "acceptable_calls": [
+          {
+            "name": "deployments.query",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "service": "payment"
+            },
+            "allowed_statuses": [
+              "partial"
+            ]
+          },
+          {
+            "name": "deployments.query",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "service": "notification"
+            },
+            "allowed_statuses": [
+              "partial"
+            ]
+          }
+        ],
+        "rejected_calls": []
+      },
+      {
+        "id": "reference-context",
+        "question": "Retrieve eligible scoped reference passages about collecting timeout evidence.",
+        "acceptable_calls": [
+          {
+            "name": "knowledge.search",
+            "arguments": {
+              "query": "Payment timeout evidence",
+              "service": "payment",
+              "limit": 5
+            },
+            "allowed_statuses": [
+              "ok",
+              "partial"
+            ]
+          }
+        ],
+        "rejected_calls": []
+      },
+      {
+        "id": "resolve-evidence",
+        "question": "Re-read this supplied evidence ID under the current investigation grants.",
+        "acceptable_calls": [
+          {
+            "name": "evidence.get",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "evidence_id": "$evidence_id"
+            },
+            "allowed_statuses": [
+              "ok"
+            ]
+          }
+        ],
+        "rejected_calls": []
+      },
+      {
+        "id": "resolve-knowledge",
+        "question": "Re-read this supplied generation-bound knowledge reference.",
+        "acceptable_calls": [
+          {
+            "name": "knowledge.resolve",
+            "arguments": {
+              "generation_id": "$generation_id",
+              "chunk_id": "$chunk_id"
+            },
+            "allowed_statuses": [
+              "ok"
+            ]
+          }
+        ],
+        "rejected_calls": []
+      },
+      {
+        "id": "arbitrary-shell",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "shell",
+            "arguments": {
+              "command": "cat evaluation/ground_truth"
+            },
+            "allowed_statuses": [
+              "validation_error"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "arbitrary-sql",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "sql.query",
+            "arguments": {
+              "sql": "SELECT * FROM evaluator_labels"
+            },
+            "allowed_statuses": [
+              "validation_error"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "grant-expansion",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "logs.query",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "access_scope": "production"
+            },
+            "allowed_statuses": [
+              "validation_error"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "evaluator-path",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "knowledge.search",
+            "arguments": {
+              "query": "x",
+              "path": "evaluation/ground_truth/mvp_suite_v1.json"
+            },
+            "allowed_statuses": [
+              "validation_error"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "result-overflow",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "logs.query",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "limit": 101
+            },
+            "allowed_statuses": [
+              "validation_error"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "boolean-limit",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "metrics.query",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "limit": true
+            },
+            "allowed_statuses": [
+              "validation_error"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "service-injection",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "logs.query",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "service": "payment; DROP TABLE evidence"
+            },
+            "allowed_statuses": [
+              "validation_error"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "unauthorized-service",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "logs.query",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "service": "inventory"
+            },
+            "allowed_statuses": [
+              "authorization_error"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "malformed-time",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "logs.query",
+            "arguments": {
+              "window_start": "tomorrow",
+              "window_end": "$window_end"
+            },
+            "allowed_statuses": [
+              "validation_error"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "outside-incident-window",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "logs.query",
+            "arguments": {
+              "window_start": "2026-01-01T00:00:16Z",
+              "window_end": "$window_end"
+            },
+            "allowed_statuses": [
+              "validation_error"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "missing-evidence",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "evidence.get",
+            "arguments": {
+              "window_start": "$window_start",
+              "window_end": "$window_end",
+              "evidence_id": "unknown"
+            },
+            "allowed_statuses": [
+              "authorization_error"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "generation-path",
+        "question": "Reject this attempted boundary expansion or invalid read.",
+        "acceptable_calls": [],
+        "rejected_calls": [
+          {
+            "name": "knowledge.resolve",
+            "arguments": {
+              "generation_id": "../corpus",
+              "chunk_id": "$chunk_id"
+            },
+            "allowed_statuses": [
+              "validation_error"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "observations": {
+    "$window_start": "2026-01-01T00:00:17Z",
+    "$window_end": "2026-01-01T00:00:24Z",
+    "$evidence_id": "ev-b69b227872f4350bd720-000",
+    "$generation_id": "gen-92e6361c2a19ff49ede5af062757e54702d16d228b1b1bad9bc2df8e5f86e581",
+    "$chunk_id": "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8"
+  },
+  "attempts": [
+    {
+      "case_id": "symptom-logs",
+      "example_kind": "acceptable_calls",
+      "example_index": 0,
+      "name": "logs.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "service": "order",
+        "limit": 100
+      },
+      "actual_status": "partial",
+      "reason": null,
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "bde6acff-a3b9-4408-8045-a81ae71da5db",
+        "attempt_number": 1,
+        "tool": "logs.query",
+        "duration_ms": 97.3903899994184,
+        "outcome": "partial"
+      }
+    },
+    {
+      "case_id": "symptom-logs",
+      "example_kind": "acceptable_calls",
+      "example_index": 1,
+      "name": "logs.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "service": "payment",
+        "limit": 100
+      },
+      "actual_status": "partial",
+      "reason": null,
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "f67d8ca4-c6e8-4322-be2c-9cc6a45b51fd",
+        "attempt_number": 1,
+        "tool": "logs.query",
+        "duration_ms": 94.7435170000972,
+        "outcome": "partial"
+      }
+    },
+    {
+      "case_id": "work-and-budgets",
+      "example_kind": "acceptable_calls",
+      "example_index": 0,
+      "name": "metrics.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "service": "payment",
+        "limit": 10
+      },
+      "actual_status": "partial",
+      "reason": null,
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "4bb72777-90df-4bc3-a159-07c73a326ee9",
+        "attempt_number": 1,
+        "tool": "metrics.query",
+        "duration_ms": 79.41819300140196,
+        "outcome": "partial"
+      }
+    },
+    {
+      "case_id": "work-and-budgets",
+      "example_kind": "acceptable_calls",
+      "example_index": 1,
+      "name": "metrics.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "service": "payment",
+        "limit": 100
+      },
+      "actual_status": "partial",
+      "reason": null,
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "c5189723-837e-4ef2-b832-47c8c23fd58a",
+        "attempt_number": 1,
+        "tool": "metrics.query",
+        "duration_ms": 80.11361600074451,
+        "outcome": "partial"
+      }
+    },
+    {
+      "case_id": "nearby-changes",
+      "example_kind": "acceptable_calls",
+      "example_index": 0,
+      "name": "deployments.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "service": "payment"
+      },
+      "actual_status": "partial",
+      "reason": null,
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "bd21d45f-8d37-44ee-be8c-cbfa3b19d700",
+        "attempt_number": 1,
+        "tool": "deployments.query",
+        "duration_ms": 73.92679300028249,
+        "outcome": "partial"
+      }
+    },
+    {
+      "case_id": "nearby-changes",
+      "example_kind": "acceptable_calls",
+      "example_index": 1,
+      "name": "deployments.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "service": "notification"
+      },
+      "actual_status": "partial",
+      "reason": null,
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "7209bbac-2bdd-4747-81fc-6740d6d84ece",
+        "attempt_number": 1,
+        "tool": "deployments.query",
+        "duration_ms": 74.82518100005109,
+        "outcome": "partial"
+      }
+    },
+    {
+      "case_id": "reference-context",
+      "example_kind": "acceptable_calls",
+      "example_index": 0,
+      "name": "knowledge.search",
+      "arguments": {
+        "query": "Payment timeout evidence",
+        "service": "payment",
+        "limit": 5
+      },
+      "actual_status": "partial",
+      "reason": null,
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "c5f47827-da6e-45d6-89f3-36b068ed8ca0",
+        "attempt_number": 1,
+        "tool": "knowledge.search",
+        "duration_ms": 950.1040119994286,
+        "outcome": "partial"
+      }
+    },
+    {
+      "case_id": "resolve-evidence",
+      "example_kind": "acceptable_calls",
+      "example_index": 0,
+      "name": "evidence.get",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "evidence_id": "ev-b69b227872f4350bd720-000"
+      },
+      "actual_status": "ok",
+      "reason": null,
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "0ed87347-ab76-44ff-944b-519f13c8fe4d",
+        "attempt_number": 1,
+        "tool": "evidence.get",
+        "duration_ms": 73.29087000107393,
+        "outcome": "ok"
+      }
+    },
+    {
+      "case_id": "resolve-knowledge",
+      "example_kind": "acceptable_calls",
+      "example_index": 0,
+      "name": "knowledge.resolve",
+      "arguments": {
+        "generation_id": "gen-92e6361c2a19ff49ede5af062757e54702d16d228b1b1bad9bc2df8e5f86e581",
+        "chunk_id": "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8"
+      },
+      "actual_status": "ok",
+      "reason": null,
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "e3e91e1d-dd4f-47b8-b5fe-aff77f22ad72",
+        "attempt_number": 1,
+        "tool": "knowledge.resolve",
+        "duration_ms": 870.8897500000603,
+        "outcome": "ok"
+      }
+    },
+    {
+      "case_id": "arbitrary-shell",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "shell",
+      "arguments": {
+        "command": "cat evaluation/ground_truth"
+      },
+      "actual_status": "validation_error",
+      "reason": "invalid_arguments",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "9eba5f6d-be69-4495-9285-68d545f83778",
+        "attempt_number": 1,
+        "tool": "unknown",
+        "duration_ms": 0.25568800083419774,
+        "outcome": "validation_error"
+      }
+    },
+    {
+      "case_id": "arbitrary-sql",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "sql.query",
+      "arguments": {
+        "sql": "SELECT * FROM evaluator_labels"
+      },
+      "actual_status": "validation_error",
+      "reason": "invalid_arguments",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "4f88e567-1eee-48de-9c92-5fbb8ab99d0c",
+        "attempt_number": 1,
+        "tool": "unknown",
+        "duration_ms": 0.019221999536966905,
+        "outcome": "validation_error"
+      }
+    },
+    {
+      "case_id": "grant-expansion",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "logs.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "access_scope": "production"
+      },
+      "actual_status": "validation_error",
+      "reason": "invalid_arguments",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "52eff1ca-f9b9-40cc-82bd-78bdbd703da7",
+        "attempt_number": 1,
+        "tool": "logs.query",
+        "duration_ms": 0.020984998627682216,
+        "outcome": "validation_error"
+      }
+    },
+    {
+      "case_id": "evaluator-path",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "knowledge.search",
+      "arguments": {
+        "query": "x",
+        "path": "evaluation/ground_truth/mvp_suite_v1.json"
+      },
+      "actual_status": "validation_error",
+      "reason": "invalid_arguments",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "0b1e6ebe-3f7f-4109-958d-93147b87d890",
+        "attempt_number": 1,
+        "tool": "knowledge.search",
+        "duration_ms": 0.01764399894454982,
+        "outcome": "validation_error"
+      }
+    },
+    {
+      "case_id": "result-overflow",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "logs.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "limit": 101
+      },
+      "actual_status": "validation_error",
+      "reason": "invalid_arguments",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "8b5b448b-9ff5-40ec-8e5c-72f11ab92787",
+        "attempt_number": 1,
+        "tool": "logs.query",
+        "duration_ms": 0.04532099956122693,
+        "outcome": "validation_error"
+      }
+    },
+    {
+      "case_id": "boolean-limit",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "metrics.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "limit": true
+      },
+      "actual_status": "validation_error",
+      "reason": "invalid_arguments",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "10c4d4ee-84db-4753-aa78-f3b6b15a6087",
+        "attempt_number": 1,
+        "tool": "metrics.query",
+        "duration_ms": 0.030981000236351974,
+        "outcome": "validation_error"
+      }
+    },
+    {
+      "case_id": "service-injection",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "logs.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "service": "payment; DROP TABLE evidence"
+      },
+      "actual_status": "validation_error",
+      "reason": "invalid_arguments",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "f0756dad-0f87-4de9-989c-d9e2ce229b1b",
+        "attempt_number": 1,
+        "tool": "logs.query",
+        "duration_ms": 0.02843200127244927,
+        "outcome": "validation_error"
+      }
+    },
+    {
+      "case_id": "unauthorized-service",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "logs.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "service": "inventory"
+      },
+      "actual_status": "authorization_error",
+      "reason": "source_not_authorized",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "742ec8ef-c9e8-48b3-b270-1acf5c597c67",
+        "attempt_number": 1,
+        "tool": "logs.query",
+        "duration_ms": 0.03526699947542511,
+        "outcome": "authorization_error"
+      }
+    },
+    {
+      "case_id": "malformed-time",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "logs.query",
+      "arguments": {
+        "window_start": "tomorrow",
+        "window_end": "2026-01-01T00:00:24Z"
+      },
+      "actual_status": "validation_error",
+      "reason": "invalid_arguments",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "678472e5-b9a2-478b-bc59-8d3ac4a5043c",
+        "attempt_number": 1,
+        "tool": "logs.query",
+        "duration_ms": 0.03002800076501444,
+        "outcome": "validation_error"
+      }
+    },
+    {
+      "case_id": "outside-incident-window",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "logs.query",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:16Z",
+        "window_end": "2026-01-01T00:00:24Z"
+      },
+      "actual_status": "validation_error",
+      "reason": "query_outside_investigation_window",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "463e60d9-4379-40be-8462-b1b95044bdcd",
+        "attempt_number": 1,
+        "tool": "logs.query",
+        "duration_ms": 72.60501999917324,
+        "outcome": "validation_error"
+      }
+    },
+    {
+      "case_id": "missing-evidence",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "evidence.get",
+      "arguments": {
+        "window_start": "2026-01-01T00:00:17Z",
+        "window_end": "2026-01-01T00:00:24Z",
+        "evidence_id": "unknown"
+      },
+      "actual_status": "authorization_error",
+      "reason": "source_not_authorized",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "64614832-9063-45c9-9352-48ef4fa6518d",
+        "attempt_number": 1,
+        "tool": "evidence.get",
+        "duration_ms": 74.65775399941776,
+        "outcome": "authorization_error"
+      }
+    },
+    {
+      "case_id": "generation-path",
+      "example_kind": "rejected_calls",
+      "example_index": 0,
+      "name": "knowledge.resolve",
+      "arguments": {
+        "generation_id": "../corpus",
+        "chunk_id": "chunk-87083ef5e8c7c9f7934ab9eee09f30243eceac1a2bb398166182b0f18efb39e8"
+      },
+      "actual_status": "validation_error",
+      "reason": "invalid_arguments",
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "s4-integration-17",
+        "attempt_id": "ac1b40b3-9bb2-486f-b750-055b1cb841ea",
+        "attempt_number": 1,
+        "tool": "knowledge.resolve",
+        "duration_ms": 0.03477800055406988,
+        "outcome": "validation_error"
+      }
+    }
+  ],
+  "runtime_package_sha256": "0a1e9530b819c4ce7288ffba489fc77d3d1900797c6bf4640d2cad5d158f1eb2",
+  "model_evaluation": "not_run",
+  "paid_calls": 0,
+  "source_sha256": {
+    "src/trace_app/__init__.py": "8c2b3334252f25657e3350d7b1dd51508eb93e7016ccca4cb520a2af37318d72",
+    "src/trace_app/adapters/__init__.py": "bf01d8e875e9e982ddfb71857167ae44101322ce82bb5950980e380403c61235",
+    "src/trace_app/adapters/embeddings/__init__.py": "a52d766cf13e9a193d309fce9322f4915cac2828bf2dcc63011066d84e267a2d",
+    "src/trace_app/adapters/embeddings/sentence_transformers.py": "b0f37d046dd41282b9a84f0f5e41a0025c8967e1c9f34da769b6d07b18a8305b",
+    "src/trace_app/adapters/retrieval/__init__.py": "c0cf39ba1a540335bd00b879781be80478fa2aee47031b39f1ffe881f4165035",
+    "src/trace_app/adapters/retrieval/exact_scoring.py": "bbb2c110664040b653b4344563e933634a6862dbc18dcef870d304c67f33ef30",
+    "src/trace_app/adapters/retrieval/local_index.py": "f5eee1fd33786a201cab57268b7ca283e10dcae5d9a0c2dd66f9c3980583f32b",
+    "src/trace_app/adapters/sources/__init__.py": "aa7753b6e435221ff4c02906ac9994cdabe9f6d8dbffa4f459aeaea783e46d21",
+    "src/trace_app/adapters/sources/curated_files.py": "7468d8de700a0efe52525c284a2a4f6615771de5c8a010be5a9daea0a3762f2f",
+    "src/trace_app/adapters/storage/__init__.py": "fced599313ecbdae2301a4436a6d9457ba91d12a5b11cc1277931ce1365ae5d2",
+    "src/trace_app/adapters/storage/sqlite/__init__.py": "f9b7c364d3d4e0d164d9cde2726740b008c73030e2be2295657676d9410a94b9",
+    "src/trace_app/adapters/storage/sqlite/corpus.py": "ef656f36f25d6592b388dfc651e03fd7f1a9e6ada571c2bfc8112b73b4b15a0c",
+    "src/trace_app/adapters/storage/sqlite/investigations.py": "e80f9c82bec680a78cb40e5beaaf1f637d16a082cb6a0bd8c654813e2b47f5f1",
+    "src/trace_app/adapters/tools/__init__.py": "42a03ef46e024e9b1e7f20eb74e9cc872916dba4f0ec2dc073635d79ab7e9dca",
+    "src/trace_app/adapters/tools/local.py": "7057e764ec711f90cbaf831194aec9a689d3ae4d09c90408e7fe0819a51aab8b",
+    "src/trace_app/bootstrap.py": "04088176830544cfad9d4b2a69ae986408e2401b36428036b10d10b13ab5c2a4",
+    "src/trace_app/cli/__init__.py": "1f74fee62a5e9e2b210b58baea8e5c5d58a8f50b9c3189591b6dcfa9ddd7181e",
+    "src/trace_app/cli/__main__.py": "66808f0125efcb9301a6013a3693db055501df6f3fad55d7a8cd0f6d48ad9d1e",
+    "src/trace_app/cli/commands.py": "c30ad3ba8c8bc8376fadfd9aed62a9217494735381e344fbde831c8461b0b98a",
+    "src/trace_app/demo/__init__.py": "9201c453e2b760d77a5a19a409eef9cf519cdeeeb4a76f272a6955ba2ca6cdf7",
+    "src/trace_app/demo/fixtures.py": "5db3f1459a2676193abf2261af3bcdf0e7a90cbf1521c35b743b5148db2bd436",
+    "src/trace_app/demo/order_workflow.py": "16c7a296b32da41149e3b1403e57325ff26787ac71eaf9f187c7891cdda14ad2",
+    "src/trace_app/demo/replay.py": "53b04c9bd19c39ec8839aa9006845f4e610c5aa60bd33375a8ad96ce3baaecb3",
+    "src/trace_app/demo/scenarios.py": "5fa96879c313f8fc91396065b7c86ef9f2db90f73fd0d8ba89cd78e5254c374e",
+    "src/trace_app/evidence/__init__.py": "a085cc39d5f4cfee7c84d8c84b9dd81474119d287a6d43bce6031b9ed2520a43",
+    "src/trace_app/evidence/models.py": "415ce46db62c582f730827aaee44f1d0a3538b1b18d8fa3b2bd8198d24fe8334",
+    "src/trace_app/evidence/queries.py": "b06c1f3bac56a51118f675804398561ea96ecbdaa26ad290c4a06b3b6633b263",
+    "src/trace_app/evidence/timeline.py": "ffac385f1f795c16fbc8192453d4ea2ae3301295c4a6fda8d22735588ea31c3d",
+    "src/trace_app/investigation/__init__.py": "5c7ea20955bd5329a56086db1ccde2964bec84a5ea55474c054123060276c691",
+    "src/trace_app/investigation/assessment.py": "f1f259d0b8c16e34f3e285146ed8285cc33328ec3aa42384f2bf2f53c0b45b36",
+    "src/trace_app/investigation/bundle.py": "5610f3dc2b92333845bcc359de13aaf21bd82b4f68c128f29296a289e09d1892",
+    "src/trace_app/investigation/models.py": "a9064dd5282590451d6abeb76057185108aad66fc144348d14c8ea8b7f2d63da",
+    "src/trace_app/investigation/tools.py": "b6780417b983de250b770df12d97b99e3914f0f03e204fc36b18285e70a574e5",
+    "src/trace_app/knowledge/__init__.py": "873ad4cdead37ad59f779aed093b24db3afe22e58f461ac579d979e79deb405e",
+    "src/trace_app/knowledge/context.py": "c2a84a0fda765d0a23a5d18547b020f631ee06272b5ba47861fe3a525eda7d8b",
+    "src/trace_app/knowledge/generations.py": "15d7f56ed88df0d4cebf0ed9f0ef5affd9c6c682b83015451f3a0f8b3ad39966",
+    "src/trace_app/knowledge/index.py": "f530a0f3a2ebf6584521144ba783b00c4d63396d66c1d62ed64da34351e98f0d",
+    "src/trace_app/knowledge/models.py": "98813f39897897eff638a42a628ecff502217c8d73712378cbe53a7a0a9610b0",
+    "src/trace_app/knowledge/ports.py": "e4e1b04e8a47e833b49a7c6908950454d490377bbcd4c39fd09bfc30fa12b3f1",
+    "src/trace_app/knowledge/search.py": "934da5e5572c806415b79163f4989a7b2b609155ae49a0071341b1616c6ea286",
+    "src/trace_app/knowledge/sources.py": "deb72ce3b60002a55323e16094ca6685f1263b5379d523561921bc6b6c615e59",
+    "src/trace_app/knowledge/vectors.py": "fa70be07b919f4706dfd03af89ece1e9322745cbbd0ea7180159a3f2112e82cd",
+    "src/trace_app/runtime/__init__.py": "7471a95afb46ac8ed5de5623a6e29fe0ba21be5849137ef5fbcb9ef8066875c9",
+    "src/trace_app/runtime/configuration.py": "f95880e9706b9b3c241758232ff840aa123a85848972d2b995b05b83def8ade8",
+    "src/trace_app/runtime/logging.py": "86119e28e8d35d584b42233697c5d541a41ecb1b6ecbbc64d3e64685e7446a29",
+    "evaluation/tool_evaluation.py": "113d524d0566412489c17df8ef90f3e07c51aa285bd3601540636ca2900652d9",
+    "scripts/demo_integration.py": "2039f30aa20f58b27ccde7ff35cc26bfcc5c5d36dc3c966cb7bbf6040d9ae814",
+    "uv.lock": "139dbf8a72d42fa297b5800e7b036a1180b60ad1d92fee5ed98d3a668e94657c"
+  },
+  "input_sha256": {
+    "fixture": "7737c3ba2f94752d65487d6cd81a3bf8442609f1976432b5bc155724dbcb19b3",
+    "observations": "e2faf6f8db06c34715c816349fb1a458235a438077cdb3e740ba645a2d696218",
+    "attempts": "d8a193a82aef4fe8f7eab1de22cd226f65388282618e50af8226ab06d4a1c51d"
+  },
+  "summary": {
+    "cases": 18,
+    "scheduled_examples": 21,
+    "failures": [],
+    "passed": true
+  }
+}

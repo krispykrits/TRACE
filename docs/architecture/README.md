@@ -51,3 +51,5 @@ The Local/Cloud MVP investigation remains read-only. The final capstone's [appro
 The [passage evaluation and context contract](retrieval-evaluation-context.md) records #17's configured candidate limits, current source revalidation, exact byte budget and separate citation map. Evaluator-only labels/reviews remain outside runtime imports; human review gates acceptance.
 
 The [read-only tool catalog](investigation-tools.md) describes #18 typed schemas, trusted authorization, externally enforced bounds, worker termination, partial/error outcomes and audit; [ADR 0011](../adr/0011-read-only-tool-execution.md) records the execution boundary.
+
+The [scripted evidence package](scripted-evidence-package.md) composes scoped reads, observed timelines and revalidated knowledge references for the #19 Sprint 4 gate; [review and Sprint 5 handoff](../sprints/sprint-04-review.md) keep development, provider, operational and remediation acceptance separate.

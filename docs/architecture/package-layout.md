@@ -53,3 +53,5 @@ Every change must identify its capability/adapter boundary, keep application con
 The v4 passage reports bind the pre-refactor scorer implementation. Use commit `43582e3f084ff645b1227bc139d4d441b99fd220` (merged #17) for exact historical rescoring. Keep those snapshots unchanged. Fresh runs use current nested source manifests; the general evaluator hashes runtime modules recursively. Do not claim that moving packages reaccepts a benchmark, or rewrite historical hashes to make current code match old evidence.
 
 Create a new lexical exploration report with a fresh output path, then rescore it with the current checkout. The archive checkout and commands are recorded in [the evaluator guide](../../evaluation/README.md).
+
+For #19, `investigation.bundle` composes the fixed read-only `ToolInvoker` port into a cited observed package. It imports no evaluator, demo, script or adapter; the developer fixture publisher remains in scripts and tool-choice expectations remain in evaluation. The existing import checker and negative fixtures enforce that placement.

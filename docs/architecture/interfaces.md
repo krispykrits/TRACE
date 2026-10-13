@@ -31,3 +31,7 @@ Issue #7 defines the synthetic Order workflow; issue #8 defines the source-neutr
 ## Read-only investigation catalog
 
 The [#18 catalog](investigation-tools.md) wraps log, metric, deployment and knowledge readers in `ToolSession.invoke`. Closed typed argument objects cannot select grants, files, SQL, shell or publisher methods. Trusted composition fixes source scope and an investigation; direct evidence and saved citations receive source-policy checks. Bounded attempts, monotonic deadlines, read-only SQLite connections, whole-result omission diagnostics and metadata-only audit are enforced in code. This is an internal Local MVP API with a synthetic developer demonstration; no HTTP endpoint, hosted authentication or remediation capability is added.
+
+## Sprint 4 cited package
+
+The [scripted evidence package](scripted-evidence-package.md) uses the read-only invoker port to query three evidence kinds and knowledge, then resolve every selected event and quoted passage. Canonical source data/hash are separate from real execution IDs/audit; failures release no package, while source/context gaps remain partial. It produces no assessment and exposes no model/provider or mutation endpoint. Evaluator-only tool-choice cases are outside the runtime wheel.

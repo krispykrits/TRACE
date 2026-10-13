@@ -40,6 +40,11 @@ class ArchitectureTests(unittest.TestCase):
                 "from trace_app.adapters.tools.local import LocalToolBackend",
                 "from trace_app.demo.replay import ReplaySession",
             ],
+            "investigation/bundle.py": [
+                "import evaluation.tool_evaluation",
+                "from scripts.demo_integration import integration_fixture",
+                "from trace_app.adapters.tools.local import LocalToolBackend",
+            ],
             "cli/commands.py": ["from trace_app.adapters.storage import sqlite"],
             "runtime/settings.py": ["import sklearn"],
             "demo/replay.py": ["import evaluation"],
