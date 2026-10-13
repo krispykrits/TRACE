@@ -17,7 +17,7 @@ The runner lives in repository-only `evaluation/`, outside the installable appli
 
 ## Candidate and evaluator schemas
 
-[CandidateReport](../../src/trace_app/assessment.py) is a runtime-owned contract with no evaluator dependency. Its `from_dict` boundary rejects unknown/missing keys, unsupported schema versions and inconsistent status fields. Direct dataclass construction is for trusted application values; untrusted dictionaries must use the parser. Schema version `1` requires these fields:
+[CandidateReport](../../src/trace_app/investigation/assessment.py) is a runtime-owned contract with no evaluator dependency. Its `from_dict` boundary rejects unknown/missing keys, unsupported schema versions and inconsistent status fields. Direct dataclass construction is for trusted application values; untrusted dictionaries must use the parser. Schema version `1` requires these fields:
 
 | Field | Meaning |
 | --- | --- |

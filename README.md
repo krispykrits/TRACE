@@ -30,6 +30,8 @@ Sprint numbers are provisional scope increments, not calendar commitments. Dates
 
 ## Local development
 
+The [package layout and dependency rules](docs/architecture/package-layout.md) govern current and future code. Capability contracts/use cases are independent of concrete adapters; fast CI enforces those imports and tests the installed runtime wheel. See [operations](docs/operations/README.md) and [security boundaries](docs/security/README.md) for current limits and later acceptance requirements.
+
 See [the development guide](docs/development.md) for the Python 3.12/uv setup, safe local environment example, configuration precedence and structured logging conventions. The [synthetic Order–Payment workflow](docs/architecture/order-payment-workflow.md) has a runnable CLI request and explicit fixture limits. The [SQLite investigation store](docs/architecture/sqlite-investigation-store.md) records bounded synthetic evidence and execution state. The [knowledge search](docs/architecture/knowledge-retrieval.md) adds bounded, authorized lexical/semantic/hybrid retrieval over development references. The [bounded context](docs/architecture/retrieval-evaluation-context.md) retains quoted passages and citations within explicit limits, with independently scored development retrieval. The [architecture view](docs/architecture/README.md), [ADR index](docs/adr/README.md), [infrastructure responsibilities](deploy/README.md) and [Sprint 1 evidence review](docs/sprints/sprint-01-review.md) describe current boundaries and open gates.
 
 ## Production usefulness

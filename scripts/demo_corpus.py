@@ -10,15 +10,19 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
-from trace_app.corpus_sources import CorpusBatch, CuratedFileSource
-from trace_app.corpus_store import CorpusReadContext, SQLiteCorpusStore
-from trace_app.knowledge import (
+from trace_app.adapters.sources.curated_files import CuratedFileSource
+from trace_app.adapters.storage.sqlite.corpus import (
+    CorpusReadContext,
+    SQLiteCorpusStore,
+)
+from trace_app.knowledge.models import (
     CorpusAccessError,
     CorpusConflictError,
     CorpusDependencyError,
     CorpusInputError,
 )
-from trace_app.structured_logging import configure_logging
+from trace_app.knowledge.sources import CorpusBatch
+from trace_app.runtime.logging import configure_logging
 
 _ROOT = Path(__file__).resolve().parents[1]
 _AT = datetime(2026, 10, 12, 12, tzinfo=UTC)

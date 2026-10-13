@@ -20,10 +20,14 @@ from pathlib import Path
 from typing import Any
 
 from evaluation.scoring import SupportReview
-from trace_app.corpus_sources import CorpusBatch, CuratedFileSource
-from trace_app.corpus_store import SQLiteCorpusStore
-from trace_app.evidence import _parse_utc, format_utc
-from trace_app.knowledge import (
+from trace_app.adapters.embeddings.sentence_transformers import LocalSentenceEncoder
+from trace_app.adapters.retrieval.local_index import build_index, load_index
+from trace_app.adapters.sources.curated_files import CuratedFileSource
+from trace_app.adapters.storage.sqlite.corpus import SQLiteCorpusStore
+from trace_app.bootstrap import create_search_service as SearchService
+from trace_app.evidence.models import _parse_utc, format_utc
+from trace_app.knowledge.context import CONTEXT_VERSION, ContextAssembler, ContextBudget
+from trace_app.knowledge.models import (
     CorpusAccessError,
     CorpusDependencyError,
     CorpusReadContext,
@@ -34,12 +38,9 @@ from trace_app.knowledge import (
     digest,
     parse_json,
 )
-from trace_app.knowledge_context import CONTEXT_VERSION, ContextAssembler, ContextBudget
-from trace_app.retrieval import SearchService
-from trace_app.retrieval_backends import LocalSentenceEncoder
-from trace_app.retrieval_contracts import EncoderFailure, SearchMode, SearchRequest
-from trace_app.retrieval_index import build_index, load_index
-from trace_app.structured_logging import configure_logging
+from trace_app.knowledge.ports import EncoderFailure, SearchMode, SearchRequest
+from trace_app.knowledge.sources import CorpusBatch
+from trace_app.runtime.logging import configure_logging
 
 SCORER_VERSION = "passage-retrieval-scorer.v3"
 _ROOT = Path(__file__).resolve().parents[1]
@@ -820,18 +821,13 @@ def run(
         else None
     )
     sources = [
+        "uv.lock",
         "evaluation/retrieval_quality.py",
         "evaluation/scoring.py",
-        "src/trace_app/knowledge_context.py",
-        "src/trace_app/retrieval.py",
-        "src/trace_app/retrieval_index.py",
-        "src/trace_app/retrieval_contracts.py",
-        "src/trace_app/retrieval_backends.py",
-        "src/trace_app/knowledge.py",
-        "src/trace_app/corpus_store.py",
-        "src/trace_app/corpus_sources.py",
-        "uv.lock",
         "corpus/development/manifest.json",
+    ] + [
+        path.relative_to(_ROOT).as_posix()
+        for path in sorted((_ROOT / "src/trace_app").rglob("*.py"))
     ]
     configuration = {
         "modes": modes,

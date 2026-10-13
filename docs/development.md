@@ -14,8 +14,10 @@ The supported development and CI runtime is CPython 3.12 on Linux. Install Pytho
 | Run lint checks | `make lint` |
 | Check formatting | `make format-check` |
 | Run static type checks | `make type-check` |
-| Run the deterministic test suite | `make test` |
-| Run the process-boundary integration test | `make integration` |
+| Run unit and contract tests | `make test` |
+| Run storage, evaluator and process integration tests | `make integration` |
+| Enforce dependency direction and evaluator isolation | `make architecture-check` |
+| Build/install and smoke-test the runtime wheel | `make package-check` |
 | Compare real cached lexical/semantic/hybrid baselines | `make integration-semantic` |
 | Compare #17 passage rankings and context | `make retrieval-evaluate` |
 | Run the opt-in provider gate | `make integration-live` |
@@ -30,11 +32,13 @@ make check
 make lint
 make format-check
 make type-check
+make architecture-check
 make test
 make integration
+make package-check
 ```
 
-Run that sequence twice from the repository root to check a fresh setup and repeatability. The integration fixture uses temporary directories, passes a deliberately minimal environment to a real Python CLI subprocess, and removes its files on both success and failure. It makes no provider calls and needs no production credentials or AWS resources. The tests are offline fixtures; they do not count as live-provider or Operational Pilot evidence. Use `make clean` to remove the local virtual environment and build outputs.
+The integration fixtures use temporary state, including a deliberately minimal environment for actual CLI subprocesses, and clean up on success/failure. Unit/contract and integration suites have separate discovery and do not duplicate process tests. The package check installs a built wheel and locked runtime dependencies into a clean environment outside the checkout; package downloads are public dependencies, not live provider calls. These checks need no production credentials or AWS resources and do not count as Operational Pilot evidence. See [package placement and contribution rules](architecture/package-layout.md). Use `make clean` to remove the local virtual environment and build outputs.
 
 The checked-in example contains no credentials. The .env file is ignored by Git. The default trace-app invocation still prints help, and --version does not require configuration.
 
@@ -63,7 +67,7 @@ Re-running `ingest` with the same submission key and scenario returns zero new r
 
 Pull requests and pushes to `main` run the `Quality checks` workflow on `ubuntu-24.04`. It uses CPython 3.12, uv 0.12.17 and the committed `uv.lock`; `uv sync --locked` fails if dependency metadata and the lock disagree. The job records the Python and uv versions and the resolved dependency tree in its log. It runs the same syntax, lint, format, type, unit and process-integration commands listed above. Any failed command fails the job. These checks are deterministic and require no credentials, network-backed application service, AWS access or paid model call; model benchmarks are not part of this workflow.
 
-The manual workflow has a separate **Run live provider integration checks** input, off by default. Enabling it runs a distinct job and cannot change or skip the fast quality job. That job fails with an explicit message until real checks are added under `tests/live_provider`; a missing or empty suite cannot pass as verified. No provider checks currently exist and no credentials are configured for the job, so it is not live-provider acceptance evidence. Record an enabled, passing run before describing such checks as verified.
+The manual workflow has a separate **Run live provider integration checks** input, off by default. Enabling it runs a distinct job and cannot change or skip the fast quality job. That job fails with an explicit message until real checks are added under `tests/live`; a missing or empty suite cannot pass as verified. No provider checks currently exist and no credentials are configured for the job, so it is not live-provider acceptance evidence. Record an enabled, passing run before describing such checks as verified.
 
 ## Configuration
 

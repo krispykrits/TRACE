@@ -27,7 +27,7 @@ Volume 4 already supports configurable candidate/document limits. TRACE exposes 
 
 ## Context contract
 
-[ContextAssembler](../../src/trace_app/knowledge_context.py) accepts a bounded search response, trusted read context, UTC read time and `ContextBudget`. It depends on the reader port, not SQLite or evaluator labels. Input has at most 20 candidates. Defaults are five passages and 8,192 UTF-8 bytes; supported limits are 1–20 passages and 128–1,000,000 bytes. These are implementation bounds, not an operational SLA or owner spending commitment.
+[ContextAssembler](../../src/trace_app/knowledge/context.py) accepts a bounded search response, trusted read context, UTC read time and `ContextBudget`. It depends on the reader port, not SQLite or evaluator labels. Input has at most 20 candidates. Defaults are five passages and 8,192 UTF-8 bytes; supported limits are 1–20 passages and 128–1,000,000 bytes. These are implementation bounds, not an operational SLA or owner spending commitment.
 
 The byte bound covers the exact canonical JSON `serialized_data`: quoted original text, citation IDs, complete citation metadata and envelope, including JSON escaping. It excludes the caller's diagnostic wrapper, system policy and eventual model prompt. This is not an LLM token budget; future generation must separately account for the selected model's full context. A response cannot exceed this data byte bound. Whole passages are omitted when they do not fit; smaller later passages can still fit. No source quotation is cut or rewritten.
 
@@ -55,14 +55,14 @@ From the repository root, with a fresh output path:
 ```sh
 uv run --locked python scripts/demo_context.py --query 'PAYMENT_TIMEOUT evidence' --max-passages 5 --max-bytes 8192
 uv run --locked python -m evaluation.retrieval_quality --modes lexical --output /tmp/trace-passage-lexical.json
-uv run --locked python -m evaluation.retrieval_quality --rescore evaluation/reports/retrieval_passage_candidates_v4.json
+uv run --locked python -m evaluation.retrieval_quality --rescore /tmp/trace-passage-lexical.json
 make retrieval-evaluate
 uv run --locked --extra semantic python -m evaluation.retrieval_quality --max-chunks-per-document 1 --output /tmp/trace-passage-baseline.json
 ```
 
 `make retrieval-evaluate` uses the actual pinned cached encoder for all three branches; prepare the semantic extra/model as described in the [search setup](knowledge-retrieval.md). Missing packages/cache become explicit failures, never fixture embeddings or a silent mode fallback. The evaluator may run the explicitly requested lexical comparison even when dense initialization fails; dense attempts stay failed in their denominators. There are no paid/provider/AWS calls. The demo uses temporary synthetic state and resolves every emitted citation; valid empty results exit 0, invalid/dependency outcomes exit 2.
 
-Original proposal artifacts remain archived; the exact original scorer checkout is identified in the [revision record](../../evaluation/retrieval/judgment-revisions.md). Current commands rescore the v4 reports with scorer v3. Saved reports snapshot suite, reviews, protocol, configuration and attempts with hashes; scorer/code/lock/source hashes identify the measured implementation. Model-free rescoring requires the exact scorer and verifies snapshot hashes, metrics, reviews and acceptance state. Reports are evaluator artifacts, not source-read authorization or runtime inputs. Changing source/configuration requires another measured run. Existing output paths are refused.
+Original proposal artifacts remain archived; the exact original scorer checkout is identified in the [revision record](../../evaluation/retrieval/judgment-revisions.md). The v4 reports require pre-refactor commit 43582e3 for exact historical rescoring; current commands rescore fresh outputs. See the evaluator guide for archive checkout commands. Saved reports snapshot suite, reviews, protocol, configuration and attempts with hashes; scorer/code/lock/source hashes identify the measured implementation. Model-free rescoring requires the exact scorer and verifies snapshot hashes, metrics, reviews and acceptance state. Reports are evaluator artifacts, not source-read authorization or runtime inputs. Changing source/configuration requires another measured run. Existing output paths are refused.
 
 The owner endorsed all v4 relevance sets and proposed claim verdicts on 2026-10-12. The 211 decisions in `reviews_v4.json` record that blanket endorsement and shared provenance without inventing per-target notes. The frozen bundle remains a proposal snapshot; its later endorsement is recorded separately. The [acceptance report](../../evaluation/reports/retrieval_passage_acceptance_v4.json) passed with Recall@5 **0.9544**, MRR@5 **0.9137**, Recall@10 **0.9881**, 100 attempts, zero failures and six verified freshness exclusions. Its model-free rescore reproduces the saved result. All 16 no-relevant cases returned candidates. This is scoped development acceptance; independent held-out quality and Operational Pilot usefulness remain unvalidated.
 

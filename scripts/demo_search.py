@@ -9,23 +9,23 @@ import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 
-from trace_app.corpus_sources import CuratedFileSource
-from trace_app.corpus_store import SQLiteCorpusStore
-from trace_app.knowledge import (
+from trace_app.adapters.embeddings.sentence_transformers import LocalSentenceEncoder
+from trace_app.adapters.retrieval.local_index import build_index, load_index
+from trace_app.adapters.sources.curated_files import CuratedFileSource
+from trace_app.adapters.storage.sqlite.corpus import SQLiteCorpusStore
+from trace_app.bootstrap import create_search_service as SearchService
+from trace_app.knowledge.models import (
     CorpusAccessError,
     CorpusConflictError,
     CorpusDependencyError,
     CorpusReadContext,
 )
-from trace_app.retrieval import SearchService
-from trace_app.retrieval_backends import LocalSentenceEncoder
-from trace_app.retrieval_contracts import (
+from trace_app.knowledge.ports import (
     EncoderFailure,
     IndexCompatibilityError,
     SearchRequest,
 )
-from trace_app.retrieval_index import build_index, load_index
-from trace_app.structured_logging import configure_logging
+from trace_app.runtime.logging import configure_logging
 
 _ROOT = Path(__file__).resolve().parents[1]
 _AT = datetime(2026, 10, 12, 12, tzinfo=UTC)
