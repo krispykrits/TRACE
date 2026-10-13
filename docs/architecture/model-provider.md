@@ -73,6 +73,16 @@ Share nonsecret configuration only. Keep API keys/access tokens/passwords/client
 
 The model version and deployment type are now supplied and recorded locally. To recheck the current model version, open deployment `gpt-6-luna` in Foundry and its **Details** tab and compare **Model version** with the local setup record. Model version identifies the exact model release, separately from deployment name and the API's `v1` version. Global Standard uses pay-per-token global capacity; Data Zone Standard restricts processing to its defined data zone; Provisioned types reserve capacity. These examples explain the field; owner-supplied configuration is not verified live acceptance. Sources: [Model versions](https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/model-versions), [Deployment types](https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/deployment-types).
 
+On 2026-10-13, a preliminary network check against the configured resource completed verified HTTPS and returned HTTP 404 for an unauthenticated `HEAD /openai/v1/models`. This proves the host answered that probe, not authentication, the deployment's existence/version or inference capability. No credentials, prompts or inference calls were sent; the content-free result is retained in Git-ignored `.env.provider-reachability.local`. Initial local checks found no Azure CLI on PATH, Azure/OpenAI Python SDK in the checked interpreter or complete Entra service-principal/certificate/workload-identity environment configuration. Local Microsoft sign-in is the immediate prerequisite for an authenticated Azure smoke check. A direct diagnostic check can precede the hosted adapter, while #34's TRACE live contract acceptance still requires the implemented adapter and its applicable policy/spending gates.
+
+For this diagnostic session, Microsoft Azure CLI **2.91.0** was installed in isolated `/tmp/trace-azure-verification-venv` and its version command passed; TRACE runtime dependencies and the system installation are unchanged. Authentication state has an isolated directory, `/tmp/trace-azure-verification-auth`, with mode 0700. The owner must complete Microsoft sign-in locally; do not share tokens or credentials. Use the following command in this WSL environment, then verify the invoking identity's model permission before any paid check. Sources: [Microsoft Azure CLI package](https://pypi.org/project/azure-cli/2.91.0/), [Interactive Azure CLI sign-in](https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli-interactively).
+
+```bash
+AZURE_CONFIG_DIR=/tmp/trace-azure-verification-auth \
+AZURE_CORE_COLLECT_TELEMETRY=false \
+/tmp/trace-azure-verification-venv/bin/az login --use-device-code --output none
+```
+
 ## Contract and placement
 
 `investigation.provider` owns `model-provider.v1`, configuration, requests, structured results, usage and error categories. It imports only the standard library. `adapters.models.process` runs one explicitly supplied `ModelTransport` in a spawned worker. `bootstrap.create_model_provider` composes it without a default transport. Only `tests/fixtures/model_provider.py` contains the deterministic fake; it requires explicit `offline_test` selection and is excluded from the runtime wheel.
