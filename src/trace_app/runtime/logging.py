@@ -16,6 +16,15 @@ _SENSITIVE_NAME = re.compile(
     r"(?:password|secret|token|api[_-]?key|authorization|credential|private[_-]?key)",
     re.IGNORECASE,
 )
+_TOKEN_METRICS = frozenset(
+    {
+        "input_tokens",
+        "output_tokens",
+        "total_tokens",
+        "cached_tokens",
+        "reasoning_tokens",
+    }
+)
 _CORRELATION_ID: contextvars.ContextVar[str | None] = contextvars.ContextVar(
     "trace_correlation_id", default=None
 )
@@ -35,6 +44,10 @@ class SecretRedactor:
         )
 
     def sanitize(self, value: object, *, key: str | None = None) -> object:
+        if key in _TOKEN_METRICS and (
+            value is None or type(value) is int and value >= 0
+        ):
+            return value
         if key is not None and _SENSITIVE_NAME.search(key):
             return "[REDACTED]"
         if isinstance(value, str):

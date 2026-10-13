@@ -5,11 +5,38 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
-from scripts.run_live_provider_checks import discover_live_provider_suite
+from scripts.run_live_provider_checks import discover_live_provider_suite, main
 
 
 class LiveProviderGateTests(unittest.TestCase):
+    def test_no_paid_call_or_discovery_without_explicit_opt_in(self) -> None:
+        with (
+            patch.dict("os.environ", {}, clear=True),
+            patch(
+                "scripts.run_live_provider_checks.discover_live_provider_suite"
+            ) as discover,
+        ):
+            self.assertEqual(main(), 2)
+            discover.assert_not_called()
+
+    def test_skipped_live_test_does_not_count_as_verified(self) -> None:
+        suite = unittest.TestSuite()
+        result = unittest.TestResult()
+        result.skipped.append(
+            (unittest.FunctionTestCase(lambda: None), "not configured")
+        )
+        with (
+            patch.dict("os.environ", {"TRACE_ALLOW_PAID_LIVE": "1"}),
+            patch(
+                "scripts.run_live_provider_checks.discover_live_provider_suite",
+                return_value=suite,
+            ),
+            patch("unittest.TextTestRunner.run", return_value=result),
+        ):
+            self.assertEqual(main(), 2)
+
     def test_missing_directory_is_not_a_verified_empty_gate(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             test_directory = Path(directory) / "missing"

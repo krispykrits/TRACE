@@ -14,7 +14,7 @@ Accepted direction for [#46](https://github.com/krispykrits/TRACE/issues/46), me
 | `adapters/embeddings` | Cached Sentence Transformers implementation |
 | `adapters/sources` | Curated-file ingestion implementation |
 | `adapters/tools` | Fixed local read worker, deadline termination and metadata-only logging audit, selected by bootstrap |
-| `adapters/models` | One explicitly composed model call in a bounded process; hosted transport selection remains #34's owner gate |
+| `adapters/models` | Policy-admitted Azure Responses call in a bounded process and private SQLite provenance/spending journal |
 | `runtime` | Configuration and correlated structured logging |
 | `demo` | Explicit synthetic Order fixtures, replay and development scenario generation |
 | `cli` | Argument handling, presentation and exit behavior |
@@ -24,7 +24,7 @@ Core packages (`evidence`, `knowledge`, `investigation`) may import each other a
 
 For retrieval, `SearchService` receives `ScoreBackend`; it never imports sklearn/NumPy implementations. `create_search_service` supplies the existing exact scorer. `CorpusGeneration`, `IndexGeneration` and vector validation are framework-independent contracts, not SQLite/index-adapter exports. Source batching is a core contract; reading and hashing files is a source adapter. No serialized identity, threshold, permission or algorithm is changed by these moves.
 
-Do not add empty provider, PostgreSQL, HTTP API or remediation packages. Introduce them with their scoped implementation/ADR. The implemented [model boundary](model-provider.md) / proposed [ADR 0012](../adr/0012-model-provider-contract-and-bounded-call.md) keeps `adapters/models` imports within TRACE limited to `investigation.provider` and runtime utilities: no evidence/knowledge/source/storage/tool handles or investigation state/bundle imports. Bootstrap supplies a transport explicitly; the deterministic fake exists only in tests and is excluded from the wheel. No hosted transport/model is selected. A future remediation executor is a separate composition/authority boundary; the investigator cannot gain mutation privileges through imports or tool configuration.
+Introduce PostgreSQL, HTTP API or remediation packages only with their scoped implementation/ADR. The [model boundary](model-provider.md) / proposed [ADR 0012](../adr/0012-model-provider-contract-and-bounded-call.md) limits `adapters/models` imports within TRACE to `investigation.provider`, `investigation.provider_policy` and runtime utilities: no evidence/knowledge/source/storage/tool handles or investigation state/bundle imports. Core admission resolves evidence independently; transports receive only prepared text. Network imports belong to adapters (core `urllib.parse` is permitted). Bootstrap selects the Azure transport and private journal explicitly; fakes/authorities remain test-only and outside the wheel. A future remediation executor remains a separate authority boundary.
 
 ## Tests and nonruntime content
 

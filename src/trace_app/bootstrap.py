@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
+import secrets
+import time
+from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
 from typing import Callable
 
+from trace_app.adapters.models.azure import (
+    AzureModelSettings,
+    AzureResponsesTransport,
+    load_azure_settings,
+)
+from trace_app.adapters.models.journal import ModelPricing, SqliteProviderJournal
 from trace_app.adapters.models.process import ProcessModelProvider
 from trace_app.adapters.retrieval.exact_scoring import LocalExactScorer
 from trace_app.adapters.tools.local import (
@@ -16,9 +25,16 @@ from trace_app.adapters.tools.local import (
 from trace_app.demo.fixtures import CustomerFixture, NotificationFixture, PaymentFixture
 from trace_app.demo.order_workflow import OrderWorkflow
 from trace_app.investigation.provider import (
+    AdmissionGuard,
     ModelCapabilities,
     ModelConfiguration,
     ModelTransport,
+)
+from trace_app.investigation.provider_policy import (
+    EvidenceAuthority,
+    PolicyModelProvider,
+    PromptTemplate,
+    ProviderScope,
 )
 from trace_app.investigation.tools import ToolPolicy, ToolScope, ToolSession
 from trace_app.knowledge.index import IndexGeneration
@@ -32,10 +48,86 @@ def create_model_provider(
     transport: ModelTransport,
     *,
     credential_present: bool,
+    admission_guard: AdmissionGuard | None = None,
 ) -> ProcessModelProvider:
-    """Explicit composition only; hosted transport selection remains gated in #34."""
+    """Explicit composition; live calls additionally require admission receipts."""
     return ProcessModelProvider(
-        configuration, capabilities, transport, credential_present=credential_present
+        configuration,
+        capabilities,
+        transport,
+        credential_present=credential_present,
+        admission_guard=admission_guard,
+    )
+
+
+def create_azure_model_provider(
+    settings: AzureModelSettings,
+    api_key: str,
+    *,
+    authority: EvidenceAuthority,
+    scope: ProviderScope,
+    prompts: Mapping[str, PromptTemplate],
+    journal_path: Path,
+    monthly_limit_nusd: int,
+    initial_spend_nusd: int,
+    read_clock: Callable[[], float] = time.time,
+) -> PolicyModelProvider:
+    """Explicit, policy-gated composition; a missing source authority never defaults."""
+    guard = AdmissionGuard(secrets.token_bytes(32), read_clock)
+    transport = AzureResponsesTransport(settings, api_key, guard)
+    process = create_model_provider(
+        settings.configuration(),
+        settings.capabilities(),
+        transport,
+        credential_present=bool(api_key),
+        admission_guard=guard,
+    )
+    # Long-context cached-write input and long-context output ceiling rates.
+    # Conservative estimates, not an Azure account-wide billing hard cap.
+    journal = SqliteProviderJournal(
+        journal_path,
+        ModelPricing("azure-luna-global-ceiling-2026-09-22.v1", 250, 750),
+        monthly_limit_nusd=monthly_limit_nusd,
+        initial_spend_nusd=initial_spend_nusd,
+        now=read_clock(),
+    )
+    return PolicyModelProvider(
+        settings.configuration(),
+        process,
+        authority,
+        journal,
+        guard,
+        scope,
+        prompts,
+        known_secrets=(api_key,),
+        read_clock=read_clock,
+    )
+
+
+def create_azure_model_provider_from_files(
+    setup_path: Path,
+    secrets_path: Path,
+    *,
+    authority: EvidenceAuthority,
+    scope: ProviderScope,
+    prompts: Mapping[str, PromptTemplate],
+    journal_path: Path,
+    monthly_limit_nusd: int,
+    initial_spend_nusd: int,
+    read_clock: Callable[[], float] = time.time,
+) -> PolicyModelProvider:
+    """Load explicit private files and return only the gated application interface."""
+    settings, api_key = load_azure_settings(setup_path, secrets_path)
+    return create_azure_model_provider(
+        settings,
+        api_key,
+        authority=authority,
+        scope=scope,
+        prompts=prompts,
+        journal_path=journal_path,
+        monthly_limit_nusd=monthly_limit_nusd,
+        initial_spend_nusd=initial_spend_nusd,
+        read_clock=read_clock,
     )
 
 

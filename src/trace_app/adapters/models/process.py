@@ -12,6 +12,7 @@ import time
 from multiprocessing.connection import Connection
 
 from trace_app.investigation.provider import (
+    AdmissionGuard,
     ModelCapabilities,
     ModelConfiguration,
     ModelErrorCode,
@@ -42,9 +43,14 @@ def _worker(
                 "structured_json": reply.structured_json,
                 "operation_id": reply.operation_id,
                 "usage": reply.usage.to_dict(),
+                "reported_model": reply.reported_model,
             }
         except ModelProviderError as error:
-            envelope = {"error": error.code.value}
+            envelope = {
+                "error": error.code.value,
+                "usage": error.usage.to_dict() if error.usage is not None else None,
+                "diagnostics": error.diagnostics,
+            }
         except Exception:
             envelope = {"error": ModelErrorCode.DEPENDENCY.value}
         try:
@@ -63,18 +69,25 @@ class ProcessModelProvider:
         transport: ModelTransport,
         *,
         credential_present: bool,
+        admission_guard: AdmissionGuard | None = None,
     ) -> None:
         self.readiness = validate_model_readiness(
             configuration, capabilities, credential_present=credential_present
         )
         self._configuration = configuration
         self._transport = transport
+        self._admission_guard = admission_guard
+        if configuration.mode == "live" and admission_guard is None:
+            raise ModelProviderError(ModelErrorCode.CONFIGURATION)
 
     def generate(self, request: ModelRequest) -> ModelResult:
         if not isinstance(request, ModelRequest) or (
             request.configuration != self._configuration
         ):
             raise ModelProviderError(ModelErrorCode.CONFIGURATION)
+        if self._configuration.mode == "live":
+            assert self._admission_guard is not None
+            self._admission_guard.verify(request)
         started = time.monotonic()
         deadline = started + request.bounds.timeout_ms / 1000
         context = multiprocessing.get_context("spawn")
@@ -113,12 +126,24 @@ class ProcessModelProvider:
                 raise ModelProviderError(ModelErrorCode.TIMEOUT)
             envelope = json.loads(encoded)
             if "error" in envelope:
-                raise ModelProviderError(ModelErrorCode(envelope["error"]))
+                failed_usage = envelope.get("usage")
+                raise ModelProviderError(
+                    ModelErrorCode(envelope["error"]),
+                    usage=(
+                        ModelUsage(
+                            failed_usage["input_tokens"], failed_usage["output_tokens"]
+                        )
+                        if isinstance(failed_usage, dict)
+                        else None
+                    ),
+                    diagnostics=envelope.get("diagnostics"),
+                )
             usage = envelope["usage"]
             reply = ModelReply(
                 envelope["structured_json"],
                 envelope["operation_id"],
                 ModelUsage(usage["input_tokens"], usage["output_tokens"]),
+                reported_model=envelope.get("reported_model"),
             )
             result = validate_model_reply(request, reply)
             if time.monotonic() >= deadline:

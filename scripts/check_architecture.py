@@ -11,6 +11,7 @@ CORE = frozenset({"evidence", "knowledge", "investigation"})
 PACKAGES = CORE | {"adapters", "cli", "runtime", "demo"}
 ROOT_MODULES = frozenset({"__init__", "bootstrap"})
 FORBIDDEN_RUNTIME_ROOTS = frozenset({"evaluation", "tests", "scripts"})
+NETWORK_ROOTS = frozenset({"http", "urllib", "socket", "ssl"})
 
 
 def imported_modules(source: str, module: str, *, package: bool = False) -> list[str]:
@@ -74,6 +75,13 @@ def collect_violations(root: Path) -> list[str]:
             forbidden = (
                 top in FORBIDDEN_RUNTIME_ROOTS or dependency == "<dynamic-import>"
             )
+            # External network execution belongs to explicitly selected adapters.
+            forbidden |= (
+                top in NETWORK_ROOTS
+                and dependency != "urllib.parse"
+                and not dependency.startswith("urllib.parse.")
+                and layer != "adapters"
+            )
             target = (
                 dependency.split(".")[1]
                 if dependency.startswith("trace_app.")
@@ -95,8 +103,12 @@ def collect_violations(root: Path) -> list[str]:
                     if target == "investigation":
                         forbidden |= not (
                             dependency == "trace_app.investigation.provider"
+                            or dependency == "trace_app.investigation.provider_policy"
                             or dependency.startswith(
                                 "trace_app.investigation.provider."
+                            )
+                            or dependency.startswith(
+                                "trace_app.investigation.provider_policy."
                             )
                         )
             elif layer == "demo":

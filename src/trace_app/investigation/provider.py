@@ -2,13 +2,19 @@
 
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
+import math
 import re
-from dataclasses import dataclass, field
+import time
+from collections.abc import Callable
+from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from typing import Protocol
 
 MODEL_CONTRACT_VERSION = "model-provider.v1"
+PROVIDER_POLICY_VERSION = "trace-provider-data-policy.v1"
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}\Z")
 
 
@@ -23,6 +29,9 @@ class ModelErrorCode(StrEnum):
     DEPENDENCY = "dependency_failure"
     MALFORMED_RESPONSE = "malformed_response"
     OUTPUT_LIMIT = "output_limit"
+    POLICY = "policy_rejected"
+    AUDIT = "audit_unavailable"
+    BUDGET = "budget_exhausted"
 
 
 _ERROR_MESSAGES = {
@@ -36,14 +45,58 @@ _ERROR_MESSAGES = {
     ModelErrorCode.DEPENDENCY: "The required model dependency failed.",
     ModelErrorCode.MALFORMED_RESPONSE: "The model response failed contract validation.",
     ModelErrorCode.OUTPUT_LIMIT: "The model response exceeded its configured output bound.",
+    ModelErrorCode.POLICY: "Provider transmission or response access failed policy checks.",
+    ModelErrorCode.AUDIT: "Provider audit is unavailable; reconcile the attempt before continuing.",
+    ModelErrorCode.BUDGET: "The local model spending allowance is exhausted or unresolved.",
 }
 
 
 class ModelProviderError(Exception):
     """Fixed messages cannot contain SDK exception text, prompts or credentials."""
 
-    def __init__(self, code: ModelErrorCode) -> None:
+    def __init__(
+        self,
+        code: ModelErrorCode,
+        *,
+        usage: ModelUsage | None = None,
+        diagnostics: dict[str, object] | None = None,
+    ) -> None:
         self.code = ModelErrorCode(code)
+        self.usage = usage
+        self.diagnostics: dict[str, object] = {}
+        for name, value in (diagnostics or {}).items():
+            if (
+                name == "http_status"
+                and type(value) is int
+                and 100 <= value <= 599
+                or name == "provider_error_code"
+                and value
+                in (
+                    "unsupported_parameter",
+                    "unsupported_value",
+                    "invalid_request_error",
+                    "invalid_value",
+                    "invalid_parameter",
+                    "model_not_found",
+                    "content_policy_violation",
+                    "missing_required_parameter",
+                    "unknown_parameter",
+                )
+                or name == "provider_error_parameter"
+                and value
+                in (
+                    "model",
+                    "instructions",
+                    "input",
+                    "text",
+                    "text.format",
+                    "text.format.type",
+                    "max_output_tokens",
+                    "store",
+                    "truncation",
+                )
+            ):
+                self.diagnostics[name] = value
         super().__init__(_ERROR_MESSAGES[self.code])
 
 
@@ -68,6 +121,8 @@ class ModelConfiguration:
     mode: str = "live"
     response_format: str = "json_object"
     automatic_retries: int = 0
+    deployment_id: str | None = None
+    model_version: str | None = None
 
     def __post_init__(self) -> None:
         for value in (
@@ -77,6 +132,9 @@ class ModelConfiguration:
             self.adapter_version,
         ):
             _identifier(value)
+        for optional_value in (self.deployment_id, self.model_version):
+            if optional_value is not None:
+                _identifier(optional_value)
         if (
             self.mode not in ("live", "offline_test")
             or self.response_format != "json_object"
@@ -86,7 +144,7 @@ class ModelConfiguration:
             raise ModelProviderError(ModelErrorCode.CONFIGURATION)
 
     def to_dict(self) -> dict[str, object]:
-        return {
+        result: dict[str, object] = {
             "provider_id": self.provider_id,
             "model_id": self.model_id,
             "configuration_id": self.configuration_id,
@@ -95,11 +153,22 @@ class ModelConfiguration:
             "response_format": self.response_format,
             "automatic_retries": self.automatic_retries,
         }
+        if self.deployment_id is not None:
+            result["deployment_id"] = self.deployment_id
+        if self.model_version is not None:
+            result["model_version"] = self.model_version
+        return result
 
     @classmethod
     def from_dict(cls, value: object) -> ModelConfiguration:
         required = {"provider_id", "model_id", "configuration_id", "adapter_version"}
-        optional = {"mode", "response_format", "automatic_retries"}
+        optional = {
+            "mode",
+            "response_format",
+            "automatic_retries",
+            "deployment_id",
+            "model_version",
+        }
         if (
             not isinstance(value, dict)
             or not required <= value.keys()
@@ -183,6 +252,27 @@ class ModelCallBounds:
 
 
 @dataclass(frozen=True, slots=True)
+class ModelAdmission:
+    """A short-lived receipt bound to every byte of a prepared request."""
+
+    policy_version: str
+    evidence_ids: tuple[str, ...]
+    sensitivity: str
+    scope_id: str
+    principal_id: str = field(repr=False)
+    expires_at: float
+    signature: str = field(repr=False)
+
+    def metadata(self) -> dict[str, object]:
+        return {
+            "policy_version": self.policy_version,
+            "evidence_ids": list(self.evidence_ids),
+            "sensitivity": self.sensitivity,
+            "scope_id": self.scope_id,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class ModelRequest:
     request_id: str
     configuration: ModelConfiguration
@@ -192,6 +282,7 @@ class ModelRequest:
     source_context: str = field(repr=False)
     bounds: ModelCallBounds
     contract_version: str = MODEL_CONTRACT_VERSION
+    admission: ModelAdmission | None = field(default=None, repr=False)
 
     def __post_init__(self) -> None:
         for value in (self.request_id, self.prompt_version, self.response_schema_id):
@@ -221,7 +312,81 @@ class ModelRequest:
             "configuration": self.configuration.to_dict(),
             "prompt_version": self.prompt_version,
             "response_schema_id": self.response_schema_id,
+            **(self.admission.metadata() if self.admission is not None else {}),
         }
+
+
+class AdmissionGuard:
+    """Private composition capability; evidence cannot mint transport authority."""
+
+    def __init__(self, key: bytes, read_clock: Callable[[], float] = time.time) -> None:
+        if not isinstance(key, bytes) or len(key) < 32:
+            raise ModelProviderError(ModelErrorCode.CONFIGURATION)
+        self._key = key
+        self._read_clock = read_clock
+
+    def _signature(self, request: ModelRequest, receipt: ModelAdmission) -> str:
+        value = {
+            "request": {
+                **request.metadata(),
+                "instructions": request.instructions,
+                "source_context": request.source_context,
+                "bounds": [
+                    request.bounds.timeout_ms,
+                    request.bounds.max_response_bytes,
+                    request.bounds.max_output_tokens,
+                ],
+            },
+            "receipt": {
+                **receipt.metadata(),
+                "principal_id": receipt.principal_id,
+                "expires_at": receipt.expires_at,
+            },
+        }
+        payload = json.dumps(value, sort_keys=True, allow_nan=False).encode()
+        return hmac.new(self._key, payload, hashlib.sha256).hexdigest()
+
+    def issue(
+        self,
+        request: ModelRequest,
+        *,
+        evidence_ids: tuple[str, ...],
+        sensitivity: str,
+        scope_id: str,
+        principal_id: str,
+        expires_at: float,
+    ) -> ModelRequest:
+        receipt = ModelAdmission(
+            PROVIDER_POLICY_VERSION,
+            evidence_ids,
+            sensitivity,
+            scope_id,
+            principal_id,
+            expires_at,
+            "",
+        )
+        prepared = replace(request, admission=receipt)
+        receipt = replace(receipt, signature=self._signature(prepared, receipt))
+        return replace(prepared, admission=receipt)
+
+    def verify(self, request: ModelRequest) -> None:
+        if not isinstance(request, ModelRequest):
+            raise ModelProviderError(ModelErrorCode.POLICY)
+        receipt = request.admission
+        try:
+            valid = (
+                isinstance(receipt, ModelAdmission)
+                and receipt.policy_version == PROVIDER_POLICY_VERSION
+                and math.isfinite(receipt.expires_at)
+                and receipt.expires_at > self._read_clock()
+                and hmac.compare_digest(
+                    receipt.signature, self._signature(request, receipt)
+                )
+            )
+        except (TypeError, ValueError, UnicodeError):
+            valid = False
+        if not valid:
+            raise ModelProviderError(ModelErrorCode.POLICY)
 
 
 @dataclass(frozen=True, slots=True)
@@ -258,6 +423,7 @@ class ModelReply:
     operation_id: str | None = None
     usage: ModelUsage = ModelUsage()
     finish_reason: str = "completed"
+    reported_model: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -270,6 +436,7 @@ class ModelResult:
             **self.request.metadata(),
             "provider_operation_id": self.reply.operation_id,
             "usage": self.reply.usage.to_dict(),
+            "reported_model": self.reply.reported_model,
             "status": "structured_response_received",
         }
 
@@ -317,16 +484,18 @@ def validate_model_reply(request: ModelRequest, reply: ModelReply) -> ModelResul
             reply.operation_id
         ):
             raise ModelProviderError(ModelErrorCode.MALFORMED_RESPONSE)
+    if reply.reported_model is not None:
+        _identifier(reply.reported_model)
     if reply.finish_reason == "output_limit" or (
         reply.usage.output_tokens is not None
         and reply.usage.output_tokens > request.bounds.max_output_tokens
     ):
-        raise ModelProviderError(ModelErrorCode.OUTPUT_LIMIT)
+        raise ModelProviderError(ModelErrorCode.OUTPUT_LIMIT, usage=reply.usage)
     if reply.finish_reason != "completed" or not isinstance(reply.structured_json, str):
-        raise ModelProviderError(ModelErrorCode.MALFORMED_RESPONSE)
+        raise ModelProviderError(ModelErrorCode.MALFORMED_RESPONSE, usage=reply.usage)
     try:
         if len(reply.structured_json.encode()) > request.bounds.max_response_bytes:
-            raise ModelProviderError(ModelErrorCode.OUTPUT_LIMIT)
+            raise ModelProviderError(ModelErrorCode.OUTPUT_LIMIT, usage=reply.usage)
         value = json.loads(
             reply.structured_json,
             object_pairs_hook=_unique_object,
@@ -338,7 +507,9 @@ def validate_model_reply(request: ModelRequest, reply: ModelReply) -> ModelResul
         # json.loads also accepts overflowing finite literals such as 1e999.
         json.dumps(value, allow_nan=False)
     except (ValueError, TypeError, UnicodeError, RecursionError):
-        raise ModelProviderError(ModelErrorCode.MALFORMED_RESPONSE) from None
+        raise ModelProviderError(
+            ModelErrorCode.MALFORMED_RESPONSE, usage=reply.usage
+        ) from None
     return ModelResult(request, reply)
 
 
