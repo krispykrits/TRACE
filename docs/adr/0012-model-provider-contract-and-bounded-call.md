@@ -1,6 +1,6 @@
 # ADR 0012: Provider-neutral model contract and bounded call boundary
 
-- **Status:** Proposed for owner review; offline subtask #50 of #34; provider/model choice and live acceptance pending
+- **Status:** Proposed for owner review in [PR #51](https://github.com/krispykrits/TRACE/pull/51); offline subtask #50 of #34; provider/model choice and live acceptance pending
 - **Date:** 2026-10-13 (America/New_York)
 - **Owner:** Project owner
 - **Scope:** Offline model contracts and one-call execution; no hosted provider selection
