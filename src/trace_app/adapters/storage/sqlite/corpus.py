@@ -56,7 +56,10 @@ def _at(value: datetime) -> str:
 class SQLiteCorpusStore:
     """Trusted local publisher plus scoped read adapter; no investigator mutations."""
 
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, *, read_only: bool = False) -> None:
+        if type(read_only) is not bool:
+            raise CorpusInputError("read_only requires a boolean.")
+        self._read_only = read_only
         if path.is_symlink() or not path.parent.is_dir():
             raise CorpusInputError(
                 "Corpus database requires a nonsymlink path and existing parent."
@@ -68,15 +71,23 @@ class SQLiteCorpusStore:
                     "Corpus database must be a private regular file."
                 )
         else:
+            if read_only:
+                raise CorpusInputError("Read-only corpus database must exist.")
             descriptor = os.open(
                 path, os.O_CREAT | os.O_EXCL | os.O_RDWR | os.O_NOFOLLOW, 0o600
             )
             os.close(descriptor)
         try:
-            self._connection = sqlite3.connect(path, isolation_level=None)
+            target = path.resolve().as_uri() + "?mode=ro" if read_only else str(path)
+            self._connection = sqlite3.connect(
+                target, uri=read_only, isolation_level=None
+            )
             self._connection.row_factory = sqlite3.Row
             self._connection.execute("PRAGMA foreign_keys=ON")
-            self._connection.execute("PRAGMA secure_delete=ON")
+            if read_only:
+                self._connection.execute("PRAGMA query_only=ON")
+            else:
+                self._connection.execute("PRAGMA secure_delete=ON")
             version = self._connection.execute("PRAGMA user_version").fetchone()[0]
             tables = {
                 row["name"]
@@ -96,6 +107,12 @@ class SQLiteCorpusStore:
                 raise CorpusDependencyError(
                     "Database is not the expected corpus schema."
                 )
+            if read_only:
+                if version != 1:
+                    raise CorpusDependencyError(
+                        "Read-only corpus schema is incompatible."
+                    )
+                return
             with self._transaction():
                 if version == 0:
                     for statement in _SCHEMA:
@@ -117,7 +134,7 @@ class SQLiteCorpusStore:
     @contextmanager
     def _transaction(self) -> Iterator[None]:
         try:
-            self._connection.execute("BEGIN IMMEDIATE")
+            self._connection.execute("BEGIN" if self._read_only else "BEGIN IMMEDIATE")
             yield
             self._connection.execute("COMMIT")
         except BaseException as error:

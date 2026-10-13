@@ -1,0 +1,404 @@
+{
+  "synthetic": true,
+  "fixture_read_at": "2026-10-12T12:00:00Z",
+  "calls": {
+    "logs.query": {
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "demo-tools-17",
+        "attempt_id": "6dfc26b4-7d5c-4c48-b0a7-4271d392c94e",
+        "attempt_number": 1,
+        "tool": "logs.query",
+        "duration_ms": 97.40485499969509,
+        "outcome": "partial"
+      },
+      "status": "partial",
+      "data": {
+        "content_role": "untrusted_source_data",
+        "entries": [
+          {
+            "kind": "log",
+            "record": {
+              "schema_version": "1",
+              "evidence_id": "tool-log",
+              "service": "order",
+              "environment": "test",
+              "observed_at": "2026-01-01T00:00:17Z",
+              "collected_at": "2026-10-13T03:31:36.241075Z",
+              "source_record_id": "synthetic:tool-log",
+              "source_revision": "tools-fixture.v1",
+              "access_classification": "synthetic_public",
+              "redaction_status": "not_required",
+              "correlation_id": "synthetic-75907f892ded9e853b36",
+              "event": "log.observed",
+              "integrity_sha256": "3e8a7a6e3e39d06c5adf600aa4191a4f1386fa479eb47148919127eb03d54fda"
+            },
+            "payload": {
+              "message": "Synthetic Order failure."
+            }
+          }
+        ],
+        "sources": [
+          {
+            "source": "synthetic_tool_fixture",
+            "status": "available",
+            "reason": null
+          },
+          {
+            "source": "sanitized_export",
+            "status": "unavailable",
+            "reason": "No authorized operational source supplied."
+          }
+        ],
+        "matching_count": 1,
+        "truncated": false,
+        "source_status": "incomplete",
+        "byte_budget_omissions": 0
+      },
+      "reason": null
+    },
+    "metrics.query": {
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "demo-tools-17",
+        "attempt_id": "31d50d10-d558-455d-bc37-8702dee2bdf0",
+        "attempt_number": 2,
+        "tool": "metrics.query",
+        "duration_ms": 109.86335300003702,
+        "outcome": "partial"
+      },
+      "status": "partial",
+      "data": {
+        "content_role": "untrusted_source_data",
+        "entries": [
+          {
+            "kind": "metric",
+            "record": {
+              "schema_version": "1",
+              "evidence_id": "tool-metric",
+              "service": "customer",
+              "environment": "test",
+              "observed_at": "2026-01-01T00:00:18Z",
+              "collected_at": "2026-10-13T03:31:36.241075Z",
+              "source_record_id": "synthetic:tool-metric",
+              "source_revision": "tools-fixture.v1",
+              "access_classification": "synthetic_public",
+              "redaction_status": "not_required",
+              "correlation_id": "synthetic-75907f892ded9e853b36",
+              "event": "metric.observed",
+              "integrity_sha256": "845ae383aedcaa14d792abc820e5ee611aa61dc750257a43d53cff1fa075df0d"
+            },
+            "payload": {
+              "name": "fixture_duration",
+              "value": 12.5,
+              "unit": "ms"
+            }
+          }
+        ],
+        "sources": [
+          {
+            "source": "synthetic_tool_fixture",
+            "status": "available",
+            "reason": null
+          },
+          {
+            "source": "sanitized_export",
+            "status": "unavailable",
+            "reason": "No authorized operational source supplied."
+          }
+        ],
+        "matching_count": 1,
+        "truncated": false,
+        "source_status": "incomplete",
+        "byte_budget_omissions": 0
+      },
+      "reason": null
+    },
+    "deployments.query": {
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "demo-tools-17",
+        "attempt_id": "a45943e1-8c27-4988-b374-3b3d513172f1",
+        "attempt_number": 3,
+        "tool": "deployments.query",
+        "duration_ms": 100.61840199887229,
+        "outcome": "partial"
+      },
+      "status": "partial",
+      "data": {
+        "content_role": "untrusted_source_data",
+        "entries": [
+          {
+            "kind": "deployment",
+            "record": {
+              "schema_version": "1",
+              "evidence_id": "tool-deployment",
+              "service": "payment",
+              "environment": "test",
+              "observed_at": "2026-01-01T00:00:19Z",
+              "collected_at": "2026-10-13T03:31:36.241075Z",
+              "source_record_id": "synthetic:tool-deployment",
+              "source_revision": "tools-fixture.v1",
+              "access_classification": "synthetic_public",
+              "redaction_status": "not_required",
+              "correlation_id": "synthetic-75907f892ded9e853b36",
+              "event": "deployment.observed",
+              "integrity_sha256": "c503152ef520f8d9f67dca6c0766272acd281397681ff40ca3a7b5f0c02c77d7"
+            },
+            "payload": {
+              "revision": "fixture-v1",
+              "phase": "started"
+            }
+          }
+        ],
+        "sources": [
+          {
+            "source": "synthetic_tool_fixture",
+            "status": "available",
+            "reason": null
+          },
+          {
+            "source": "sanitized_export",
+            "status": "unavailable",
+            "reason": "No authorized operational source supplied."
+          }
+        ],
+        "matching_count": 1,
+        "truncated": false,
+        "source_status": "incomplete",
+        "byte_budget_omissions": 0
+      },
+      "reason": null
+    },
+    "evidence.get": {
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "demo-tools-17",
+        "attempt_id": "41455e4c-368d-4e26-8035-bb0548f550de",
+        "attempt_number": 4,
+        "tool": "evidence.get",
+        "duration_ms": 112.68247499901918,
+        "outcome": "ok"
+      },
+      "status": "ok",
+      "data": {
+        "content_role": "untrusted_source_data",
+        "entries": [
+          {
+            "kind": "log",
+            "record": {
+              "schema_version": "1",
+              "evidence_id": "tool-log",
+              "service": "order",
+              "environment": "test",
+              "observed_at": "2026-01-01T00:00:17Z",
+              "collected_at": "2026-10-13T03:31:36.241075Z",
+              "source_record_id": "synthetic:tool-log",
+              "source_revision": "tools-fixture.v1",
+              "access_classification": "synthetic_public",
+              "redaction_status": "not_required",
+              "correlation_id": "synthetic-75907f892ded9e853b36",
+              "event": "log.observed",
+              "integrity_sha256": "3e8a7a6e3e39d06c5adf600aa4191a4f1386fa479eb47148919127eb03d54fda"
+            },
+            "payload": {
+              "message": "Synthetic Order failure."
+            }
+          }
+        ],
+        "truncated": false
+      },
+      "reason": null
+    },
+    "knowledge.search": {
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "demo-tools-17",
+        "attempt_id": "a3288866-187c-4dae-9bc0-536e6a5506ab",
+        "attempt_number": 5,
+        "tool": "knowledge.search",
+        "duration_ms": 1142.5903719991766,
+        "outcome": "ok"
+      },
+      "status": "ok",
+      "data": {
+        "version": "knowledge-context.v1",
+        "status": "ok",
+        "retrieval_status": "ok",
+        "budget": {
+          "max_bytes": 8192,
+          "max_passages": 5
+        },
+        "used_bytes": 3201,
+        "data": {
+          "citations": {
+            "knowledge-8c190344cead1896a62f14e518e9597a8812f5950368d05e3da470fe3a1d3a41": {
+              "chunk_id": "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+              "corpus_generation_id": "gen-92e6361c2a19ff49ede5af062757e54702d16d228b1b1bad9bc2df8e5f86e581",
+              "document_sha256": "c8cace06bc7e2f535a704b554d485de2a7b45ba22404a4e9d7dc23554790c1fc",
+              "end_offset": 601,
+              "metadata": {
+                "access_classification": "synthetic_public",
+                "access_scope": "local:knowledge-development",
+                "answer_bearing": false,
+                "document_id": "trace-dev-timeout-evidence",
+                "document_type": "runbook",
+                "environment": "test",
+                "evaluation_role": "development_reference",
+                "fresh_until": "2026-11-12T12:00:00Z",
+                "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+                "service": "payment",
+                "source_record_id": "reference/timeout-evidence",
+                "source_revision": "2026-10-12.v1",
+                "source_uri": "synthetic://trace-knowledge/timeout-evidence",
+                "title": "Timeout evidence collection",
+                "valid_from": "2026-01-01T00:00:00Z",
+                "valid_until": null,
+                "verified_at": "2026-10-12T12:00:00Z",
+                "version": "1.0.0"
+              },
+              "section": "Evidence checks",
+              "start_offset": 238
+            },
+            "knowledge-ed0dfd079c8892c5fc318184c3a44a8c411b6f7c47e8a39e96cf3545ddebf810": {
+              "chunk_id": "chunk-97ea9848b883f7631587f97016ac45d37821152f9a2fd4bb97524625eec712fa",
+              "corpus_generation_id": "gen-92e6361c2a19ff49ede5af062757e54702d16d228b1b1bad9bc2df8e5f86e581",
+              "document_sha256": "ec1e4e77c4acbfd43018a4ae43ac1a2e42509984f0d7ee9a9312ce222f04a517",
+              "end_offset": 515,
+              "metadata": {
+                "access_classification": "synthetic_public",
+                "access_scope": "local:knowledge-development",
+                "answer_bearing": false,
+                "document_id": "trace-dev-payment-interface",
+                "document_type": "service",
+                "environment": "test",
+                "evaluation_role": "development_reference",
+                "fresh_until": "2026-11-12T12:00:00Z",
+                "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+                "service": "payment",
+                "source_record_id": "reference/payment-interface",
+                "source_revision": "2026-10-12.v1",
+                "source_uri": "synthetic://trace-knowledge/payment-interface",
+                "title": "Payment service evidence vocabulary",
+                "valid_from": "2026-01-01T00:00:00Z",
+                "valid_until": null,
+                "verified_at": "2026-10-12T12:00:00Z",
+                "version": "1.0.0"
+              },
+              "section": "Evidence vocabulary",
+              "start_offset": 200
+            }
+          },
+          "content_role": "untrusted_source_data",
+          "passages": [
+            {
+              "citation_id": "knowledge-ed0dfd079c8892c5fc318184c3a44a8c411b6f7c47e8a39e96cf3545ddebf810",
+              "text": "# Evidence vocabulary\nUseful evidence can include request failures, measured work duration, effective caller budget and configuration revisions. Keep each source's record identity, version, service, environment and observed time when joining a request timeline. HTTP 504 is a symptom code, not a root-cause label.\n\n"
+            },
+            {
+              "citation_id": "knowledge-8c190344cead1896a62f14e518e9597a8812f5950368d05e3da470fe3a1d3a41",
+              "text": "# Evidence checks\nCompare caller failures with Payment request durations and dependency spans from the same authorized window. Check deployment/configuration history, timestamps, effective timeout configuration and work duration separately. Preserve exact error codes such as HTTP 504 and /v1/orders without rewriting them. A nearby deployment can be unrelated.\n\n"
+            }
+          ],
+          "schema_version": "1"
+        },
+        "omitted": [],
+        "incomplete": false,
+        "passage_text_truncated": false
+      },
+      "reason": null
+    },
+    "knowledge.resolve": {
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "demo-tools-17",
+        "attempt_id": "f624ce39-038c-44b6-a6ae-8350235b3778",
+        "attempt_number": 6,
+        "tool": "knowledge.resolve",
+        "duration_ms": 1188.7906230003864,
+        "outcome": "ok"
+      },
+      "status": "ok",
+      "data": {
+        "content_role": "untrusted_source_data",
+        "corpus_generation_id": "gen-92e6361c2a19ff49ede5af062757e54702d16d228b1b1bad9bc2df8e5f86e581",
+        "chunk": {
+          "chunk_id": "chunk-9bb28e983e90fa34b2f00798cf4c3b8a1b27d03181b24dc3c0fbab6bf7350abe",
+          "metadata": {
+            "document_id": "trace-dev-timeout-evidence",
+            "document_type": "runbook",
+            "title": "Timeout evidence collection",
+            "service": "payment",
+            "environment": "test",
+            "source_uri": "synthetic://trace-knowledge/timeout-evidence",
+            "source_record_id": "reference/timeout-evidence",
+            "source_revision": "2026-10-12.v1",
+            "version": "1.0.0",
+            "provenance": "TRACE-authored development reference; fictional history where explicitly stated",
+            "access_scope": "local:knowledge-development",
+            "access_classification": "synthetic_public",
+            "evaluation_role": "development_reference",
+            "answer_bearing": false,
+            "valid_from": "2026-01-01T00:00:00Z",
+            "valid_until": null,
+            "verified_at": "2026-10-12T12:00:00Z",
+            "fresh_until": "2026-11-12T12:00:00Z"
+          },
+          "document_sha256": "c8cace06bc7e2f535a704b554d485de2a7b45ba22404a4e9d7dc23554790c1fc",
+          "section": "Evidence checks",
+          "ordinal": 1,
+          "start_offset": 238,
+          "end_offset": 601,
+          "text": "# Evidence checks\nCompare caller failures with Payment request durations and dependency spans from the same authorized window. Check deployment/configuration history, timestamps, effective timeout configuration and work duration separately. Preserve exact error codes such as HTTP 504 and /v1/orders without rewriting them. A nearby deployment can be unrelated.\n\n",
+          "normalized_text": "# Evidence checks Compare caller failures with Payment request durations and dependency spans from the same authorized window. Check deployment/configuration history, timestamps, effective timeout configuration and work duration separately. Preserve exact error codes such as HTTP 504 and /v1/orders without rewriting them. A nearby deployment can be unrelated.",
+          "content_role": "untrusted_source_data"
+        },
+        "truncated": false
+      },
+      "reason": null
+    },
+    "unauthorized": {
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "demo-tools-17",
+        "attempt_id": "35adebc7-f2f0-4939-bc8a-3c27409900cd",
+        "attempt_number": 7,
+        "tool": "logs.query",
+        "duration_ms": 0.5264219998935005,
+        "outcome": "authorization_error"
+      },
+      "status": "authorization_error",
+      "data": {},
+      "reason": "source_not_authorized"
+    },
+    "over_limit": {
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "demo-tools-17",
+        "attempt_id": "2ecedd8e-974a-4a49-8ba8-5d41e70d0b34",
+        "attempt_number": 8,
+        "tool": "logs.query",
+        "duration_ms": 0.06982299964874983,
+        "outcome": "validation_error"
+      },
+      "status": "validation_error",
+      "data": {},
+      "reason": "invalid_arguments"
+    },
+    "shell": {
+      "audit": {
+        "version": "investigation-tools.v1",
+        "correlation_id": "demo-tools-17",
+        "attempt_id": "d1c883cc-0139-4b85-a89f-1388588d55d4",
+        "attempt_number": 9,
+        "tool": "unknown",
+        "duration_ms": 0.023922999389469624,
+        "outcome": "validation_error"
+      },
+      "status": "validation_error",
+      "data": {},
+      "reason": "invalid_arguments"
+    }
+  },
+  "cleanup": "temporary state removed before return"
+}
