@@ -2,7 +2,7 @@
 
 TRACE currently provides an importable CLI, configuration check, synthetic Order–Payment demo and a local SQLite evidence-store demo. It also provides authorized local knowledge search with optional cached CPU embeddings. It has no incident investigator, hosted model API, operational source integration or deployed cloud runtime.
 
-The [model-provider contract](architecture/model-provider.md) adds provider-neutral interfaces and bounded single-call execution for #34's offline subtask #50. Its fake is explicitly selected in tests only. The owner selected Azure AI Foundry and a $20/month model spending cap on 2026-10-13; exact model/deployment, access, data handling and live acceptance remain open. A passed offline check does not establish model readiness or enforce monthly spending. See the contract for configuration, content handling, error categories, reproduction and the blocked live acceptance procedure.
+The [model-provider contract](architecture/model-provider.md) adds provider-neutral interfaces and bounded single-call execution for #34's offline subtask #50. Its fake is explicitly selected in tests only. The owner selected Azure AI Foundry / GPT-6 Luna and a $20/month model spending cap on 2026-10-13 and reports an existing deployment; deployment configuration/access, data handling and live acceptance remain open. The guide includes the recommended synthetic-only/stateless prompt policy and nonsecret deployment checklist for owner confirmation. A passed offline check does not establish model readiness or enforce monthly spending. See the contract for configuration, content handling, error categories, reproduction and the blocked live acceptance procedure.
 
 ## Supported setup
 
