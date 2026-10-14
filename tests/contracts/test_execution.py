@@ -59,7 +59,7 @@ class ExecutionContracts(unittest.TestCase):
         )
 
     def test_shared_counts_are_durable_and_exhaustion_stops_both_ports(self) -> None:
-        _, ledger, _, provider, transport, _, _, tools, backend = self.fixture(
+        _, ledger, _, provider, transport, _, journal, tools, backend = self.fixture(
             ExecutionPolicy(max_model_calls=1)
         )
         self.assertEqual(tools.invoke("logs.query", QUERY).payload.status, "ok")
@@ -72,6 +72,8 @@ class ExecutionContracts(unittest.TestCase):
         )
         self.assertEqual((len(transport.requests), backend.calls), (1, 1))
         self.assertEqual(len(ledger.records), 4)
+        for entry in journal.entries:
+            self.assertIn(entry["request_id"], ledger.records)
 
     def test_invalid_tool_calls_count_and_do_not_dispatch(self) -> None:
         _, ledger, _, _, transport, _, _, tools, backend = self.fixture(
@@ -129,6 +131,37 @@ class ExecutionContracts(unittest.TestCase):
             provider.generate(call())
         self.assertEqual(failure.exception.code, ModelErrorCode.EXPIRED)
         self.assertEqual(transport.requests, [])
+
+    def test_waiting_for_ledger_lock_cannot_dispatch_after_deadline(self) -> None:
+        for kind in ("model", "tool"):
+            _, ledger, clock, provider, transport, _, _, tools, backend = self.fixture(
+                ExecutionPolicy(deadline_ms=100)
+            )
+
+            def wait_for_lock():
+                active = ledger.state.active
+                if active is not None and (kind == "tool" or active.input_allowance):
+                    clock.now += 0.2
+
+            ledger.before_operation = wait_for_lock
+            if kind == "model":
+                with self.assertRaises(ModelProviderError) as failure:
+                    provider.generate(call())
+                self.assertEqual(failure.exception.code, ModelErrorCode.EXPIRED)
+            else:
+                self.assertEqual(
+                    tools.invoke("logs.query", QUERY).payload.status, "expired"
+                )
+            self.assertEqual((len(transport.requests), backend.calls), (0, 0))
+
+    def test_denied_tool_attempt_numbers_and_ids_remain_correlated(self) -> None:
+        _, ledger, _, _, _, _, _, tools, _ = self.fixture(
+            ExecutionPolicy(max_tool_calls=1)
+        )
+        results = [tools.invoke("logs.query", QUERY) for _ in range(3)]
+        self.assertEqual([result.audit.attempt_number for result in results], [1, 2, 3])
+        for result in results:
+            self.assertIn(result.audit.attempt_id, ledger.records)
 
     def test_late_model_reply_is_accounted_and_never_released_or_retried(self) -> None:
         _, ledger, clock, provider, transport, _, journal, tools, backend = (

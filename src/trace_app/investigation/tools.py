@@ -347,11 +347,17 @@ class ToolSession:
             return result
         except ExecutionRejected as error:
             payload = _execution_failure(error.outcome)
+            with self._state_lock:
+                if ticket is None:
+                    self._attempts += 1
+                attempt_number = self._attempts
             record = ToolAudit(
                 TOOL_VERSION,
                 self._scope.correlation_id,
-                ticket.call_id if ticket is not None else str(uuid.uuid4()),
-                self._attempts + 1,
+                ticket.call_id
+                if ticket is not None
+                else error.call_id or str(uuid.uuid4()),
+                attempt_number,
                 name if isinstance(name, str) and name in TOOL_NAMES else "unknown",
                 0.0,
                 payload.status,

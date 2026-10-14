@@ -45,6 +45,7 @@ class MemoryLedger:
     records: dict[str, dict[str, object]] = field(default_factory=dict)
     terminal: str | None = None
     fail: bool = False
+    before_operation: Callable[[], None] = lambda: None
 
     def apply(
         self,
@@ -58,6 +59,7 @@ class MemoryLedger:
         pending = copy.deepcopy(self.state)
         if self.terminal is not None:
             pending.stop_reason = self.terminal
+        self.before_operation()
         record = operation(pending)
         self.state = pending
         if record is not None:

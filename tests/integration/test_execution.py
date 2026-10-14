@@ -217,6 +217,7 @@ class ExecutionIntegrationTests(unittest.TestCase):
             self.assertFalse(thread.is_alive())
         self.assertEqual(sorted(outcomes), ["admitted", "call_active"])
         self.assertEqual(len(self.saved()[1]), 2)
+        self.assertEqual(self.saved()[0]["tool_calls"], 2)
 
     def test_stale_attempt_cannot_poison_current_worker_or_extend_lease_bounds(
         self,

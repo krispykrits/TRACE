@@ -728,6 +728,8 @@ class PolicyModelProvider:
             self._responses.add(response)
             return response
         except ExecutionRejected as error:
+            if error.call_id is not None:
+                metadata["request_id"] = error.call_id
             metadata["outcome"] = _execution_code(error.outcome).value
             raise ModelProviderError(_execution_code(error.outcome)) from None
         except ModelProviderError as error:

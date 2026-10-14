@@ -58,8 +58,9 @@ _METADATA = frozenset(
 class ExecutionRejected(RuntimeError):
     """A fixed outcome, never dependency exception text or source content."""
 
-    def __init__(self, outcome: str) -> None:
+    def __init__(self, outcome: str, *, call_id: str | None = None) -> None:
         self.outcome = outcome
+        self.call_id = call_id
         super().__init__(f"Investigation execution stopped: {outcome}.")
 
 
@@ -239,16 +240,26 @@ class ExecutionSession:
             raise ExecutionRejected("clock_invalid")
 
         def update(state: ExecutionState) -> dict[str, object] | None:
+            # Sample after the adapter obtains its lock, not before a bounded busy wait.
+            effective_now = self._clock()
+            if type(effective_now) not in (int, float) or not math.isfinite(
+                effective_now
+            ):
+                raise ExecutionRejected("clock_invalid")
             if state.pricing is None:
                 state.pricing = asdict(self.pricing)
             elif state.pricing != asdict(self.pricing):
                 raise ExecutionRejected("configuration_changed")
-            if now < state.last_at:
+            if effective_now < state.last_at:
                 state.stop_reason = state.stop_reason or "clock_invalid"
-            state.last_at = max(now, state.last_at)
-            if (now - state.started_at) * 1000 >= self.policy.deadline_ms:
+            state.last_at = max(effective_now, state.last_at)
+            if (
+                (effective_now - state.started_at) * 1000 >= self.policy.deadline_ms
+                or state.authority_deadline is not None
+                and effective_now >= state.authority_deadline
+            ):
                 state.stop_reason = state.stop_reason or "expired"
-            return operation(state, now)
+            return operation(state, effective_now)
 
         try:
             record = self._ledger.apply(self.identity, self.policy, now, update)
@@ -336,8 +347,6 @@ class ExecutionSession:
                 "correction",
             ):
                 reason = reason or "invalid_call"
-            elif state.active is not None:
-                reason = reason or "call_active"
             else:
                 if kind == "model":
                     state.model_calls += 1
@@ -368,6 +377,8 @@ class ExecutionSession:
                 if exhausted:
                     state.stop_reason = state.stop_reason or "budget_exhausted"
                     reason = state.stop_reason
+                if state.active is not None:
+                    reason = reason or "call_active"
             if reason is None:
                 state.active = ticket
             return {
@@ -377,7 +388,8 @@ class ExecutionSession:
 
         self._apply(admit)
         if reason is not None:
-            raise ExecutionRejected(reason)
+            assert ticket is not None
+            raise ExecutionRejected(reason, call_id=ticket.call_id)
         assert ticket is not None
         return ticket
 
