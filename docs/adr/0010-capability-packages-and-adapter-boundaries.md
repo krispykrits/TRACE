@@ -28,3 +28,7 @@ No provider/RDS/remediation implementation, AWS resource, benchmark threshold ch
 ## Proposed extension — #34 offline subtask #50, 2026-10-13
 
 [ADR 0012](0012-model-provider-contract-and-bounded-call.md) proposes `investigation.provider` and `investigation.provider_policy` for model/admission contracts and rules, and `adapters/models` for bounded Azure transport/process execution and private SQLite audit/provenance/spending. Model adapters can import only these model/policy contracts and runtime within TRACE; source/storage/tool handles stay outside. Network execution belongs to adapters; core URL parsing remains allowed. The checker, negative cases and package guide change together. Test-only transports/authorities are excluded from the wheel. Azure/owner policy is selected; actual synthetic live evidence and operational acceptance limits are recorded in the provider guide. No SDK dependency is added.
+
+## Scoped assessment extension — 2026-10-14
+
+[ADR 0013](0013-assessment-validation-and-support-review.md) places strict v2 schema, snapshot/current citation resolution and protected acceptance/review in `investigation`. Existing core tool/provider contracts are reused; bootstrap binds their scope. No evaluator review type, storage adapter, transport acceptance authority or new SDK enters core. Checker negatives/wheel requirements protect the additional modules; model adapters remain limited to model/policy contracts and cannot acquire assessment review/readers.

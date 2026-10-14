@@ -280,6 +280,10 @@ class ToolSession:
         self._lock = Lock()
         self._state_lock = Lock()
 
+    @property
+    def investigation_id(self) -> str:
+        return self._scope.investigation_id
+
     def invoke(self, name: object, arguments: object) -> ToolResult:
         started = self._clock()
         # Count all requests atomically, including concurrent denied attempts.

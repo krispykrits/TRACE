@@ -24,6 +24,16 @@ from trace_app.adapters.tools.local import (
 )
 from trace_app.demo.fixtures import CustomerFixture, NotificationFixture, PaymentFixture
 from trace_app.demo.order_workflow import OrderWorkflow
+from trace_app.investigation.assessment_context import (
+    AssessmentBoundaryError,
+    AssessmentContext,
+    ToolCitationResolver,
+)
+from trace_app.investigation.assessment_validation import (
+    AssessmentValidator,
+    SupportReviewReader,
+)
+from trace_app.investigation.bundle import EvidencePackage
 from trace_app.investigation.provider import (
     AdmissionGuard,
     ModelCapabilities,
@@ -129,6 +139,19 @@ def create_azure_model_provider_from_files(
         initial_spend_nusd=initial_spend_nusd,
         read_clock=read_clock,
     )
+
+
+def create_assessment_validator(
+    package: EvidencePackage,
+    *,
+    scope: ProviderScope,
+    tools: ToolSession,
+    reviews: SupportReviewReader,
+) -> AssessmentValidator:
+    if tools.investigation_id != scope.investigation_id:
+        raise AssessmentBoundaryError("scope_mismatch")
+    context = AssessmentContext.from_package(package, scope)
+    return AssessmentValidator(context, ToolCitationResolver(tools, context), reviews)
 
 
 def create_tool_session(

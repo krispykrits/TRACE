@@ -8,7 +8,7 @@ Accepted direction for [#46](https://github.com/krispykrits/TRACE/issues/46), me
 | --- | --- |
 | `evidence` | Source-neutral records, bounded queries, reader contracts and deterministic timelines |
 | `knowledge` | Documents/chunks, corpus/index identities, ports, vector validation, authorized search and bounded context |
-| `investigation` | Request/execution/assessment and provider-neutral model contracts, fixed read-only tool arguments/grants/session budgets; future bounded investigator |
+| `investigation` | Request/execution, strict assessment schemas/current citation validation/protected support review, provider-neutral contracts/policy, fixed read-only tools; future bounded investigator |
 | `adapters/storage/sqlite` | Existing database implementations; storage-specific schema and mapping stay here |
 | `adapters/retrieval` | Exact numerical scoring and local artifact publication/loading |
 | `adapters/embeddings` | Cached Sentence Transformers implementation |
@@ -56,3 +56,5 @@ The v4 passage reports bind the pre-refactor scorer implementation. Use commit `
 Create a new lexical exploration report with a fresh output path, then rescore it with the current checkout. The archive checkout and commands are recorded in [the evaluator guide](../../evaluation/README.md).
 
 For #19, `investigation.bundle` composes the fixed read-only `ToolInvoker` port into a cited observed package. It imports no evaluator, demo, script or adapter; the developer fixture publisher remains in scripts and tool-choice expectations remain in evaluation. The existing import checker and negative fixtures enforce that placement.
+
+For #35, `assessment_schema`, `assessment_context` and `assessment_validation` stay inside investigation. The fixed tool port supplies current references and an independently composed review reader supplies human support. Model adapters cannot import those acceptance/readers; core cannot import evaluator `SupportReview`/fixtures or storage adapters. ADR 0013, checker negatives and wheel requirements record this boundary without a new capability package or dependency.

@@ -56,7 +56,13 @@ class ArchitectureTests(unittest.TestCase):
                 "from trace_app.adapters.models.azure import AzureResponsesTransport",
                 "from evaluation.scoring import evaluate",
             ],
+            "investigation/assessment_validation.py": [
+                "from evaluation.scoring import SupportReview",
+                "from tests.fixtures.assessments import Reviews",
+                "from trace_app.adapters.storage.sqlite.corpus import SQLiteCorpusStore",
+            ],
             "adapters/models/provider.py": [
+                "from trace_app.investigation.assessment_validation import AssessmentValidator",
                 "from trace_app.investigation.tools import ToolSession",
                 "from trace_app.adapters.tools.local import LocalToolBackend",
                 "from trace_app.adapters.storage.sqlite import investigations",

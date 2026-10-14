@@ -29,6 +29,22 @@ from trace_app.investigation.provider_policy import (
 
 
 class ProviderPolicyTests(unittest.TestCase):
+    def test_known_credentials_in_field_names_never_enter_provenance(self) -> None:
+        marker = "opaqueunitcredentialmarker"
+        policy, provider, authority, journal = policy_fixture(known_secrets=(marker,))
+        authority.records["evidence-1"] = record(
+            fields=(EvidenceField(marker, "withheld", Sensitivity.SECRET, True),)
+        )
+        with self.assertRaises(ModelProviderError):
+            policy.generate(
+                call(
+                    evidence=(EvidenceSelection("evidence-1", "revision-1", (marker,)),)
+                )
+            )
+        self.assertEqual(provider.requests, [])
+        self.assertEqual(journal.redactions, [])
+        self.assertNotIn(marker, json.dumps(journal.entries))
+
     def test_quoted_credentials_and_multiple_cookie_values_redact_whole_excerpt(
         self,
     ) -> None:

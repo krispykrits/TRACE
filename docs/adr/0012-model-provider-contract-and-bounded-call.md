@@ -1,6 +1,6 @@
 # ADR 0012: Model provider, Azure connector and deterministic admission
 
-- **Status:** Owner selected Azure AI Foundry / GPT-6 Luna, $20/month and transmission policy; implementation/boundary proposed for review in [PR #51](https://github.com/krispykrits/TRACE/pull/51)
+- **Status:** Accepted for the Local MVP synthetic provider workflow after owner merge of [PR #51](https://github.com/krispykrits/TRACE/pull/51) and closure of #34; operational source/identity/retention gates remain separate
 - **Date:** 2026-10-13 (America/New_York)
 - **Owner:** Project owner
 - **Scope:** #34 / implementation subtask #50; one read-only model call and per-request provider policy, not the investigation workflow or Operational Pilot
@@ -11,7 +11,7 @@ Sprint 4 #19 / PR #49 is accepted/merged. The owner selected Azure AI Foundry, G
 
 Core investigation needs explicit provider identity, usage absence, safe failures and enforced bounds without vendor/source authority. Raw requests and initial-only redaction would permit later tool results/history to bypass the owner's policy. The model cap requires a conservative admission reservation before even synthetic live checks.
 
-## Proposed decision
+## Decision
 
 Keep provider-neutral contracts in `investigation.provider`; put reference-based admission, independent source-authority/journal ports and protected response handles in `investigation.provider_policy`. Bootstrap alone composes an independent source authority, trusted scope, registered prompt catalog, guard, process adapter, Azure transport and private journal. Missing grants/classification/audit/budget reject before dispatch. Preserve citation IDs and source revisions with local value-free redaction provenance. Recheck current dependencies immediately before dispatch and on response reads/exports/reuse. Generated responses retain the most sensitive original input classification; no automatic declassification exists.
 
@@ -33,6 +33,6 @@ Threads cannot terminate stalled synchronous calls. Processes add startup/serial
 
 Deterministic contracts cover missing/denied/revoked transmission/access, internal-owner permission, unreviewed/evaluator/customer/employee rejection, secret/PII/quoted-cookie redaction, bounded later selections/history, preserved citations/value-free provenance, protected output reads/exports and forged/expired/tampered requests. Actual process/SQLite integration checks cover native payloads, safe failures, usage, concurrency-safe reservations, uncertain replay and private files. Architecture negatives and installed-wheel tests protect source/evaluator/SDK separation.
 
-The separately opted-in **actual TRACE synthetic live check passed on 2026-10-13**, with valid JSON/citation, 143 input / 90 output tokens and 2,400 ms. Three prior configuration rejections remain accounted for with unknown-usage reservations; no automatic retries occurred. The reported model lacks a dated version, which remains owner-reported. The guide records bounds, metadata-only artifacts and reproduction. All required local code gates must pass before PR handoff; review/merge, operational identity/source/processing/retention and pilot gates remain separate.
+The separately opted-in **actual TRACE synthetic live check passed on 2026-10-13**, with valid JSON/citation, 143 input / 90 output tokens and 2,400 ms. Three prior configuration rejections remain accounted for with unknown-usage reservations; no automatic retries occurred. The reported model lacks a dated version, which remains owner-reported. The guide records bounds, metadata-only artifacts and reproduction. All required local code gates must pass before PR handoff; owner merge/#34 closure accepts the Local MVP provider scope; operational identity/source/processing/retention and pilot gates remain separate.
 
 Revisit for changed model/pricing/deployment/auth requirements, measured process overhead, streaming need, real-source authenticated grant derivation, multi-host accounting or response persistence/export. #35 owns assessment support; #36 investigation-wide budgets; #37 workflow/recovery; #38 inspection/export. No diagnostic-quality, cloud, pilot or remediation acceptance follows from synthetic provider checks.
