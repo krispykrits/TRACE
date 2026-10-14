@@ -1,6 +1,8 @@
 # ADR 0002: Terraform and EC2 for the Cloud MVP
 
-- **Status:** Accepted direction; topology and release mechanism remain to be designed
+> Historical decision text is retained below. For current Azure/AKS deployment, shared-state and hosted-observability work follow [ADR 0015](0015-azure-aks-cloud-deployment.md) and [#55-#60](../planning/azure-cloud-backlog.md). The old AWS settings are not Azure configuration or acceptance evidence.
+
+- **Status:** Superseded cloud target by [ADR 0015](0015-azure-aks-cloud-deployment.md), 2026-10-14; Terraform retained
 - **Date:** 2026-09-23
 - **Decision owner:** Project owner
 - **Context:** The Cloud MVP needs a repeatable AWS deployment of the accepted local workflow. The owner selected Terraform to automate infrastructure and EC2 as the initial compute target while TRACE is still in planning. This decision does not authorize AWS provisioning or commit a cost, instance size, region, deadline, or production environment. The later owner selection of PostgreSQL on RDS for Cloud MVP state is in [ADR 0005](0005-sqlite-local-postgresql-rds-cloud.md).

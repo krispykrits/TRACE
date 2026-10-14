@@ -1,4 +1,4 @@
-# ADR 0015: Bounded investigation and private publication
+# ADR 0016: Bounded investigation and private publication
 
 - **Status:** Proposed for #37 owner review
 - **Date:** 2026-10-14 (America/New_York)
@@ -34,4 +34,4 @@ Two latest logs and limited passages can omit useful mechanisms; explicit omissi
 
 Use fake ports/injected clocks for accepted/competing/abstaining/pending outcomes, optional check/correction gates, scope/injection/invalid-tool failures, revocation and duplicate/stale/cancelled publication. Use real SQLite/corpus/read-only workers for persistence, schema migration, protected delivery/revocation and retained evidence after model failure. Demonstrate the answerable and insufficient development incidents plus an explicit timeout with hand-authored simulation records, no actual provider/human acceptance.
 
-Revisit context selection on measured development results, authenticated restoration/review persistence in #38, the S6 quality/baseline gate, and cloud worker recovery/operational-source identity/retention. Preserve frozen evaluator contracts/reports. No synthetic workflow success proves an Operational Pilot, hosted CloudWatch delivery, Cloud MVP or production remediation.
+Revisit context selection on measured development results, authenticated restoration/review persistence in #38, the S6 quality/baseline gate, and cloud worker recovery/operational-source identity/retention. Preserve frozen evaluator contracts/reports. No synthetic workflow success proves an Operational Pilot, hosted Azure telemetry delivery, Cloud MVP or production remediation.

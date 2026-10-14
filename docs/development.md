@@ -40,7 +40,7 @@ make integration
 make package-check
 ```
 
-The integration fixtures use temporary state, including a deliberately minimal environment for actual CLI subprocesses, and clean up on success/failure. Unit/contract and integration suites have separate discovery and do not duplicate process tests. The package check installs a built wheel and locked runtime dependencies into a clean environment outside the checkout; package downloads are public dependencies, not live provider calls. These checks need no production credentials or AWS resources and do not count as Operational Pilot evidence. See [package placement and contribution rules](architecture/package-layout.md). Use `make clean` to remove the local virtual environment and build outputs.
+The integration fixtures use temporary state, including a deliberately minimal environment for actual CLI subprocesses, and clean up on success/failure. Unit/contract and integration suites have separate discovery and do not duplicate process tests. The package check installs a built wheel and locked runtime dependencies into a clean environment outside the checkout; package downloads are public dependencies, not live provider calls. These checks need no production credentials or cloud resources and do not count as Operational Pilot evidence. See [package placement and contribution rules](architecture/package-layout.md). Use `make clean` to remove the local virtual environment and build outputs.
 
 The checked-in example contains no credentials. The .env file is ignored by Git. The default trace-app invocation still prints help, and --version does not require configuration.
 
@@ -52,7 +52,7 @@ Run one Order → Payment request with the in-process Customer, Payment and Noti
 uv run --locked trace-app demo-order --environment test --order-id order-001 --customer-id customer-001 --amount-cents 1250
 ```
 
-The command prints one JSON business outcome to stdout and correlated JSON operational logs to stderr. It needs no credentials, network service or AWS resource. The fixture recognizes only `customer-001`; an unknown customer yields a rejected outcome without Payment or Notification calls. Invalid input/configuration exits 2; an adapter dependency error exits 3 without an accepted receipt. The demo refuses the `production` environment. See the [workflow contract and fixture limits](architecture/order-payment-workflow.md) and [ADR 0004](adr/0004-synchronous-synthetic-order-workflow.md). These logs are not incident evidence or Operational Pilot data.
+The command prints one JSON business outcome to stdout and correlated JSON operational logs to stderr. It needs no credentials, network service or cloud resource. The fixture recognizes only `customer-001`; an unknown customer yields a rejected outcome without Payment or Notification calls. Invalid input/configuration exits 2; an adapter dependency error exits 3 without an accepted receipt. The demo refuses the `production` environment. See the [workflow contract and fixture limits](architecture/order-payment-workflow.md) and [ADR 0004](adr/0004-synchronous-synthetic-order-workflow.md). These logs are not incident evidence or Operational Pilot data.
 
 ## Local SQLite evidence demo
 
@@ -67,7 +67,7 @@ Re-running `ingest` with the same submission key and scenario returns zero new r
 
 ## GitHub Actions quality gate
 
-Pull requests and pushes to `main` run the `Quality checks` workflow on `ubuntu-24.04`. It uses CPython 3.12, uv 0.12.17 and the committed `uv.lock`; `uv sync --locked` fails if dependency metadata and the lock disagree. The job records the Python and uv versions and the resolved dependency tree in its log. It runs the same syntax, lint, format, type, unit and process-integration commands listed above. Any failed command fails the job. These checks are deterministic and require no credentials, network-backed application service, AWS access or paid model call; model benchmarks are not part of this workflow.
+Pull requests and pushes to `main` run the `Quality checks` workflow on `ubuntu-24.04`. It uses CPython 3.12, uv 0.12.17 and the committed `uv.lock`; `uv sync --locked` fails if dependency metadata and the lock disagree. The job records the Python and uv versions and the resolved dependency tree in its log. It runs the same syntax, lint, format, type, unit and process-integration commands listed above. Any failed command fails the job. These checks are deterministic and require no credentials, network-backed application service, cloud access or paid model call; model benchmarks are not part of this workflow.
 
 The manual workflow has a separate **Run live provider integration checks** input, off by default, and cannot weaken the fast job. Local `tests/live` now has one actual Azure synthetic connector check. Running it requires `TRACE_ALLOW_PAID_LIVE=1` and explicit private setup/secret/journal/report paths plus the known initial spending estimate; see the provider guide. Missing opt-in, missing/empty tests and skips fail closed. The hosted manual job has no private files/budget ownership configured and is not live acceptance evidence. Never enable paid calls in deterministic CI or copy a historical smoke result as current verification.
 
@@ -113,13 +113,13 @@ The package uses the specific trace_app module name to avoid colliding with Pyth
 
 ## Log output and incident evidence
 
-The TRACE logging module uses Python's standard logging framework to emit structured JSON to stderr. It provides correlation fields and redaction for the application's own operational records. It does not store, index, or query telemetry. The local SQLite adapter stores bounded synthetic evidence snapshots and job state; it is separate from CloudWatch application logging.
+The TRACE logging module uses Python's standard logging framework to emit correlated structured JSON to stderr with pre-transmission redaction. It does not store/index/query operational telemetry. SQLite evidence/job state and private provider/execution audit are separate from hosted application logging.
 
-Amazon CloudWatch Logs is the selected hosted platform (owner decision, 2026-09-24). See [ADR 0003](adr/0003-cloudwatch-hosted-logging.md) and the [collection example and hosted acceptance procedure](../deploy/cloudwatch/README.md). The existing JSON stderr output remains the application boundary; deployment captures it to a file collected by the EC2 CloudWatch agent. CloudWatch delivery is not yet deployed or verified. Although issue #3 is closed on GitHub, its hosted acceptance evidence remains unverified and is not implied by local tests.
+Azure Monitor / Log Analytics is the planning baseline for hosted logs after the owner-selected Azure/AKS change. [ADR 0015](adr/0015-azure-aks-cloud-deployment.md), [cloud architecture](architecture/azure-cloud.md) and #59 require platform-managed AKS collection, actual correlation/redaction/access/retention and collector-recovery evidence. Do not enable raw prompt/response capture. Historical CloudWatch #3 preparation did not establish hosted delivery and is superseded; the legacy example is not the current deployment path.
 
-TRACE's incident investigation still needs read-only adapters to query the operator's actual log and metric sources. The roadmap places bounded evidence queries in S3 and real-source contracts and controlled tools in S4. Sending TRACE's own runtime logs to CloudWatch does not satisfy those incident evidence integrations. If the authorized pilot source already uses Elastic, TRACE should query that source through an adapter rather than creating a second log store.
+TRACE incident evidence still needs independently authorized read-only source adapters. Sending TRACE runtime logs to Azure Monitor does not authorize or implement operator incident sources. Query an already-authorized source behind its own TRACE contract rather than silently duplicating its data into the application telemetry store.
 
-References: [CloudWatch agent collection](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html), [CloudWatch pricing](https://aws.amazon.com/cloudwatch/pricing/), [Elastic pricing](https://www.elastic.co/pricing), [Elastic licensing](https://www.elastic.co/pricing/faq/licensing).
+The cloud follow-up packages the accepted CLI/modular application into an immutable non-root ACR image, migrates shared durable state and monetary admission into Azure PostgreSQL and verifies scoped AKS Workload Identity. #55-#60 are implementation/acceptance tasks; there is no local container/cluster requirement introduced by this records update. The existing synthetic Azure connector does not prove cloud token authentication, AKS delivery or Operational Pilot usefulness.
 
 ## MVP development fixtures
 

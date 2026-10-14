@@ -14,10 +14,11 @@ Individual issues are stories/tasks; milestones are sprints. Project Status is t
 | Release | Provisional sprints | Outcome |
 | --- | --- | --- |
 | Local MVP | 1–6 | Order → Payment incidents, small retrieval corpus, bounded read-only tools, cited diagnosis, abstention, timeline and automated scoring |
-| Cloud MVP | 7–9 | The same workflow on AWS with repeatable deployment, access controls, observability, cost limits and teardown |
+| Cloud MVP | 7–9 | The same workflow containerized on Azure AKS with repeatable deployment, shared state, workload identity, observability, cost limits and teardown |
 | Full capstone | 10–18 | Broader scenarios, evaluated ML, five-arm study, production hardening and final defense |
 
 - [Complete project plan and release gates](docs/planning/capstone-project-plan.md)
+- [Azure/AKS cloud direction](docs/adr/0015-azure-aks-cloud-deployment.md) and [cloud stories](docs/planning/azure-cloud-backlog.md)
 - [Approved production-usefulness amendment](docs/planning/production-roadmap-amendment.md)
 - [Implementation reuse review](docs/planning/production-usefulness-review.md)
 - [MVP-first delivery tracker](https://github.com/krispykrits/TRACE/issues/9)

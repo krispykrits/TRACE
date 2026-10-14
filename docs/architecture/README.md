@@ -23,7 +23,7 @@ flowchart LR
     ContextDemo[Developer context CLI] --> Context[Bounded quoted context]
     Context --> Search
     Context --> Corpus
-    Log -. planned EC2 collection .-> CW[CloudWatch Logs]
+    Log -. planned AKS collection .-> CloudLogs["Azure Monitor Logs"]
     Composition[Explicit application composition] --> Investigation[Bounded read-only investigation]
     Investigation --> Tools[Scoped read-only tool catalog]
     Tools --> Store
@@ -38,7 +38,7 @@ flowchart LR
     Approved[Exact action approval] -. final capstone only .-> Executor[Separate deterministic remediation executor]
 ```
 
-Solid arrows describe implemented local behavior, including the proposed #37 composition; dotted arrows are planned boundaries or deployment work. [ADR 0001](../adr/0001-repository-runtime-and-local-tooling.md) selects one modular Python application with capability-owned contracts and explicit edge adapters. [ADR 0002](../adr/0002-terraform-and-ec2-cloud-deployment.md) selects Terraform/EC2 for the Cloud MVP, and [ADR 0003](../adr/0003-cloudwatch-hosted-logging.md) selects hosted logging, but no EC2 runtime or hosted delivery is verified. The Azure connector has separate native health evidence; the new investigator uses explicitly scripted offline model/review records for its demonstration. Authenticated inspection, operational source adapters, an HTTP API and the remediation executor remain separate work. The local [knowledge search](knowledge-retrieval.md) adapts Volume 4 lexical/semantic/hybrid baselines with a pinned optional cached embedding model. SQLite persists synthetic snapshots, jobs, durable budgets and private workflow artifacts; it is not a real-source integration. [ADR 0004](../adr/0004-synchronous-synthetic-order-workflow.md) records the synchronous demo boundary.
+Solid arrows describe implemented local behavior, including the proposed #37 composition; dotted arrows are planned boundaries or deployment work. [ADR 0001](../adr/0001-repository-runtime-and-local-tooling.md) selects one modular Python application with capability-owned contracts and explicit edge adapters. [ADR 0015](../adr/0015-azure-aks-cloud-deployment.md) selects Terraform-managed Azure/container/AKS cloud delivery and Azure telemetry; exact resources, shared-state migration and hosted acceptance remain #55-#60 gates. The Azure connector has separate native health evidence; the new investigator uses explicitly scripted offline model/review records for its demonstration. Authenticated inspection, operational source adapters, an HTTP API and the remediation executor remain separate work. The local [knowledge search](knowledge-retrieval.md) adapts Volume 4 lexical/semantic/hybrid baselines with a pinned optional cached embedding model. SQLite persists synthetic snapshots, jobs, durable budgets and private workflow artifacts; it is not a real-source integration. [ADR 0004](../adr/0004-synchronous-synthetic-order-workflow.md) records the synchronous demo boundary.
 
 The Local/Cloud MVP investigation remains read-only. The final capstone's [approved production remediation scope](../planning/production-remediation-scope.md) requires a separate deterministic executor with proposal-bound approval, state revalidation, bounded execution and outcome verification. A source filter or investigation access cannot grant mutation authority.
 
@@ -62,3 +62,5 @@ The [passage evaluation and context contract](retrieval-evaluation-context.md) r
 The [read-only tool catalog](investigation-tools.md) describes #18 typed schemas, trusted authorization, externally enforced bounds, worker termination, partial/error outcomes and audit; [ADR 0011](../adr/0011-read-only-tool-execution.md) records the execution boundary.
 
 The [scripted evidence package](scripted-evidence-package.md) composes scoped reads, observed timelines and revalidated knowledge references for the #19 Sprint 4 gate; [review and Sprint 5 handoff](../sprints/sprint-04-review.md) keep development, provider, operational and remediation acceptance separate.
+
+The [Azure cloud architecture](azure-cloud.md) records the planned container/registry, Workload Identity, shared-state/admission, telemetry and release boundaries. Historical AWS ADRs are superseded; current local contracts and evaluator/source isolation remain in force.

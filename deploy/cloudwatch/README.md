@@ -1,10 +1,12 @@
 # TRACE hosted application logs
 
+> **Superseded historical preparation — 2026-10-14.** The owner selected Azure/container/AKS in [ADR 0015](../../docs/adr/0015-azure-aks-cloud-deployment.md). This AWS example is retained for decision history, not as TRACE's active deployment path. Do not use its account/region, retention, budget or apply commands as Azure authorization. Current hosted collection/acceptance is #59 under [cloud responsibilities](../README.md).
+
 CloudWatch Logs is the owner-selected hosted platform; see [ADR 0003](../../docs/adr/0003-cloudwatch-hosted-logging.md). This directory supplies a collection example, not deployed infrastructure. Do not apply the example unchanged.
 
 ## Before activation
 
-Owner-selected settings: AWS account 267653922622, region us-east-2, seven-day retention and a $5/month CloudWatch spending alert. The alert email and target EC2 host/environment are pending. Choose a bounded local rotation policy and provision reader/collector identities. The current aws-app-local identity resolves to the selected account but lacks logs:DescribeLogGroups. Use an authorized deployment profile/role before planning or applying. No AWS resources have been created by this PR.
+Historical settings specified an AWS account/region, seven-day retention and a $5/month CloudWatch spending alert. Account identifiers and local profile details are omitted from this superseded record. The alert recipient, EC2 host/environment and deployment permissions were unresolved, including missing logs:DescribeLogGroups permission. Hosted delivery was never accepted. Current Azure design and hosted collection belong to #55/#59; these historical settings and commands do not authorize deployment.
 
 Use Terraform to create the approved log group with explicit retention and tags. Replace REPLACE_ENVIRONMENT in agent.example.json with the chosen environment and validate the rendered configuration using the installed CloudWatch agent schema. Region follows the EC2 host unless deployment explicitly configures otherwise. Retention is intentionally absent from the agent example because Terraform owns it; the collector should not modify retention or create arbitrary groups.
 
