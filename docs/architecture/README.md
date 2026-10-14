@@ -1,5 +1,7 @@
 # TRACE architecture view
 
+The owner-selected [independent .NET testbed and JSON-first evidence direction](../adr/0017-dotnet-testbed-and-json-first-evidence.md) is planned under [#69-#76](../planning/dotnet-testbed-backlog.md). Order/Payment workloads run separately; TRACE keeps one Python application. Future sources normalize exported JSON first, then scoped Azure query results, preserving current evidence and authority boundaries. No .NET service/source adapter is implemented by this records update.
+
 The [capability package layout](package-layout.md) and [ADR 0010](../adr/0010-capability-packages-and-adapter-boundaries.md) define dependency direction and composition; make architecture-check and make package-check enforce this during every future PR.
 
 Status: Sprint 4 evidence tooling and Sprint 5 provider/assessment/budget enablers merged; #37 bounded investigation proposed for owner review, 2026-10-14. Local implementation and offline demonstrations do not establish operational or release acceptance.
