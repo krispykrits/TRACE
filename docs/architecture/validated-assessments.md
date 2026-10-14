@@ -1,6 +1,6 @@
 # Validated assessments and cited support
 
-Scoped story [#35](https://github.com/krispykrits/TRACE/issues/35), following accepted #34 / merged PR #51. [ADR 0013](../adr/0013-assessment-validation-and-support-review.md) records the proposed acceptance policy. This implements a validation/use-case boundary for hand-authored or generated reports; the investigator loop and inspection UI remain #37/#38.
+Scoped story [#35](https://github.com/krispykrits/TRACE/issues/35), submitted in [PR #52](https://github.com/krispykrits/TRACE/pull/52), following accepted #34 / merged PR #51. [ADR 0013](../adr/0013-assessment-validation-and-support-review.md) records the proposed acceptance policy. This implements a validation/use-case boundary for hand-authored or generated reports; the investigator loop and inspection UI remain #37/#38.
 
 ## Versioned schema
 

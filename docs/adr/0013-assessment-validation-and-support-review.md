@@ -1,6 +1,6 @@
 # ADR 0013: Assessment validation and independent support review
 
-- **Status:** Proposed for owner review in #35
+- **Status:** Proposed for owner review in #35 / [PR #52](https://github.com/krispykrits/TRACE/pull/52)
 - **Date:** 2026-10-14 (America/New_York)
 - **Scope:** Local MVP assessment acceptance; read-only, without an investigation loop or production authority
 
