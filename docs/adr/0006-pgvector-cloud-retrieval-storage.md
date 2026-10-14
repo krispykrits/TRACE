@@ -1,6 +1,8 @@
 # ADR 0006: pgvector on PostgreSQL for cloud retrieval storage
 
-- **Status:** Accepted direction by the owner, 2026-09-25; implementation and retrieval acceptance pending
+> Historical decision text is retained below. For current Azure/AKS deployment, shared-state and hosted-observability work follow [ADR 0015](0015-azure-aks-cloud-deployment.md) and [#55-#60](../planning/azure-cloud-backlog.md). The old AWS settings are not Azure configuration or acceptance evidence.
+
+- **Status:** Partially superseded by [ADR 0015](0015-azure-aks-cloud-deployment.md), 2026-10-14: RDS hosting replaced; PostgreSQL/pgvector and authorization/evaluation gates retained
 - **Date:** 2026-09-25
 - **Decision owner:** Project owner, with retrieval evidence from issue #16
 - **Scope:** Versioned knowledge chunks and embeddings; investigation/evidence state remains under [ADR 0005](0005-sqlite-local-postgresql-rds-cloud.md).

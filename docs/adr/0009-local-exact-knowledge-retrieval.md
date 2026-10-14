@@ -48,7 +48,7 @@ TRACE retains technical tokens (including paths/codes/dotted identifiers and neg
 | Implement replacement pure-Python TF-IDF/embeddings | Rejected: rebuilds educational algorithms rather than adapting them; no measured benefit |
 | Hosted embedding API | Deferred: no approved provider/budget, requires credentials/network and paid acceptance |
 | Dense or hybrid by default | Deferred: measured development ranking did not beat lexical; options remain explicit |
-| RDS/pgvector or ANN now | Deferred to approved Cloud MVP gates/scale evidence; no database, extension or vector service provisioned |
+| Cloud PostgreSQL/pgvector or ANN now | Deferred to approved Cloud MVP gates/scale evidence; current Azure hosting follows ADR 0015; no database, extension or vector service provisioned |
 | Reranking or a separate vector database | Deferred until measured need and preserved source/citation contracts |
 
 The 1,000-chunk/20 MB artifact and top-K bounds are implementation limits, not operational capacity/SLA commitments. Package/configuration changes reject old indexes and require rebuilds; conservative compatibility trades reuse for traceability. Exact search and current authorization checks must remain available as a migration correctness reference.
@@ -60,3 +60,4 @@ Revisit defaults/token-window policy on broader independently reviewed developme
 ## #17 candidate configuration extension — 2026-10-12
 
 The [passage evaluation/context contract](../architecture/retrieval-evaluation-context.md) records a measured section-recall gap with the one-passage-per-document baseline. Adapt Volume 4's existing configurable limits behind `SearchRequest`: defaults remain candidate pool 100 and one passage per document; #17 explicitly retains pool 20 and up to 20 passages per document before a five-passage/byte-bounded context. The owner supplied primary/secondary K, minimum 100 queries and thresholds before measurement. Lexical remains the existing default; no reranker or new dependency is selected. The owner endorsed the v4 judgment bundle, and the frozen lexical development acceptance passed at Recall@5 0.9544, MRR@5 0.9137 and Recall@10 0.9881; implementation review and merge remain pending. The recorded endorsement is a blanket review, not independent per-target notes or a held-out study. Version `exact-retrieval.v2` requires explicit index rebuilding; chunk/source/embedding identities remain unchanged.
+

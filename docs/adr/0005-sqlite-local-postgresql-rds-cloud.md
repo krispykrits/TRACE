@@ -1,6 +1,8 @@
 # ADR 0005: SQLite for Local MVP and PostgreSQL on RDS for Cloud MVP
 
-- **Status:** Accepted direction by the owner, 2026-09-25; Local SQLite implementation proposed in issue #10, Cloud migration pending
+> Historical decision text is retained below. For current Azure/AKS deployment, shared-state and hosted-observability work follow [ADR 0015](0015-azure-aks-cloud-deployment.md) and [#55-#60](../planning/azure-cloud-backlog.md). The old AWS settings are not Azure configuration or acceptance evidence.
+
+- **Status:** Partially superseded by [ADR 0015](0015-azure-aks-cloud-deployment.md), 2026-10-14: RDS hosting replaced; Local SQLite and managed PostgreSQL semantics retained
 - **Decision owner:** Project owner
 - **Scope:** Investigation execution state and bounded evidence snapshots; this does not select an incident log source or a retrieval index.
 

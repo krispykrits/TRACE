@@ -67,7 +67,7 @@ Reasons are bounded safe codes. Missing snapshots remain `snapshot_missing`; oth
 
 ## Audit and demonstration
 
-Every attempt records version, tool catalog name (or `unknown`), correlation ID, unique attempt ID, attempt number, monotonic elapsed milliseconds and outcome. `LoggingToolAudit` emits `tools.attempt.completed` through the existing structured/redacted TRACE logger. It logs neither arguments, source bodies, model query text, grants, configured paths nor exception text. A normal host caller configures logging at startup. Child readers' incidental logs are not mixed into the parent result/audit channel. CloudWatch agent delivery and hosted audit acceptance remain separate deployment work; local records do not supply that evidence.
+Every attempt records version, tool catalog name (or `unknown`), correlation ID, unique attempt ID, attempt number, monotonic elapsed milliseconds and outcome. `LoggingToolAudit` emits `tools.attempt.completed` through the existing structured/redacted TRACE logger. It logs neither arguments, source bodies, model query text, grants, configured paths nor exception text. A normal host caller configures logging at startup. Child readers' incidental logs are not mixed into the parent result/audit channel. Azure Monitor collection and hosted audit acceptance under #59 remain separate deployment work; local records do not supply that evidence.
 
 From the repository root:
 

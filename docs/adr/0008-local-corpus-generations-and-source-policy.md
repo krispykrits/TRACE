@@ -9,7 +9,7 @@
 
 The approved amendment requires adaptation of Volume 4 provenance/chunking/generation contracts, with real source identity, updates/deletions, freshness and revocation. Volume 4 preserves original passages and offsets, normalizes separate ranking text, hashes stable chunk identities and publishes validated generations atomically. Its source schema requires synthetic IDs/URIs and its storage does not enforce source withdrawals across generations. TRACE must add those controls while keeping one modular application and no sibling runtime dependency.
 
-SQLite is already the Local MVP persistence direction. The cloud direction remains PostgreSQL on RDS with pgvector under ADRs 0005/0006. No embedding model, runtime dependency or authorized operational corpus has been selected for this story.
+SQLite is already the Local MVP persistence direction. The cloud direction is Azure PostgreSQL with pgvector under ADR 0015; the Local SQLite/PostgreSQL contract decisions in ADRs 0005/0006 are retained. No embedding model, runtime dependency or authorized operational corpus has been selected for this story.
 
 ## Decision
 
@@ -39,7 +39,7 @@ TRACE keeps the provenance/generation principles and adapts the standard-library
 | Import the Volume 4 application unchanged | Rejected: synthetic-only identities, new dependency set and absent revocation boundary |
 | Copy its generation directories and add a separate mutable policy file | Deferred: coordinating pointer/policy updates adds an unnecessary local atomicity boundary |
 | SQLite generations plus current policy | Selected for the bounded local corpus; transactional publication and withdrawals, with serialized reads/writes |
-| Provision RDS/pgvector now | Deferred to the approved cloud gates; no access, workload or cost acceptance is provided |
+| Provision cloud PostgreSQL/pgvector now | Deferred to the approved cloud gates; no access, workload or cost acceptance is provided; current hosting follows ADR 0015 |
 
 The generation manifests record original counts; deletion can intentionally remove content without changing historical generation identity. A current policy check can make retained chunks unavailable. Retention purge is explicit administration, with scheduled execution, backups, exports and recovery left to hosted design. This implementation does not establish retrieval quality, pilot usefulness or production erasure guarantees.
 
