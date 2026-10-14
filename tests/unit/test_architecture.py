@@ -61,7 +61,13 @@ class ArchitectureTests(unittest.TestCase):
                 "from tests.fixtures.assessments import Reviews",
                 "from trace_app.adapters.storage.sqlite.corpus import SQLiteCorpusStore",
             ],
+            "investigation/execution.py": [
+                "from trace_app.adapters.storage.sqlite.execution import SqliteExecutionLedger",
+                "from evaluation.scoring import evaluate",
+                "from tests.fixtures.execution import MemoryLedger",
+            ],
             "adapters/models/provider.py": [
+                "from trace_app.investigation.execution import ExecutionSession",
                 "from trace_app.investigation.assessment_validation import AssessmentValidator",
                 "from trace_app.investigation.tools import ToolSession",
                 "from trace_app.adapters.tools.local import LocalToolBackend",

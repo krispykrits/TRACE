@@ -32,6 +32,9 @@ class ModelErrorCode(StrEnum):
     POLICY = "policy_rejected"
     AUDIT = "audit_unavailable"
     BUDGET = "budget_exhausted"
+    CANCELLED = "cancelled"
+    EXPIRED = "expired"
+    TERMINAL = "execution_stopped"
 
 
 _ERROR_MESSAGES = {
@@ -47,7 +50,10 @@ _ERROR_MESSAGES = {
     ModelErrorCode.OUTPUT_LIMIT: "The model response exceeded its configured output bound.",
     ModelErrorCode.POLICY: "Provider transmission or response access failed policy checks.",
     ModelErrorCode.AUDIT: "Provider audit is unavailable; reconcile the attempt before continuing.",
-    ModelErrorCode.BUDGET: "The local model spending allowance is exhausted or unresolved.",
+    ModelErrorCode.BUDGET: "Investigation or local spending allowance is exhausted; inspect the correlated budget record.",
+    ModelErrorCode.CANCELLED: "Investigation was cancelled; no further calls are permitted.",
+    ModelErrorCode.EXPIRED: "Investigation deadline or active attempt lease has expired.",
+    ModelErrorCode.TERMINAL: "Investigation execution stopped; inspect its correlated audit before continuing.",
 }
 
 
@@ -387,6 +393,34 @@ class AdmissionGuard:
             valid = False
         if not valid:
             raise ModelProviderError(ModelErrorCode.POLICY)
+
+
+@dataclass(frozen=True, slots=True)
+class ModelPricing:
+    """Versioned upper-rate snapshot; estimates are never settled provider billing."""
+
+    version: str
+    input_nusd_per_token: int
+    output_nusd_per_token: int
+
+    def __post_init__(self) -> None:
+        _identifier(self.version)
+        if any(
+            type(value) is not int or value <= 0
+            for value in (self.input_nusd_per_token, self.output_nusd_per_token)
+        ):
+            raise ModelProviderError(ModelErrorCode.CONFIGURATION)
+
+    def estimate(self, input_tokens: int, output_tokens: int) -> int:
+        if any(
+            type(value) is not int or value < 0
+            for value in (input_tokens, output_tokens)
+        ):
+            raise ModelProviderError(ModelErrorCode.CONFIGURATION)
+        return (
+            input_tokens * self.input_nusd_per_token
+            + output_tokens * self.output_nusd_per_token
+        )
 
 
 @dataclass(frozen=True, slots=True)

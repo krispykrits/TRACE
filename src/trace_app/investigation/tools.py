@@ -12,6 +12,12 @@ from threading import Lock
 from typing import Callable, Literal, Protocol, cast
 
 from trace_app.evidence.queries import EvidenceQuery, TrustedQueryContext
+from trace_app.investigation.execution import (
+    CallPurpose,
+    CallTicket,
+    ExecutionRejected,
+    ExecutionSession,
+)
 from trace_app.investigation.models import EvidenceKind, _identifier
 from trace_app.knowledge.models import CorpusReadContext
 from trace_app.knowledge.ports import SearchRequest
@@ -34,6 +40,9 @@ ToolStatus = Literal[
     "timeout",
     "dependency_failure",
     "budget_exhausted",
+    "cancelled",
+    "expired",
+    "execution_stopped",
 ]
 
 
@@ -223,6 +232,9 @@ class ToolPayload:
             "timeout",
             "dependency_failure",
             "budget_exhausted",
+            "cancelled",
+            "expired",
+            "execution_stopped",
         ) or not isinstance(self.data, dict):
             raise ValueError("Invalid tool result envelope.")
         if self.reason is not None and (
@@ -273,9 +285,26 @@ class ToolSession:
         policy: ToolPolicy = ToolPolicy(),
         *,
         clock: Callable[[], float] = time.monotonic,
+        execution: ExecutionSession | None = None,
     ) -> None:
         self._backend, self._scope, self._audit = backend, scope, audit
         self._policy, self._clock = policy, clock
+        self._execution = execution
+        if execution is not None:
+            if (
+                execution.identity.investigation_id != scope.investigation_id
+                or execution.identity.correlation_id != scope.correlation_id
+            ):
+                raise ValueError("Tool execution scope must match the durable attempt.")
+            self._policy = replace(
+                policy,
+                call_timeout_ms=min(
+                    policy.call_timeout_ms, execution.policy.tool_timeout_ms
+                ),
+                max_result_bytes=min(
+                    policy.max_result_bytes, execution.policy.max_tool_result_bytes
+                ),
+            )
         self._started, self._attempts = clock(), 0
         self._lock = Lock()
         self._state_lock = Lock()
@@ -284,7 +313,59 @@ class ToolSession:
     def investigation_id(self) -> str:
         return self._scope.investigation_id
 
-    def invoke(self, name: object, arguments: object) -> ToolResult:
+    def invoke(
+        self, name: object, arguments: object, *, purpose: CallPurpose = "initial"
+    ) -> ToolResult:
+        if self._execution is None:
+            return self._invoke(name, arguments)
+        ticket: CallTicket | None = None
+        try:
+            ticket = self._execution.begin(
+                "tool",
+                purpose,
+                metadata={
+                    "tool_version": TOOL_VERSION,
+                    "tool": name
+                    if isinstance(name, str) and name in TOOL_NAMES
+                    else "unknown",
+                },
+            )
+            result = self._invoke(name, arguments, ticket=ticket)
+            final = self._execution.finish(
+                ticket,
+                result.payload.status,
+                metadata={
+                    "tool_version": TOOL_VERSION,
+                    "tool": result.audit.tool,
+                },
+            )
+            if final != result.payload.status:
+                payload = _execution_failure(final)
+                return ToolResult(
+                    replace(result.audit, outcome=payload.status), payload
+                )
+            return result
+        except ExecutionRejected as error:
+            payload = _execution_failure(error.outcome)
+            record = ToolAudit(
+                TOOL_VERSION,
+                self._scope.correlation_id,
+                ticket.call_id if ticket is not None else str(uuid.uuid4()),
+                self._attempts + 1,
+                name if isinstance(name, str) and name in TOOL_NAMES else "unknown",
+                0.0,
+                payload.status,
+            )
+            try:
+                self._audit.emit(record)
+            except Exception:
+                payload = ToolPayload("dependency_failure", {}, "audit_unavailable")
+                record = replace(record, outcome=payload.status)
+            return ToolResult(record, payload)
+
+    def _invoke(
+        self, name: object, arguments: object, *, ticket: CallTicket | None = None
+    ) -> ToolResult:
         started = self._clock()
         # Count all requests atomically, including concurrent denied attempts.
         with self._state_lock:
@@ -331,6 +412,8 @@ class ToolSession:
                             1, int(min(remaining, self._policy.call_timeout_ms))
                         )
                         try:
+                            if ticket is not None and self._execution is not None:
+                                timeout = min(timeout, self._execution.dispatch(ticket))
                             payload = (
                                 ToolPayload(
                                     "budget_exhausted", {}, "session_budget_exhausted"
@@ -361,6 +444,8 @@ class ToolSession:
                             payload = ToolPayload(
                                 "timeout", {}, "call_deadline_exceeded"
                             )
+                        except ExecutionRejected as error:
+                            payload = _execution_failure(error.outcome)
                         except Exception:
                             # No exception text, arguments or retrieved content in audit/errors.
                             payload = ToolPayload(
@@ -369,7 +454,7 @@ class ToolSession:
             record = ToolAudit(
                 TOOL_VERSION,
                 self._scope.correlation_id,
-                str(uuid.uuid4()),
+                ticket.call_id if ticket is not None else str(uuid.uuid4()),
                 attempt_number,
                 safe_name,
                 max(0.0, (self._clock() - started) * 1000),
@@ -385,3 +470,20 @@ class ToolSession:
         finally:
             if acquired:
                 self._lock.release()
+
+
+def _execution_failure(outcome: str) -> ToolPayload:
+    status: ToolStatus = (
+        cast(ToolStatus, outcome)
+        if outcome in ("budget_exhausted", "cancelled", "expired", "timeout")
+        else "dependency_failure"
+        if outcome == "audit_unavailable"
+        else "execution_stopped"
+    )
+    return ToolPayload(
+        status,
+        {},
+        "audit_unavailable"
+        if outcome == "audit_unavailable"
+        else "investigation_execution_stopped",
+    )

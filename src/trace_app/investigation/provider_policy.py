@@ -11,10 +11,17 @@ import time
 import uuid
 import weakref
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import IntEnum, StrEnum
 from typing import Protocol
 
+from trace_app.investigation.execution import (
+    EXECUTION_POLICY_VERSION,
+    CallPurpose,
+    CallTicket,
+    ExecutionRejected,
+    ExecutionSession,
+)
 from trace_app.investigation.provider import (
     PROVIDER_POLICY_VERSION,
     AdmissionGuard,
@@ -223,6 +230,7 @@ class ProviderCall:
     evidence: tuple[EvidenceSelection, ...]
     bounds: ModelCallBounds
     history: tuple[ProtectedModelResponse, ...] = field(default=(), repr=False)
+    purpose: CallPurpose = "initial"
 
 
 @dataclass(frozen=True, slots=True)
@@ -303,6 +311,8 @@ class PolicyModelProvider:
         max_evidence: int = 32,
         max_context_bytes: int = 65_536,
         read_clock: Callable[[], float] = time.time,
+        duration_clock: Callable[[], float] = time.monotonic,
+        execution: ExecutionSession | None = None,
     ) -> None:
         if (
             configuration.mode != "live"
@@ -324,6 +334,13 @@ class PolicyModelProvider:
         self._max_evidence = max_evidence
         self._max_context_bytes = max_context_bytes
         self._clock = read_clock
+        self._duration_clock = duration_clock
+        self._execution = execution
+        if (
+            execution is not None
+            and execution.identity.investigation_id != scope.investigation_id
+        ):
+            raise ModelProviderError(ModelErrorCode.CONFIGURATION)
         self._responses: weakref.WeakSet[ProtectedModelResponse] = weakref.WeakSet()
         for value in (
             json.dumps(configuration.to_dict()),
@@ -456,9 +473,10 @@ class PolicyModelProvider:
 
     def generate(self, call: ProviderCall) -> ProtectedModelResponse:
         attempt = uuid.uuid4().hex
-        started = time.monotonic()
+        started = self._duration_clock()
         usage = ModelUsage()
         dispatched = False
+        ticket: CallTicket | None = None
         metadata: dict[str, object] = {
             "request_id": attempt,
             "scope_id": self._scope.investigation_id,
@@ -467,8 +485,26 @@ class PolicyModelProvider:
             "evidence_ids": [],
             "sensitivity": "unknown",
             "outcome": ModelErrorCode.POLICY.value,
+            "reported_model": None,
+            "provider_operation_id": None,
         }
+        if self._execution is not None:
+            metadata.update(
+                investigation_id=self._scope.investigation_id,
+                attempt_id=self._execution.identity.attempt_id,
+                correlation_id=self._execution.identity.correlation_id,
+                execution_policy_version=EXECUTION_POLICY_VERSION,
+                execution_configuration_id=self._execution.policy.configuration_id,
+            )
         try:
+            if self._execution is not None:
+                ticket = self._execution.begin(
+                    "model",
+                    call.purpose if isinstance(call, ProviderCall) else "initial",
+                    metadata=metadata,
+                )
+                attempt = ticket.call_id
+                metadata["request_id"] = attempt
             if (
                 not isinstance(call, ProviderCall)
                 or not isinstance(call.bounds, ModelCallBounds)
@@ -481,6 +517,10 @@ class PolicyModelProvider:
             ):
                 _deny()
             prompt = self._prompts[call.prompt_version]
+            if ticket is not None and self._execution is not None:
+                call = replace(
+                    call, bounds=self._execution.model_bounds(call.bounds, ticket)
+                )
             _id(call.prompt_version)
             _id(prompt.response_schema_id)
             instructions = prompt.instructions + _UNTRUSTED_INSTRUCTIONS
@@ -634,16 +674,30 @@ class PolicyModelProvider:
                 context,
                 call.bounds,
             )
+            input_allowance = len(instructions.encode()) + len(context.encode()) + 1024
+            if ticket is not None and self._execution is not None:
+                self._execution.reserve(
+                    ticket, input_allowance, call.bounds.max_output_tokens, metadata
+                )
             self._journal.begin(
                 metadata,
                 tuple(redactions),
-                len(instructions.encode()) + len(context.encode()) + 1024,
+                input_allowance,
                 call.bounds.max_output_tokens,
                 self._clock(),
             )
             dependency_tuple = tuple(dependencies.values())
             # Re-resolve after provenance/budget writes, immediately before dispatch.
             self.revalidate(dependency_tuple, transmission=True)
+            if ticket is not None and self._execution is not None:
+                timeout = self._execution.dispatch(ticket)
+                request = replace(
+                    request,
+                    bounds=replace(
+                        request.bounds,
+                        timeout_ms=min(timeout, request.bounds.timeout_ms),
+                    ),
+                )
             prepared = self._guard.issue(
                 request,
                 evidence_ids=tuple(dependencies),
@@ -655,6 +709,9 @@ class PolicyModelProvider:
             dispatched = True
             result = self._provider.generate(prepared)
             usage = result.reply.usage
+            for value in (result.reply.reported_model, result.reply.operation_id):
+                if value is not None and self._sensitive_text(value):
+                    _deny()
             metadata["reported_model"] = result.reply.reported_model
             metadata["provider_operation_id"] = result.reply.operation_id
             self.revalidate(dependency_tuple, transmission=False)
@@ -670,6 +727,9 @@ class PolicyModelProvider:
             )
             self._responses.add(response)
             return response
+        except ExecutionRejected as error:
+            metadata["outcome"] = _execution_code(error.outcome).value
+            raise ModelProviderError(_execution_code(error.outcome)) from None
         except ModelProviderError as error:
             usage = error.usage or usage
             metadata.update(error.diagnostics)
@@ -680,14 +740,57 @@ class PolicyModelProvider:
             raise ModelProviderError(ModelErrorCode.DEPENDENCY) from None
         finally:
             metadata["usage"] = usage.to_dict()
-            metadata["elapsed_ms"] = max(0, int((time.monotonic() - started) * 1000))
+            metadata["elapsed_ms"] = max(
+                0, int((self._duration_clock() - started) * 1000)
+            )
             try:
-                self._journal.finish(metadata, usage, dispatched, self._clock())
-            except Exception:
-                metadata["outcome"] = ModelErrorCode.AUDIT.value
-                raise ModelProviderError(ModelErrorCode.AUDIT) from None
+                try:
+                    self._journal.finish(metadata, usage, dispatched, self._clock())
+                except Exception:
+                    metadata["outcome"] = ModelErrorCode.AUDIT.value
+                    raise ModelProviderError(ModelErrorCode.AUDIT) from None
+                finally:
+                    if ticket is not None and self._execution is not None:
+                        self._finish_execution(ticket, metadata, usage, dispatched)
             finally:
                 logging.getLogger("trace_app.models").info(
                     "Provider policy attempt completed.",
                     extra={"event": "models.policy.completed", **metadata},
                 )
+
+    def _finish_execution(
+        self,
+        ticket: CallTicket,
+        metadata: dict[str, object],
+        usage: ModelUsage,
+        dispatched: bool,
+    ) -> None:
+        assert self._execution is not None
+        try:
+            final = self._execution.finish(
+                ticket, str(metadata["outcome"]), usage, metadata=metadata
+            )
+        except ExecutionRejected as error:
+            metadata["outcome"] = _execution_code(error.outcome).value
+            raise ModelProviderError(_execution_code(error.outcome)) from None
+        if final != metadata["outcome"]:
+            metadata["outcome"] = final
+            try:
+                # Idempotently retain late cancellation/expiry in the spending journal too.
+                self._journal.finish(metadata, usage, dispatched, self._clock())
+            except Exception:
+                metadata["outcome"] = ModelErrorCode.AUDIT.value
+                raise ModelProviderError(ModelErrorCode.AUDIT) from None
+            raise ModelProviderError(_execution_code(final), usage=usage)
+
+
+def _execution_code(outcome: str) -> ModelErrorCode:
+    if outcome in (
+        "cancelled",
+        "expired",
+        "timeout",
+        "audit_unavailable",
+        "budget_exhausted",
+    ):
+        return ModelErrorCode(outcome)
+    return ModelErrorCode.TERMINAL

@@ -1,6 +1,6 @@
 # ADR 0013: Assessment validation and independent support review
 
-- **Status:** Proposed for owner review in #35 / [PR #52](https://github.com/krispykrits/TRACE/pull/52)
+- **Status:** Accepted for scoped Local MVP assessment validation after owner merge of [PR #52](https://github.com/krispykrits/TRACE/pull/52) / closure of #35; operational review and pilot gates remain separate
 - **Date:** 2026-10-14 (America/New_York)
 - **Scope:** Local MVP assessment acceptance; read-only, without an investigation loop or production authority
 
@@ -8,7 +8,7 @@
 
 The owner closed #34 after merging PR #51. The provider gate protects each call, its admitted citation views and generated response access. A syntactically valid response can still invent references, conceal missing sources or overstate causal support. #14's frozen candidate/scoring contract already separates ID validity from human support; changing its serialized version would undermine historical rescoring. #35 requires contradictions, gaps, current scope/revision checks, justified abstention and a bounded next read-only check.
 
-## Proposed decision
+## Decision
 
 Keep `investigation.assessment.CandidateReport` version 1 unchanged. Add `assessment_schema.AssessmentReport` (`assessment.v2`) with strict closed fields, supporting/contradicting references, explicit causal basis, source-gap IDs and a typed fixed-catalog next check. Preserve an explicit v1 projection for the existing evaluator; it omits v2-only detail and never replaces the full protected report.
 
