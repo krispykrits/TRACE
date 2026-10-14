@@ -82,6 +82,21 @@ class SqliteExecutionLedger:
                     if row[0] != policy_json:
                         raise ExecutionRejected("configuration_changed")
                     data = json.loads(row[1])
+                    # #37 preserves each port's outcome across intervening citation reads.
+                    if set(data) == set(ExecutionState.__dataclass_fields__) - {
+                        "last_model_outcome",
+                        "last_tool_outcome",
+                    }:
+                        data["last_model_outcome"] = (
+                            data["last_outcome"]
+                            if data["last_kind"] == "model"
+                            else None
+                        )
+                        data["last_tool_outcome"] = (
+                            data["last_outcome"]
+                            if data["last_kind"] == "tool"
+                            else None
+                        )
                     if set(data) != set(ExecutionState.__dataclass_fields__):
                         raise ExecutionRejected("audit_unavailable")
                     if data["active"] is not None:

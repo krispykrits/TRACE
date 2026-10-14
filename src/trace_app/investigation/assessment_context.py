@@ -140,6 +140,11 @@ class AssessmentContext:
             result.append("knowledge:incomplete")
         if knowledge["omitted"]:
             result.append("knowledge:omitted")
+        omitted = value.get("model_context_omissions", {})
+        if omitted.get("evidence"):
+            result.append("evidence:context_omitted")
+        if omitted.get("knowledge"):
+            result.append("knowledge:context_omitted")
         return tuple(sorted(set(result)))
 
 

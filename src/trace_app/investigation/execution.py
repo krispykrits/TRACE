@@ -164,6 +164,8 @@ class ExecutionState:
     active: CallTicket | None = None
     last_kind: CallKind | None = None
     last_outcome: str | None = None
+    last_model_outcome: str | None = None
+    last_tool_outcome: str | None = None
     pricing: dict[str, object] | None = None
     authority_deadline: float | None = None
 
@@ -199,6 +201,10 @@ class ExecutionState:
             or self.last_kind not in (None, "model", "tool")
             or self.last_outcome is not None
             and self.last_outcome not in _OUTCOMES
+            or any(
+                value is not None and value not in _OUTCOMES
+                for value in (self.last_model_outcome, self.last_tool_outcome)
+            )
             or self.active is not None
             and not isinstance(self.active, CallTicket)
         ):
@@ -357,7 +363,12 @@ class ExecutionSession:
                 if purpose == "retry":
                     state.retries += 1
                     exhausted |= state.retries > self.policy.max_retries
-                    if state.last_kind != kind or state.last_outcome not in (
+                    last = (
+                        state.last_model_outcome
+                        if kind == "model"
+                        else state.last_tool_outcome
+                    )
+                    if last not in (
                         "rate_limit",
                         "dependency_failure",
                     ):
@@ -365,14 +376,15 @@ class ExecutionSession:
                 elif purpose == "correction":
                     state.corrections += 1
                     exhausted |= state.corrections > self.policy.max_corrections
-                    if (
-                        kind != "model"
-                        or state.last_kind != "model"
-                        or state.last_outcome
-                        not in (_SUCCESS | {"malformed_response", "output_limit"})
+                    if kind != "model" or state.last_model_outcome not in (
+                        _SUCCESS | {"malformed_response", "output_limit"}
                     ):
                         reason = reason or "correction_not_permitted"
-                elif state.last_kind == kind and state.last_outcome not in _SUCCESS:
+                elif (
+                    state.last_model_outcome
+                    if kind == "model"
+                    else state.last_tool_outcome
+                ) not in (None, *_SUCCESS):
                     reason = reason or "retry_or_correction_required"
                 if exhausted:
                     state.stop_reason = state.stop_reason or "budget_exhausted"
@@ -546,6 +558,10 @@ class ExecutionSession:
             ):
                 state.stop_reason = state.stop_reason or "failed"
             state.last_kind, state.last_outcome, state.active = active.kind, final, None
+            if active.kind == "model":
+                state.last_model_outcome = final
+            else:
+                state.last_tool_outcome = final
             estimate = (
                 self.pricing.estimate(usage.input_tokens, usage.output_tokens)
                 if active.dispatched
@@ -589,3 +605,17 @@ class ExecutionSession:
             state.stop_reason = state.stop_reason or outcome
 
         self._apply(stop)
+
+    def checkpoint(self) -> None:
+        """Check current durable cancellation/expiry between workflow steps."""
+        reason: str | None = None
+
+        def check(state: ExecutionState, now: float) -> None:
+            nonlocal reason
+            reason = state.stop_reason or (
+                "call_active" if state.active is not None else None
+            )
+
+        self._apply(check)
+        if reason is not None:
+            raise ExecutionRejected(reason)

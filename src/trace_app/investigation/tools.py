@@ -313,6 +313,14 @@ class ToolSession:
     def investigation_id(self) -> str:
         return self._scope.investigation_id
 
+    @property
+    def scope(self) -> ToolScope:
+        return self._scope
+
+    @property
+    def execution(self) -> ExecutionSession | None:
+        return self._execution
+
     def invoke(
         self, name: object, arguments: object, *, purpose: CallPurpose = "initial"
     ) -> ToolResult:

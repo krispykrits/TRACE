@@ -99,7 +99,7 @@ def collect_violations(root: Path) -> list[str]:
                 forbidden |= target in {"bootstrap", "cli", "demo"}
                 if relative.parts[:2] == ("adapters", "models"):
                     # Model transports receive prepared text, not citation readers,
-                    # assessment acceptance/reviews, job budgets, or source/tool handles.
+                    # assessment acceptance/reviews, workflows/job budgets, or source/tool handles.
                     forbidden |= target not in (None, "investigation", "runtime")
                     if target == "investigation":
                         forbidden |= not (

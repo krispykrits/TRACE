@@ -17,7 +17,8 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0011](0011-read-only-tool-execution.md) | Fixed read-only tool catalog, readonly sources and deadline-isolated execution | Accepted in #18 / PR #48 |
 | [0012](0012-model-provider-contract-and-bounded-call.md) | Provider-neutral model contract and bounded execution; Azure AI Foundry / GPT-6 Luna and per-request transmission controls | Accepted for Local MVP synthetic provider use after #34 closure / merged PR #51; operational source/identity/retention gates remain separate |
 | [0013](0013-assessment-validation-and-support-review.md) | Strict v2 assessments, current citations and independent protected support review | Accepted in #35 / merged PR #52 for Local MVP; frozen v1 scoring remains unchanged |
-| [0014](0014-durable-investigation-budgets.md) | Shared durable model/tool admission, usage reservations and content-free cost estimates | Proposed in #36; read-only Local MVP enabler |
+| [0014](0014-durable-investigation-budgets.md) | Shared durable model/tool admission, usage reservations and content-free cost estimates | Accepted in #36 / merged PR #53 for the Local MVP enabler |
+| [0015](0015-bounded-investigation-and-private-publication.md) | Fixed evidence-first workflow, complete repeated admission and private atomic publication | Proposed in #37; operational inspection remains #38 |
 
 ## Open decision register
 

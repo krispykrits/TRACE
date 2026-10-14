@@ -15,6 +15,7 @@ from dataclasses import dataclass, field, replace
 from enum import IntEnum, StrEnum
 from typing import Protocol
 
+from trace_app.evidence.models import _parse_utc
 from trace_app.investigation.execution import (
     EXECUTION_POLICY_VERSION,
     CallPurpose,
@@ -225,12 +226,61 @@ class PromptTemplate:
 
 
 @dataclass(frozen=True, slots=True)
+class InvestigationFrame:
+    """Closed application metadata; it confers no source, tool or model authority."""
+
+    service: str
+    environment: str
+    window_start: str
+    window_end: str
+    timeline_evidence_ids: tuple[str, ...]
+    source_gaps: tuple[str, ...]
+    phase: str = "draft"
+    validation_reason: str | None = None
+
+    def to_dict(self) -> dict[str, object]:
+        for value in (
+            self.service,
+            self.environment,
+            *self.timeline_evidence_ids,
+            *self.source_gaps,
+        ):
+            _id(value)
+        if (
+            self.environment not in ("test", "development")
+            or self.phase not in ("draft", "after_check", "correction")
+            or not isinstance(self.timeline_evidence_ids, tuple)
+            or not isinstance(self.source_gaps, tuple)
+            or len(self.timeline_evidence_ids) > 32
+            or len(self.source_gaps) > 100
+            or len(set(self.timeline_evidence_ids)) != len(self.timeline_evidence_ids)
+            or len(set(self.source_gaps)) != len(self.source_gaps)
+            or _parse_utc(self.window_start) > _parse_utc(self.window_end)
+        ):
+            _deny()
+        if self.validation_reason is not None:
+            _id(self.validation_reason)
+        return {
+            "workflow_version": "bounded-investigator.v1",
+            "service": self.service,
+            "environment": self.environment,
+            "window_start": self.window_start,
+            "window_end": self.window_end,
+            "timeline_evidence_ids": list(self.timeline_evidence_ids),
+            "source_gaps": list(self.source_gaps),
+            "phase": self.phase,
+            "validation_reason": self.validation_reason,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class ProviderCall:
     prompt_version: str
     evidence: tuple[EvidenceSelection, ...]
     bounds: ModelCallBounds
     history: tuple[ProtectedModelResponse, ...] = field(default=(), repr=False)
     purpose: CallPurpose = "initial"
+    frame: InvestigationFrame | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -297,6 +347,14 @@ class ProtectedModelResponse:
 class PolicyModelProvider:
     """Only references enter; source text, grants and prompts resolve independently."""
 
+    @property
+    def scope(self) -> ProviderScope:
+        return self._scope
+
+    @property
+    def execution(self) -> ExecutionSession | None:
+        return self._execution
+
     def __init__(
         self,
         configuration: ModelConfiguration,
@@ -315,7 +373,7 @@ class PolicyModelProvider:
         execution: ExecutionSession | None = None,
     ) -> None:
         if (
-            configuration.mode != "live"
+            configuration.mode not in ("live", "offline_test")
             or not prompts
             or type(max_evidence) is not int
             or not 1 <= max_evidence <= 128
@@ -650,11 +708,21 @@ class PolicyModelProvider:
                 history.append({"kind": "untrusted_prior_response", "content": content})
             if len(dependencies) > self._max_evidence:
                 _deny()
+            frame: dict[str, object] | None = None
+            if call.frame is not None:
+                if not isinstance(call.frame, InvestigationFrame):
+                    _deny()
+                frame = call.frame.to_dict()
+                if not set(
+                    call.frame.timeline_evidence_ids
+                ) <= dependencies.keys() or self._sensitive_text(json.dumps(frame)):
+                    _deny()
             context = json.dumps(
                 {
                     "requested_output_format": "JSON object",
                     "untrusted_evidence": records,
                     "untrusted_history": history,
+                    **({"investigation_context": frame} if frame is not None else {}),
                 },
                 allow_nan=False,
             )

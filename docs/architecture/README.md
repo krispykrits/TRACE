@@ -2,7 +2,7 @@
 
 The [capability package layout](package-layout.md) and [ADR 0010](../adr/0010-capability-packages-and-adapter-boundaries.md) define dependency direction and composition; make architecture-check and make package-check enforce this during every future PR.
 
-Status: Sprint 3 foundations including evaluation merged; Sprint 4 corpus and retrieval merged; bounded context proposed, 2026-10-12. This view describes implemented code and approved direction; it does not claim an incident investigation is implemented.
+Status: Sprint 4 evidence tooling and Sprint 5 provider/assessment/budget enablers merged; #37 bounded investigation proposed for owner review, 2026-10-14. Local implementation and offline demonstrations do not establish operational or release acceptance.
 
 ```mermaid
 flowchart LR
@@ -24,13 +24,21 @@ flowchart LR
     Context --> Search
     Context --> Corpus
     Log -. planned EC2 collection .-> CW[CloudWatch Logs]
-    CLI -. later S3-S6 .-> Investigation[Read-only investigation]
+    Composition[Explicit application composition] --> Investigation[Bounded read-only investigation]
+    Investigation --> Tools[Scoped read-only tool catalog]
+    Tools --> Store
+    Tools --> Context
+    Investigation --> Provider[Policy-gated model provider]
+    Provider --> Azure[Azure hosted connector]
+    Investigation --> Assessment[Current citation and support validation]
+    Assessment --> Private[Private workflow artifacts]
+    CLI -. later authenticated inspection .-> Private
     Investigation -. later source adapters .-> Sources[Authorized evidence sources]
     Investigation -. later report .-> User
     Approved[Exact action approval] -. final capstone only .-> Executor[Separate deterministic remediation executor]
 ```
 
-Solid arrows are implemented local behavior. Dotted arrows are planned boundaries or deployment work. [ADR 0001](../adr/0001-repository-runtime-and-local-tooling.md) selects one modular Python application; the current `src/trace_app` package contains CLI, configuration, structured logging and the synthetic Order workflow, dependency replay and SQLite snapshot/job-state adapter with in-process fixtures. [ADR 0002](../adr/0002-terraform-and-ec2-cloud-deployment.md) selects Terraform/EC2 for the Cloud MVP, and [ADR 0003](../adr/0003-cloudwatch-hosted-logging.md) selects hosted logging, but no EC2 runtime or hosted delivery is verified. No investigator, operational source adapter, generative model, HTTP API or remediation executor exists yet. The local [knowledge search](knowledge-retrieval.md) adapts Volume 4 lexical/semantic/hybrid baselines with a pinned optional cached embedding model. The SQLite adapter persists local synthetic snapshots and execution state; it is not a real-source integration. [ADR 0004](../adr/0004-synchronous-synthetic-order-workflow.md) records the synchronous demo boundary.
+Solid arrows describe implemented local behavior, including the proposed #37 composition; dotted arrows are planned boundaries or deployment work. [ADR 0001](../adr/0001-repository-runtime-and-local-tooling.md) selects one modular Python application with capability-owned contracts and explicit edge adapters. [ADR 0002](../adr/0002-terraform-and-ec2-cloud-deployment.md) selects Terraform/EC2 for the Cloud MVP, and [ADR 0003](../adr/0003-cloudwatch-hosted-logging.md) selects hosted logging, but no EC2 runtime or hosted delivery is verified. The Azure connector has separate native health evidence; the new investigator uses explicitly scripted offline model/review records for its demonstration. Authenticated inspection, operational source adapters, an HTTP API and the remediation executor remain separate work. The local [knowledge search](knowledge-retrieval.md) adapts Volume 4 lexical/semantic/hybrid baselines with a pinned optional cached embedding model. SQLite persists synthetic snapshots, jobs, durable budgets and private workflow artifacts; it is not a real-source integration. [ADR 0004](../adr/0004-synchronous-synthetic-order-workflow.md) records the synchronous demo boundary.
 
 The Local/Cloud MVP investigation remains read-only. The final capstone's [approved production remediation scope](../planning/production-remediation-scope.md) requires a separate deterministic executor with proposal-bound approval, state revalidation, bounded execution and outcome verification. A source filter or investigation access cannot grant mutation authority.
 
@@ -44,6 +52,7 @@ The Local/Cloud MVP investigation remains read-only. The final capstone's [appro
 - [Knowledge corpus](knowledge-corpus.md) defines source adapters, curated inputs, stable chunk provenance, atomic generations and current access/freshness/tombstone checks.
 - [Knowledge retrieval](knowledge-retrieval.md) defines authorized lexical/semantic/hybrid search, citation checks, index rebuilds and measured development defaults.
 - [Development evaluation](development-evaluation.md) defines candidate reports, offline fixture scoring, evaluator isolation, citation-support review and the baseline comparison protocol.
+- [Model provider](model-provider.md), [validated assessments](validated-assessments.md), [investigation budgets](investigation-budgets.md) and [bounded investigator](bounded-investigator.md) define the Sprint 5 application boundaries and their separate acceptance evidence.
 - [Interfaces and API contracts](interfaces.md) describe the current CLI and the deferred application/source APIs.
 - [Development guide](../development.md) gives runnable local commands and the current quality gate.
 - [Reuse review](../planning/production-usefulness-review.md) and [approved amendment](../planning/production-roadmap-amendment.md) explain why educational components must enter through TRACE-owned contracts.

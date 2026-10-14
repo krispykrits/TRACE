@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Iterator, Literal
 
 from trace_app.adapters.storage.sqlite.execution import EXECUTION_SCHEMA
+from trace_app.adapters.storage.sqlite.workflow_schema import WORKFLOW_SCHEMA
 from trace_app.evidence.models import (
     EVIDENCE_SCHEMA_VERSION,
     EvidenceRecord,
@@ -41,7 +42,7 @@ from trace_app.investigation.models import (
     _identifier,
 )
 
-_SCHEMA_VERSION = 2
+_SCHEMA_VERSION = 3
 _LOG = logging.getLogger("trace_app.persistence")
 _SCHEMA = (
     """CREATE TABLE investigations (
@@ -235,9 +236,17 @@ class SQLiteInvestigationStore:
                     self._db.execute(statement)
                 for statement in EXECUTION_SCHEMA:
                     self._db.execute(statement)
+                for statement in WORKFLOW_SCHEMA:
+                    self._db.execute(statement)
                 self._db.execute(f"PRAGMA user_version = {_SCHEMA_VERSION}")
             elif version == 1:
                 for statement in EXECUTION_SCHEMA:
+                    self._db.execute(statement)
+                for statement in WORKFLOW_SCHEMA:
+                    self._db.execute(statement)
+                self._db.execute(f"PRAGMA user_version = {_SCHEMA_VERSION}")
+            elif version == 2:
+                for statement in WORKFLOW_SCHEMA:
                     self._db.execute(statement)
                 self._db.execute(f"PRAGMA user_version = {_SCHEMA_VERSION}")
             elif version != _SCHEMA_VERSION:

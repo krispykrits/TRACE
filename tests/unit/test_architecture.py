@@ -66,7 +66,14 @@ class ArchitectureTests(unittest.TestCase):
                 "from evaluation.scoring import evaluate",
                 "from tests.fixtures.execution import MemoryLedger",
             ],
+            "investigation/workflow.py": [
+                "from trace_app.adapters.storage.sqlite.workflow import SQLiteWorkflowStore",
+                "from scripts.demo_investigator import ScriptedModel",
+                "from evaluation.scoring import evaluate",
+                "from tests.fixtures.workflow import fixture",
+            ],
             "adapters/models/provider.py": [
+                "from trace_app.investigation.workflow import BoundedInvestigation",
                 "from trace_app.investigation.execution import ExecutionSession",
                 "from trace_app.investigation.assessment_validation import AssessmentValidator",
                 "from trace_app.investigation.tools import ToolSession",

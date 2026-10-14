@@ -237,6 +237,8 @@ class ExecutionIntegrationTests(unittest.TestCase):
 
     def test_v1_migration_preserves_jobs_and_adds_empty_execution_tables(self) -> None:
         with sqlite3.connect(self.path) as connection:
+            connection.execute("DROP TABLE workflow_artifacts")
+            connection.execute("DROP TABLE workflow_runs")
             connection.execute("DROP TABLE execution_calls")
             connection.execute("DROP TABLE execution_runs")
             connection.execute("PRAGMA user_version=1")
@@ -250,7 +252,7 @@ class ExecutionIntegrationTests(unittest.TestCase):
             )
         self.session()
         with sqlite3.connect(self.path) as connection:
-            self.assertEqual(connection.execute("PRAGMA user_version").fetchone()[0], 2)
+            self.assertEqual(connection.execute("PRAGMA user_version").fetchone()[0], 3)
         self.assertEqual(self.saved()[1], [])
 
     def provider(self):
