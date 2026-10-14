@@ -127,6 +127,32 @@ class ExecutionIntegrationTests(unittest.TestCase):
         self.assertEqual(records[1]["estimated_cost_nusd"], 16)
         self.assertEqual(records[1]["end_to_end_duration_ms"], 2500)
 
+    def test_legacy_cross_port_history_cannot_invent_initial_call_permission(
+        self,
+    ) -> None:
+        session = self.session()
+        session.finish(session.begin("model"), "rate_limit")
+        session.finish(session.begin("tool"), "ok")
+        with sqlite3.connect(self.path) as connection:
+            legacy = json.loads(
+                connection.execute("SELECT state FROM execution_runs").fetchone()[0]
+            )
+            del legacy["last_model_outcome"], legacy["last_tool_outcome"]
+            connection.execute(
+                "UPDATE execution_runs SET state=?", (json.dumps(legacy),)
+            )
+        restarted = self.session()
+        state, _ = self.saved()
+        self.assertEqual((state["model_calls"], state["tool_calls"]), (1, 1))
+        self.assertIsNone(state["last_model_outcome"])
+        self.assertEqual(state["last_tool_outcome"], "ok")
+        with self.assertRaises(ExecutionRejected) as failure:
+            restarted.begin("model")
+        self.assertEqual(failure.exception.outcome, "previous_outcome_unknown")
+        self.assertFalse(self.saved()[1][-1]["dispatched"])
+        ticket = restarted.begin("tool")
+        self.assertEqual(restarted.finish(ticket, "ok"), "ok")
+
     def test_pending_dispatch_survives_restart_and_blocks_replay(self) -> None:
         session = self.session()
         ticket = session.begin("model")
@@ -237,6 +263,8 @@ class ExecutionIntegrationTests(unittest.TestCase):
 
     def test_v1_migration_preserves_jobs_and_adds_empty_execution_tables(self) -> None:
         with sqlite3.connect(self.path) as connection:
+            connection.execute("DROP TABLE workflow_artifacts")
+            connection.execute("DROP TABLE workflow_runs")
             connection.execute("DROP TABLE execution_calls")
             connection.execute("DROP TABLE execution_runs")
             connection.execute("PRAGMA user_version=1")
@@ -250,7 +278,7 @@ class ExecutionIntegrationTests(unittest.TestCase):
             )
         self.session()
         with sqlite3.connect(self.path) as connection:
-            self.assertEqual(connection.execute("PRAGMA user_version").fetchone()[0], 2)
+            self.assertEqual(connection.execute("PRAGMA user_version").fetchone()[0], 3)
         self.assertEqual(self.saved()[1], [])
 
     def provider(self):

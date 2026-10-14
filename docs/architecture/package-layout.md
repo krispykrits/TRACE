@@ -8,7 +8,7 @@ Accepted direction for [#46](https://github.com/krispykrits/TRACE/issues/46), me
 | --- | --- |
 | `evidence` | Source-neutral records, bounded queries, reader contracts and deterministic timelines |
 | `knowledge` | Documents/chunks, corpus/index identities, ports, vector validation, authorized search and bounded context |
-| `investigation` | Request/execution, strict assessment schemas/current citation validation/protected support review, provider-neutral contracts/policy, fixed read-only tools; future bounded investigator |
+| `investigation` | Request/execution, strict assessment schemas/current citation validation/protected support review, provider-neutral contracts/policy, fixed read-only tools and bounded evidence-first workflow |
 | `adapters/storage/sqlite` | Existing database implementations; storage-specific schema and mapping stay here |
 | `adapters/retrieval` | Exact numerical scoring and local artifact publication/loading |
 | `adapters/embeddings` | Cached Sentence Transformers implementation |
@@ -60,3 +60,5 @@ For #19, `investigation.bundle` composes the fixed read-only `ToolInvoker` port 
 For #35, `assessment_schema`, `assessment_context` and `assessment_validation` stay inside investigation. The fixed tool port supplies current references and an independently composed review reader supplies human support. Model adapters cannot import those acceptance/readers; core cannot import evaluator `SupportReview`/fixtures or storage adapters. ADR 0013, checker negatives and wheel requirements record this boundary without a new capability package or dependency.
 
 For #36, `investigation.execution` owns shared admission rules and the atomic `ExecutionLedger` port. `adapters/storage/sqlite/execution` persists them beside durable jobs and revalidates active attempt/scope/lease/status inside each transaction. Pricing is a provider-neutral contract in `investigation.provider` (the journal retains its existing import alias). Policy/tool boundaries share a session selected by bootstrap; transports still receive prepared text and cannot import execution state. ADR 0014, negative imports and wheel requirements preserve that boundary. No dependency is added.
+
+For #37, `investigation.workflow` owns phases, input/authority checks, bounded selection and publication contracts; `workflow_prompt` holds TRACE-owned static instructions. The private SQLite workflow/schema adapters persist scoped artifacts and active-attempt transitions; bootstrap selects them. Scripts/tests contain explicitly hand-authored offline models/reviews, excluded from the wheel. Model transports cannot import workflow/state or reach tool/publisher handles. ADR 0016 and checker/wheel negatives record that boundary without a new dependency.

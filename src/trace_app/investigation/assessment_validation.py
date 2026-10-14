@@ -330,6 +330,12 @@ class AssessmentValidator:
                 return pending
         return "supported"
 
+    def recheck_support(self, scope: ProviderScope, tasks: list[dict[str, Any]]) -> str:
+        """Current review decisions for already validated, locally retained bindings."""
+        if scope != self._context.scope or len(tasks) > 101:
+            raise AssessmentBoundaryError("review_denied")
+        return self._support(scope, tasks)
+
     def validate(
         self, response: ProtectedModelResponse, scope: ProviderScope
     ) -> AssessmentValidation:

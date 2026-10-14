@@ -18,6 +18,7 @@ from trace_app.adapters.models.journal import ModelPricing, SqliteProviderJourna
 from trace_app.adapters.models.process import ProcessModelProvider
 from trace_app.adapters.retrieval.exact_scoring import LocalExactScorer
 from trace_app.adapters.storage.sqlite.execution import SqliteExecutionLedger
+from trace_app.adapters.storage.sqlite.workflow import SQLiteWorkflowStore
 from trace_app.adapters.tools.local import (
     LocalToolBackend,
     LocalToolSources,
@@ -53,6 +54,7 @@ from trace_app.investigation.provider_policy import (
     ProviderScope,
 )
 from trace_app.investigation.tools import ToolPolicy, ToolScope, ToolSession
+from trace_app.investigation.workflow import BoundedInvestigation, WorkflowOptions
 from trace_app.knowledge.index import IndexGeneration
 from trace_app.knowledge.ports import CorpusReader, Encoder
 from trace_app.knowledge.search import SearchService
@@ -200,6 +202,32 @@ def create_execution_session(
     """Bind shared limits to an existing active durable job; no transport/source grants."""
     return ExecutionSession(
         identity, policy, SqliteExecutionLedger(evidence_db), pricing, clock=clock
+    )
+
+
+def create_investigation_workflow(
+    *,
+    evidence_db: Path,
+    tools: ToolSession,
+    provider: PolicyModelProvider | None,
+    authority: EvidenceAuthority,
+    reviews: SupportReviewReader,
+    execution: ExecutionSession,
+    scope: ProviderScope,
+    options: WorkflowOptions = WorkflowOptions(),
+    clock: Callable[[], float] = time.time,
+) -> BoundedInvestigation:
+    """Explicit granted composition; no default source authority, model or reviewer."""
+    return BoundedInvestigation(
+        SQLiteWorkflowStore(evidence_db),
+        tools,
+        provider,
+        authority,
+        reviews,
+        execution,
+        scope,
+        options=options,
+        clock=clock,
     )
 
 
