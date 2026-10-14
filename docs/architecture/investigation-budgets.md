@@ -1,6 +1,6 @@
 # Shared investigation execution limits and usage records
 
-Scoped enabler [#36](https://github.com/krispykrits/TRACE/issues/36), following merged PR #52 / accepted #35. [ADR 0014](../adr/0014-durable-investigation-budgets.md) records the proposed durable admission decision. This supplies bounded model/tool interfaces for #37; an investigator loop, production mutation and operational source authority are outside this change.
+Scoped enabler [#36](https://github.com/krispykrits/TRACE/issues/36), submitted in [PR #53](https://github.com/krispykrits/TRACE/pull/53), following merged PR #52 / accepted #35. [ADR 0014](../adr/0014-durable-investigation-budgets.md) records the proposed durable admission decision. This supplies bounded model/tool interfaces for #37; an investigator loop, production mutation and operational source authority are outside this change.
 
 ## Configuration and composition
 
@@ -61,4 +61,4 @@ make check lint format-check type-check architecture-check test integration pack
 
 `test_shared_counts_are_durable_and_exhaustion_stops_both_ports` gathers once, receives one response, exhausts the model quota and confirms neither port dispatches again. `test_late_model_reply_is_accounted_and_never_released_or_retried` advances an injected clock, withholds the response and inspects retained token/cost/correlation records. Unknown/partial/zero usage, retries/corrections, sensitive identifier/log redaction, authorization/cancellation/lease revocation and persistence/concurrency/schema migration have independent assertions. The integration cases use actual SQLite, a real read-only tool worker and a fake admitted provider; no network, credentials or paid call is used. Earlier #34's synthetic Azure check remains separate evidence, and no new live check or operational acceptance is claimed.
 
-Local verification on 2026-10-14 passed all required syntax/lint/format/type/import/test/installed-wheel gates with 286 tests (44 unit, 76 contract, 166 integration). No paid call was performed. Owner acceptance remains the open #36 feature PR; #37 workflow and the release/operational gates remain separate.
+Local verification on 2026-10-14 passed all required syntax/lint/format/type/import/test/installed-wheel gates with 286 tests (44 unit, 76 contract, 166 integration). No paid call was performed. Owner acceptance remains open in PR #53; #37 workflow and the release/operational gates remain separate.

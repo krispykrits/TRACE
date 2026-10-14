@@ -1,6 +1,6 @@
 # ADR 0014: Durable shared investigation budgets
 
-- **Status:** Proposed in #36 for owner review
+- **Status:** Proposed in #36 / [PR #53](https://github.com/krispykrits/TRACE/pull/53) for owner review
 - **Date:** 2026-10-14 (America/New_York)
 - **Scope:** Local MVP read-only execution enabler; workflow integration remains #37
 
