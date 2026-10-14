@@ -17,6 +17,7 @@ from trace_app.adapters.models.azure import (
 from trace_app.adapters.models.journal import ModelPricing, SqliteProviderJournal
 from trace_app.adapters.models.process import ProcessModelProvider
 from trace_app.adapters.retrieval.exact_scoring import LocalExactScorer
+from trace_app.adapters.storage.sqlite.execution import SqliteExecutionLedger
 from trace_app.adapters.tools.local import (
     LocalToolBackend,
     LocalToolSources,
@@ -34,6 +35,11 @@ from trace_app.investigation.assessment_validation import (
     SupportReviewReader,
 )
 from trace_app.investigation.bundle import EvidencePackage
+from trace_app.investigation.execution import (
+    ExecutionIdentity,
+    ExecutionPolicy,
+    ExecutionSession,
+)
 from trace_app.investigation.provider import (
     AdmissionGuard,
     ModelCapabilities,
@@ -81,6 +87,7 @@ def create_azure_model_provider(
     monthly_limit_nusd: int,
     initial_spend_nusd: int,
     read_clock: Callable[[], float] = time.time,
+    execution: ExecutionSession | None = None,
 ) -> PolicyModelProvider:
     """Explicit, policy-gated composition; a missing source authority never defaults."""
     guard = AdmissionGuard(secrets.token_bytes(32), read_clock)
@@ -101,6 +108,10 @@ def create_azure_model_provider(
         initial_spend_nusd=initial_spend_nusd,
         now=read_clock(),
     )
+    if execution is not None and execution.pricing != journal.pricing:
+        raise ValueError(
+            "Execution and monthly journals require the same pricing snapshot."
+        )
     return PolicyModelProvider(
         settings.configuration(),
         process,
@@ -111,6 +122,7 @@ def create_azure_model_provider(
         prompts,
         known_secrets=(api_key,),
         read_clock=read_clock,
+        execution=execution,
     )
 
 
@@ -125,6 +137,7 @@ def create_azure_model_provider_from_files(
     monthly_limit_nusd: int,
     initial_spend_nusd: int,
     read_clock: Callable[[], float] = time.time,
+    execution: ExecutionSession | None = None,
 ) -> PolicyModelProvider:
     """Load explicit private files and return only the gated application interface."""
     settings, api_key = load_azure_settings(setup_path, secrets_path)
@@ -138,6 +151,7 @@ def create_azure_model_provider_from_files(
         monthly_limit_nusd=monthly_limit_nusd,
         initial_spend_nusd=initial_spend_nusd,
         read_clock=read_clock,
+        execution=execution,
     )
 
 
@@ -162,6 +176,7 @@ def create_tool_session(
     scope: ToolScope,
     policy: ToolPolicy = ToolPolicy(),
     read_clock: Callable[[], datetime] | None = None,
+    execution: ExecutionSession | None = None,
 ) -> ToolSession:
     return ToolSession(
         LocalToolBackend(
@@ -170,6 +185,21 @@ def create_tool_session(
         scope,
         LoggingToolAudit(),
         policy,
+        execution=execution,
+    )
+
+
+def create_execution_session(
+    *,
+    evidence_db: Path,
+    identity: ExecutionIdentity,
+    pricing: ModelPricing,
+    policy: ExecutionPolicy = ExecutionPolicy(),
+    clock: Callable[[], float] = time.time,
+) -> ExecutionSession:
+    """Bind shared limits to an existing active durable job; no transport/source grants."""
+    return ExecutionSession(
+        identity, policy, SqliteExecutionLedger(evidence_db), pricing, clock=clock
     )
 
 

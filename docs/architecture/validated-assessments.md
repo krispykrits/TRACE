@@ -1,6 +1,6 @@
 # Validated assessments and cited support
 
-Scoped story [#35](https://github.com/krispykrits/TRACE/issues/35), submitted in [PR #52](https://github.com/krispykrits/TRACE/pull/52), following accepted #34 / merged PR #51. [ADR 0013](../adr/0013-assessment-validation-and-support-review.md) records the proposed acceptance policy. This implements a validation/use-case boundary for hand-authored or generated reports; the investigator loop and inspection UI remain #37/#38.
+Scoped story [#35](https://github.com/krispykrits/TRACE/issues/35), merged in [PR #52](https://github.com/krispykrits/TRACE/pull/52), following accepted #34 / merged PR #51. [ADR 0013](../adr/0013-assessment-validation-and-support-review.md) records the accepted Local MVP acceptance policy. This implements a validation/use-case boundary for hand-authored or generated reports; the investigator loop and inspection UI remain #37/#38.
 
 ## Versioned schema
 
@@ -51,7 +51,7 @@ The independent `SupportReviewReader` supplies current decisions with claim/bind
 
 `handle.read(scope)` exposes accepted content only after fresh provider/source/review checks. It preserves source identity/revision and observed/collected timestamps in the observed timeline. `handle.export(scope)` also requires current original transmission permission. The most sensitive original input classification survives redaction and summarization; changing the viewer/scope or forging a different backing response does not grant access. Source permission is checked again after review reads to prevent a review-time revocation from releasing content.
 
-No read/check/review executes a recommended tool or production mutation. `next_check` is a bounded proposal, not an execution authorization. Tool/model budgets, correction accounting and durable workflow state remain #36/#37. Operator authentication, review persistence, retention/deletion and UI/export enforcement remain #38/production gates. Plain dictionaries already read by an authorized caller cannot be retroactively erased; application composition/filesystem are trusted, not an arbitrary-Python sandbox.
+No read/check/review executes a recommended tool or production mutation. `next_check` is a bounded proposal, not an execution authorization. The [shared execution policy](investigation-budgets.md) implements #36 budgets and correction accounting; durable workflow orchestration remains #37. Operator authentication, review persistence, retention/deletion and UI/export enforcement remain #38/production gates. Plain dictionaries already read by an authorized caller cannot be retroactively erased; application composition/filesystem are trusted, not an arbitrary-Python sandbox.
 
 ## Reproduction and evidence
 

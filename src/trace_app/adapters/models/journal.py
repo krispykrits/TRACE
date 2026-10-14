@@ -7,7 +7,6 @@ import os
 import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -16,33 +15,10 @@ from trace_app.investigation.provider import (
     ModelProviderError,
     ModelUsage,
 )
+from trace_app.investigation.provider import (
+    ModelPricing as ModelPricing,
+)
 from trace_app.investigation.provider_policy import Redaction
-
-
-@dataclass(frozen=True, slots=True)
-class ModelPricing:
-    """Versioned USD nanodollar estimates; cached input receives no discount."""
-
-    version: str
-    input_nusd_per_token: int
-    output_nusd_per_token: int
-
-    def __post_init__(self) -> None:
-        if (
-            not self.version
-            or len(self.version) > 128
-            or any(
-                type(value) is not int or value <= 0
-                for value in (self.input_nusd_per_token, self.output_nusd_per_token)
-            )
-        ):
-            raise ModelProviderError(ModelErrorCode.CONFIGURATION)
-
-    def estimate(self, input_tokens: int, output_tokens: int) -> int:
-        return (
-            input_tokens * self.input_nusd_per_token
-            + output_tokens * self.output_nusd_per_token
-        )
 
 
 def _month(now: float) -> str:
@@ -51,6 +27,10 @@ def _month(now: float) -> str:
 
 class SqliteProviderJournal:
     """All instances sharing this file reserve atomically; external spend is separate."""
+
+    @property
+    def pricing(self) -> ModelPricing:
+        return self._pricing
 
     def __init__(
         self,
@@ -158,12 +138,14 @@ class SqliteProviderJournal:
                     "SELECT initial_nusd FROM months WHERE month=?", (month,)
                 ).fetchone()[0]
                 uncertain = connection.execute(
-                    "SELECT 1 FROM attempts WHERE scope_id=? AND (outcome='reserved' OR (dispatched=1 AND outcome IN (?, ?, ?))) LIMIT 1",
+                    "SELECT 1 FROM attempts WHERE scope_id=? AND (outcome='reserved' OR (dispatched=1 AND outcome IN (?, ?, ?, ?, ?))) LIMIT 1",
                     (
                         metadata["scope_id"],
                         ModelErrorCode.TIMEOUT.value,
                         ModelErrorCode.AUDIT.value,
                         ModelErrorCode.DEPENDENCY.value,
+                        ModelErrorCode.CANCELLED.value,
+                        ModelErrorCode.EXPIRED.value,
                     ),
                 ).fetchone()
                 if uncertain or used + initial + reservation > self._limit:
@@ -177,7 +159,14 @@ class SqliteProviderJournal:
                         reservation,
                         reservation,
                         "reserved",
-                        json.dumps(metadata, allow_nan=False),
+                        json.dumps(
+                            {
+                                **metadata,
+                                "input_allowance": input_allowance,
+                                "output_allowance": output_allowance,
+                            },
+                            allow_nan=False,
+                        ),
                         0,
                     ),
                 )
@@ -204,7 +193,7 @@ class SqliteProviderJournal:
             with self._connect() as connection:
                 connection.execute("BEGIN IMMEDIATE")
                 previous = connection.execute(
-                    "SELECT allowance_nusd FROM attempts WHERE request_id=?",
+                    "SELECT allowance_nusd,metadata FROM attempts WHERE request_id=?",
                     (metadata["request_id"],),
                 ).fetchone()
                 estimate = None
@@ -221,7 +210,33 @@ class SqliteProviderJournal:
                     if dispatched and previous
                     else 0
                 )
+                allowance_metadata = json.loads(previous[1]) if previous else {}
+                if dispatched and previous and estimate is None:
+                    if (
+                        "input_allowance" in allowance_metadata
+                        and "output_allowance" in allowance_metadata
+                    ):
+                        charge = self._pricing.estimate(
+                            usage.input_tokens
+                            if usage.input_tokens is not None
+                            else allowance_metadata["input_allowance"],
+                            usage.output_tokens
+                            if usage.output_tokens is not None
+                            else allowance_metadata["output_allowance"],
+                        )
+                    else:
+                        # Historical records lack dimension allowances: preserve them conservatively.
+                        charge = previous[0] + self._pricing.estimate(
+                            usage.input_tokens or 0, usage.output_tokens or 0
+                        )
                 enriched = {
+                    **{
+                        name: allowance_metadata[name]
+                        for name in ("input_allowance", "output_allowance")
+                        if name in allowance_metadata
+                    },
+                    "cost_kind": "estimate",
+                    "usage_basis": "provider_reported",
                     **metadata,
                     "pricing_version": self._pricing.version,
                     "currency": "USD",

@@ -23,6 +23,8 @@ _TOKEN_METRICS = frozenset(
         "total_tokens",
         "cached_tokens",
         "reasoning_tokens",
+        "charged_tokens",
+        "call_charged_tokens",
     }
 )
 _CORRELATION_ID: contextvars.ContextVar[str | None] = contextvars.ContextVar(

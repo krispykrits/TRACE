@@ -141,7 +141,7 @@ class SQLiteStoreTests(unittest.TestCase):
                     entry,
                 )
         with sqlite3.connect(self.path) as database:
-            self.assertEqual(database.execute("PRAGMA user_version").fetchone()[0], 1)
+            self.assertEqual(database.execute("PRAGMA user_version").fetchone()[0], 2)
 
     def test_duplicate_submission_and_collection_time_policy(self) -> None:
         expiry = "2026-10-06T00:00:00Z"
