@@ -386,6 +386,17 @@ class ExecutionSession:
                     else state.last_tool_outcome
                 ) not in (None, *_SUCCESS):
                     reason = reason or "retry_or_correction_required"
+                elif (
+                    state.active is None
+                    and (
+                        state.last_model_outcome
+                        if kind == "model"
+                        else state.last_tool_outcome
+                    )
+                    is None
+                    and (state.model_calls if kind == "model" else state.tool_calls) > 1
+                ):
+                    reason = reason or "previous_outcome_unknown"
                 if exhausted:
                     state.stop_reason = state.stop_reason or "budget_exhausted"
                     reason = state.stop_reason
