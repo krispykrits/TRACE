@@ -6,6 +6,14 @@ Last refreshed: 2026-10-14
 
 The owner-approved MVP-first plan and production-usefulness amendment are recorded in [the roadmap](planning/capstone-project-plan.md). The owner also approved [real production remediation](planning/production-remediation-scope.md) as a final-capstone requirement; only the initial investigation releases are read-only. Sprint numbers describe scope increments, not dated commitments. See [the charter](charter.md) for product gates and unresolved owner inputs.
 
+## .NET monitored testbed — 2026-10-14
+
+Owner approved lightweight .NET Order/Payment services, exported JSON first then live Azure queries, and the owner (`krispykrits`) as service owner/initial investigating engineer. [ADR 0017](adr/0017-dotnet-testbed-and-json-first-evidence.md) and [planning #69](https://github.com/krispykrits/TRACE/issues/69) record the direction.
+
+[Seven implementation stories](planning/dotnet-testbed-backlog.md) refine existing S7-S9: #70 local services; #71 telemetry/export; #72 bounded controlled recordings; #73 protected JSON import; #74 AKS workload hosting/telemetry; #75 scoped live Azure queries; #76 manual-versus-TRACE replay/shadow comparison. TRACE stays one Python application; future monitored workload source belongs under `testbed/dotnet/`, outside the runtime wheel. Existing synthetic/frozen acceptance artifacts retain their recorded identities.
+
+Main `6ad2bd3` contains the merged bounded investigator; #38/#39 still supply the CLI/scoring handoff and #63-#68 the Local MVP gate. Naming the owner resolves the testbed role input. Source field/retention, exact Azure resources/region/infrastructure budget, independent review and usefulness thresholds/live evidence remain explicit gates. Generated incidents are controlled-testbed evidence; independent Operational Pilot and real production-remediation acceptance remain separate. This records update creates no .NET/Python code, dependency, cloud resource, paid call or fault execution.
+
 ## Azure AKS cloud direction — 2026-10-14
 
 Owner selected Azure instead of AWS and containers on AKS, then authorized documentation/backlog updates in #54. [ADR 0015](adr/0015-azure-aks-cloud-deployment.md) replaces EC2, RDS hosting and CloudWatch while retaining Terraform, Local SQLite, PostgreSQL/pgvector and the modular application. [Cloud architecture](architecture/azure-cloud.md) records the planned ACR, Azure PostgreSQL, Entra Workload Identity/Key Vault and Monitor/Log Analytics boundaries.

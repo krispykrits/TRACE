@@ -39,3 +39,7 @@ The owner explicitly requested replacement of AWS sprint titles/goals on 2026-10
 ## Historical work and platform replacement
 
 Historical #1/#3/#6/#10/#16/#29 retain their earlier local/decision acceptance and state. Their AWS-hosting directions are superseded by ADR 0015 and these cloud stories. In particular #3's closed state is not CloudWatch hosted-delivery evidence; Azure logging acceptance belongs to #59. The legacy deploy/cloudwatch example is historical and not the Azure deployment path. Existing Local MVP boundaries and final Operational Pilot/remediation gates remain in force.
+
+## .NET monitored workload addition — 2026-10-14
+
+The owner approved lightweight .NET Order/Payment services, exported JSON first then live Azure queries, and the owner as service owner/initial investigating engineer. [ADR 0017](../adr/0017-dotnet-testbed-and-json-first-evidence.md) and [the testbed backlog](dotnet-testbed-backlog.md) refine S7 #69-#72, S8 #73-#75 and S9 #76 alongside the existing cloud work. Keep TRACE one Python application and preserve frozen Local MVP evidence. The new track owns monitored workload telemetry and protected source ingestion; #59 remains TRACE's own observability acceptance. Native milestones stay undated; resize capacity and keep exact field/retention/access, infrastructure spending and usefulness/review thresholds explicit. Generated-fault replay/shadow findings remain controlled-testbed evidence, with independent Operational Pilot and production-remediation gates retained.

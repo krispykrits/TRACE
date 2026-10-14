@@ -24,6 +24,7 @@ TRACE is an incident intelligence and controlled-response platform. The initial 
 - Read detailed planning/review documents when they apply to the task, rather than loading every project document for unrelated edits.
 - For future cloud work use [Azure architecture](docs/architecture/azure-cloud.md), ADR 0015 and #55-#60. Keep the modular application; containerization does not authorize microservices, public API/UI, a broker or autonomous loops. Use scoped pod Workload Identity, shared durable state/spending reservations and intentional image-digest promotion; pod retries cannot bypass application admission. Preserve source/transmission/citation/review boundaries and keep infrastructure cost separate from the $20/month model cap. Require measured design, owner inputs and reviewed Terraform plan before any apply.
 
+- The owner approved the [independent .NET testbed](docs/adr/0017-dotnet-testbed-and-json-first-evidence.md), JSON-first then live Azure source queries, and the project owner as service owner/initial investigator on 2026-10-14. Follow [#69-#76](docs/planning/dotnet-testbed-backlog.md): monitored workload source under `testbed/dotnet/` when implemented, separate .NET CI, no Python runtime dependency or wheel content. Preserve evaluator isolation, current source/transmission/citation/review protections, bounded fault/workload/query controls and honest controlled-testbed claims; role confirmation does not imply completed access/retention/threshold gates.
 
 ## Coding and design practices
 

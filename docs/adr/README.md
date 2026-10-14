@@ -20,6 +20,7 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0014](0014-durable-investigation-budgets.md) | Shared durable model/tool admission, usage reservations and content-free cost estimates | Accepted in #36 / merged PR #53 for the Local MVP enabler; distributed cloud admission remains #57 acceptance |
 | [0015](0015-azure-aks-cloud-deployment.md) | Azure/containers/AKS, shared PostgreSQL/pgvector, Workload Identity and Azure telemetry | Owner-selected direction; #55-#60 design/implementation/acceptance pending |
 | [0016](0016-bounded-investigation-and-private-publication.md) | Fixed evidence-first workflow, complete repeated admission and private atomic publication | Proposed in #37; operational inspection remains #38 |
+| [0017](0017-dotnet-testbed-and-json-first-evidence.md) | Independent .NET Order/Payment testbed, JSON-first then live Azure source ingestion and owner-led investigation | Accepted owner direction; #69-#76 implementation/usefulness pending |
 
 ## Open decision register
 
@@ -30,7 +31,7 @@ These are gates, not inferred decisions. The [charter](../charter.md) is the ful
 | Input | Owner and gate | Current effect |
 | --- | --- | --- |
 | University rubric/deadline and weekly capacity/sprint length | Project owner, before calendar or scope commitment | Sprint numbers are increments, not dates |
-| Pilot operator/team, service, data-access owner and source permission | Project owner and source owner, before replay or shadow use | Operational Pilot remains unvalidated |
+| Pilot operator/team, service, data-access owner and source permission | Owner is confirmed .NET testbed service owner/initial investigator under ADR 0017; exact source/transmission/retention precede ingestion or shadow use | Planned Order/Payment JSON-first track is #69-#76; controlled-testbed and broader Operational Pilot usefulness remain unvalidated |
 | Runtime additions, model/provider and source adapters | Project team, when a specific capability is designed and evaluated | Numerical/lexical dependencies and optional local encoder accepted in [ADR 0009](0009-local-exact-knowledge-retrieval.md); Azure AI Foundry / GPT-6 Luna and $20/month model cap selected in [ADR 0012](0012-model-provider-contract-and-bounded-call.md); Azure adapter/live synthetic contract accepted in #34; operational source/identity/retention gates remain open |
 | Shared Azure PostgreSQL sizing/migration/roles/admission | Project team and account owner, S7–S9/#55/#57 | Local SQLite is implemented under ADR 0005; [ADR 0015](0015-azure-aks-cloud-deployment.md) selects the Azure hosting baseline; shared migration/concurrency/restore acceptance remains pending |
 | Vector index, embedding versions and retrieval limits | Project team and owner, #16 then S7–S9 | ADR 0006 retains PostgreSQL/pgvector semantics with Azure hosting in [ADR 0015](0015-azure-aks-cloud-deployment.md); [ADR 0009](0009-local-exact-knowledge-retrieval.md) records the accepted local baseline; cloud extension/rebuild/citation acceptance remains #57 |
