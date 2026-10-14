@@ -15,7 +15,7 @@ Keep the fixed catalog, typed arguments, trusted scope, quota/result contracts a
 
 Enforce one active worker per session, a bounded attempt count and monotonic total/call deadlines outside prompts. Count malformed and concurrent denied calls. Kill/reap an overdue worker and discard late output; no retries or fallback. Keep original source records/quotes, current authorized citation revalidation and whole-item loss diagnostics within bounded JSON payloads. Emit metadata-only audit through the existing logger; fail closed when the audit sink raises. Use no new dependencies, provider calls, semantic default or cloud resource.
 
-The worker is not an OS privilege/filesystem sandbox and the timing bounds are not a hard real-time SLA. Deployment must protect configured source files, supply current authenticated grants, retain the real clock, configure logging and use least-privilege operational adapters when introduced. Real-source redaction and hosted CloudWatch delivery remain separate gates. Investigation assessment review never authorizes production mutation; the deterministic remediation executor remains separate.
+The worker is not an OS privilege/filesystem sandbox and the timing bounds are not a hard real-time SLA. Deployment must protect configured source files, supply current authenticated grants, retain the real clock, configure logging and use least-privilege operational adapters when introduced. Real-source redaction and hosted Azure Monitor delivery remain separate gates. Investigation assessment review never authorizes production mutation; the deterministic remediation executor remains separate.
 
 ## Alternatives and consequences
 

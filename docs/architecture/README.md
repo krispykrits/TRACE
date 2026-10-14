@@ -23,14 +23,14 @@ flowchart LR
     ContextDemo[Developer context CLI] --> Context[Bounded quoted context]
     Context --> Search
     Context --> Corpus
-    Log -. planned EC2 collection .-> CW[CloudWatch Logs]
+    Log -. planned AKS collection .-> CloudLogs["Azure Monitor Logs"]
     CLI -. later S3-S6 .-> Investigation[Read-only investigation]
     Investigation -. later source adapters .-> Sources[Authorized evidence sources]
     Investigation -. later report .-> User
     Approved[Exact action approval] -. final capstone only .-> Executor[Separate deterministic remediation executor]
 ```
 
-Solid arrows are implemented local behavior. Dotted arrows are planned boundaries or deployment work. [ADR 0001](../adr/0001-repository-runtime-and-local-tooling.md) selects one modular Python application; the current `src/trace_app` package contains CLI, configuration, structured logging and the synthetic Order workflow, dependency replay and SQLite snapshot/job-state adapter with in-process fixtures. [ADR 0002](../adr/0002-terraform-and-ec2-cloud-deployment.md) selects Terraform/EC2 for the Cloud MVP, and [ADR 0003](../adr/0003-cloudwatch-hosted-logging.md) selects hosted logging, but no EC2 runtime or hosted delivery is verified. No investigator, operational source adapter, generative model, HTTP API or remediation executor exists yet. The local [knowledge search](knowledge-retrieval.md) adapts Volume 4 lexical/semantic/hybrid baselines with a pinned optional cached embedding model. The SQLite adapter persists local synthetic snapshots and execution state; it is not a real-source integration. [ADR 0004](../adr/0004-synchronous-synthetic-order-workflow.md) records the synchronous demo boundary.
+Solid arrows are implemented local behavior. Dotted arrows are planned boundaries or deployment work. [ADR 0001](../adr/0001-repository-runtime-and-local-tooling.md) selects one modular Python application; the current `src/trace_app` package contains CLI, configuration, structured logging and the synthetic Order workflow, dependency replay and SQLite snapshot/job-state adapter with in-process fixtures. [ADR 0015](../adr/0015-azure-aks-cloud-deployment.md) selects Terraform-managed Azure/container/AKS cloud delivery and Azure telemetry; exact resources, shared-state migration and hosted acceptance remain #55-#60 gates. The Azure native model connector is accepted through #34 / PR #51; no complete investigator workflow, operational source adapter, HTTP API or remediation executor is accepted yet. The local [knowledge search](knowledge-retrieval.md) adapts Volume 4 lexical/semantic/hybrid baselines with a pinned optional cached embedding model. The SQLite adapter persists local synthetic snapshots and execution state; it is not a real-source integration. [ADR 0004](../adr/0004-synchronous-synthetic-order-workflow.md) records the synchronous demo boundary.
 
 The Local/Cloud MVP investigation remains read-only. The final capstone's [approved production remediation scope](../planning/production-remediation-scope.md) requires a separate deterministic executor with proposal-bound approval, state revalidation, bounded execution and outcome verification. A source filter or investigation access cannot grant mutation authority.
 
@@ -53,3 +53,5 @@ The [passage evaluation and context contract](retrieval-evaluation-context.md) r
 The [read-only tool catalog](investigation-tools.md) describes #18 typed schemas, trusted authorization, externally enforced bounds, worker termination, partial/error outcomes and audit; [ADR 0011](../adr/0011-read-only-tool-execution.md) records the execution boundary.
 
 The [scripted evidence package](scripted-evidence-package.md) composes scoped reads, observed timelines and revalidated knowledge references for the #19 Sprint 4 gate; [review and Sprint 5 handoff](../sprints/sprint-04-review.md) keep development, provider, operational and remediation acceptance separate.
+
+The [Azure cloud architecture](azure-cloud.md) records the planned container/registry, Workload Identity, shared-state/admission, telemetry and release boundaries. Historical AWS ADRs are superseded; current local contracts and evaluator/source isolation remain in force.

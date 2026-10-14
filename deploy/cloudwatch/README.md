@@ -1,5 +1,7 @@
 # TRACE hosted application logs
 
+> **Superseded historical preparation — 2026-10-14.** The owner selected Azure/container/AKS in [ADR 0015](../../docs/adr/0015-azure-aks-cloud-deployment.md). This AWS example is retained for decision history, not as TRACE's active deployment path. Do not use its account/region, retention, budget or apply commands as Azure authorization. Current hosted collection/acceptance is #59 under [cloud responsibilities](../README.md).
+
 CloudWatch Logs is the owner-selected hosted platform; see [ADR 0003](../../docs/adr/0003-cloudwatch-hosted-logging.md). This directory supplies a collection example, not deployed infrastructure. Do not apply the example unchanged.
 
 ## Before activation

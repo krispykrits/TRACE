@@ -1,6 +1,8 @@
 # ADR 0003: Amazon CloudWatch Logs for hosted application logging
 
-- **Status:** Accepted platform selection by the owner, 2026-09-24; deployment pending.
+> Historical decision text is retained below. For current Azure/AKS deployment, shared-state and hosted-observability work follow [ADR 0015](0015-azure-aks-cloud-deployment.md) and [#55-#60](../planning/azure-cloud-backlog.md). The old AWS settings are not Azure configuration or acceptance evidence.
+
+- **Status:** Superseded logging platform by [ADR 0015](0015-azure-aks-cloud-deployment.md), 2026-10-14; historical hosted acceptance never established
 - **Context:** The owner wants a hosted logging platform. Terraform and EC2 are already the approved cloud direction. Console-only logging does not satisfy hosted acceptance.
 - **Decision:** Use Amazon CloudWatch Logs for TRACE application logs and Logs Insights for search. Keep Python standard-library logging, structured JSON and redaction in the application. Use the managed CloudWatch agent on EC2 for delivery; do not implement a custom log transport, storage or search platform.
 - **Boundary:** Application JSON stderr → deployment-managed local file → CloudWatch agent → environment-specific CloudWatch log group. The EC2 launch/service wrapper must capture stderr into the configured file; the agent does not automatically collect arbitrary process stderr. Select and test log rotation, file permissions and agent checkpoint persistence during deployment.
