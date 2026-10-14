@@ -151,3 +151,7 @@ The [evaluation contract](architecture/development-evaluation.md) defines metric
 ## Passage evaluation and context demonstration
 
 `uv run --locked python scripts/demo_context.py --query "PAYMENT_TIMEOUT evidence" --max-passages 1` demonstrates whole-passage omissions and resolvable source mappings. `uv run --locked python -m evaluation.retrieval_quality --modes lexical --output /tmp/trace-passage-review.json` scores 100 evaluator-only development requests without an encoder. Follow the [protocol, review bundle and reproduction instructions](architecture/retrieval-evaluation-context.md) for real-model comparison, model-free rescoring and the owner's pending human review. Acceptance cannot run until those decisions are recorded; the saved thresholds precede measurement.
+
+## Validated assessment examples
+
+The [#35 assessment guide](architecture/validated-assessments.md) documents `assessment.v2`, version-1 scoring projection, current evidence/knowledge checks and private scoped review packets. Run `uv run --locked python -m unittest tests.unit.test_assessment_schema tests.contracts.test_assessment_validation tests.integration.test_assessments -v` for hand-authored answerable/insufficient examples and valid-but-nonsupporting citations. The support decisions are synthetic fixtures; unreviewed runtime proposals remain `review_required`. No live service/key or new paid check is used. Assessment logs include correlated request/scope IDs and validation/support outcomes without report/citation content. The full required quality/wheel gates still apply.

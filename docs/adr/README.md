@@ -15,7 +15,9 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0009](0009-local-exact-knowledge-retrieval.md) | Pinned optional CPU embeddings, exact retrieval and development-selected lexical default | Accepted with merged issue #16 implementation |
 | [0010](0010-capability-packages-and-adapter-boundaries.md) | Capability packages, adapters/composition and automatic import/wheel verification | Accepted in #46 / PR #47 |
 | [0011](0011-read-only-tool-execution.md) | Fixed read-only tool catalog, readonly sources and deadline-isolated execution | Accepted in #18 / PR #48 |
-| [0012](0012-model-provider-contract-and-bounded-call.md) | Provider-neutral model contract and bounded execution; Azure AI Foundry / GPT-6 Luna and per-request transmission controls | Process boundary proposed in #34/#50; owner selected model/platform, $20/month cap and policy/production requirements; deployment/enforcement/live acceptance pending |
+| [0012](0012-model-provider-contract-and-bounded-call.md) | Provider-neutral model contract and bounded execution; Azure AI Foundry / GPT-6 Luna and per-request transmission controls | Accepted for Local MVP synthetic provider use after #34 closure / merged PR #51; operational source/identity/retention gates remain separate |
+
+| [0013](0013-assessment-validation-and-support-review.md) | Strict v2 assessments, current citations and independent protected support review | Proposed in #35; frozen v1 scoring remains unchanged |
 
 ## Open decision register
 
@@ -27,10 +29,10 @@ These are gates, not inferred decisions. The [charter](../charter.md) is the ful
 | --- | --- | --- |
 | University rubric/deadline and weekly capacity/sprint length | Project owner, before calendar or scope commitment | Sprint numbers are increments, not dates |
 | Pilot operator/team, service, data-access owner and source permission | Project owner and source owner, before replay or shadow use | Operational Pilot remains unvalidated |
-| Runtime additions, model/provider and source adapters | Project team, when a specific capability is designed and evaluated | Numerical/lexical dependencies and optional local encoder accepted in [ADR 0009](0009-local-exact-knowledge-retrieval.md); Azure AI Foundry / GPT-6 Luna and $20/month model cap selected in [ADR 0012](0012-model-provider-contract-and-bounded-call.md); API/adapter and deployment configuration pending |
+| Runtime additions, model/provider and source adapters | Project team, when a specific capability is designed and evaluated | Numerical/lexical dependencies and optional local encoder accepted in [ADR 0009](0009-local-exact-knowledge-retrieval.md); Azure AI Foundry / GPT-6 Luna and $20/month model cap selected in [ADR 0012](0012-model-provider-contract-and-bounded-call.md); Azure adapter/live synthetic contract accepted in #34; operational source/identity/retention gates remain open |
 | SQLite schema and RDS sizing/migration/roles | Project team and account owner, #10 then S7–S9 | Products selected in [ADR 0005](0005-sqlite-local-postgresql-rds-cloud.md); implementation and acceptance pending |
 | Vector index, embedding versions and retrieval limits | Project team and owner, #16 then S7–S9 | [ADR 0006](0006-pgvector-cloud-retrieval-storage.md) selects pgvector on RDS; [ADR 0009](0009-local-exact-knowledge-retrieval.md) records the accepted measured local baseline and embedding/index details; cloud migration remains gated |
-| AWS/model spending constraints and measured workload | Project owner and relevant reviewer, before paid evaluation or provisioning | Model cap is $20/month through Azure AI Foundry; AWS budget and remaining model access/retention/enforcement/spend controls are open; no TRACE live acceptance or paid experiment is evidenced |
+| AWS/model spending constraints and measured workload | Project owner and relevant reviewer, before paid evaluation or provisioning | Model cap is $20/month through Azure AI Foundry; TRACE-local model reservations/usage estimates and a synthetic live contract are accepted in #34; account-wide billing, operational retention and AWS budget remain separate |
 | EC2 topology, identity, Terraform state and application release/recovery | Project team and account owner, S7/S8 after budget/workload inputs | See [ADR 0002](0002-terraform-and-ec2-cloud-deployment.md) |
 | CloudWatch alert recipient, target host and deployment role | Project owner/account owner, before hosted logging deployment | See [ADR 0003](0003-cloudwatch-hosted-logging.md) |
 | Production action/target, service owner and approver | Project owner and service owner, before action-specific design and execution | No standing mutation permission; see [approved scope](../planning/production-remediation-scope.md) |

@@ -231,6 +231,29 @@ class _Dependency:
     fingerprint: str = field(repr=False)
 
 
+@dataclass(frozen=True, slots=True)
+class ProviderCitationView:
+    """The exact admitted projection and value-free local redaction provenance."""
+
+    citation_id: str
+    source_id: str
+    source_revision: str
+    sensitivity: Sensitivity
+    _fields_json: str = field(repr=False)
+    redactions: tuple[Redaction, ...] = ()
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "citation_id": self.citation_id,
+            "source_id": self.source_id,
+            "source_revision": self.source_revision,
+            "sensitivity": self.sensitivity.name.lower(),
+            "fields": json.loads(self._fields_json),
+            "redactions": [item.to_dict() for item in self.redactions],
+            "policy_version": PROVIDER_POLICY_VERSION,
+        }
+
+
 @dataclass(frozen=True, slots=True, weakref_slot=True)
 class ProtectedModelResponse:
     """Content reads, exports and later reuse revalidate original input access."""
@@ -240,6 +263,7 @@ class ProtectedModelResponse:
     _dependencies: tuple[_Dependency, ...] = field(repr=False)
     sensitivity: Sensitivity
     _owner: PolicyModelProvider = field(repr=False)
+    _views: tuple[ProviderCitationView, ...] = field(default=(), repr=False)
 
     def metadata(self) -> dict[str, object]:
         return {
@@ -256,6 +280,10 @@ class ProtectedModelResponse:
     def export(self, scope: ProviderScope) -> dict[str, object]:
         self._owner.revalidate(self._dependencies, transmission=True)
         return self.structured_response(scope)
+
+    def citation_views(self, scope: ProviderScope) -> tuple[ProviderCitationView, ...]:
+        self.structured_response(scope)
+        return self._views
 
 
 class PolicyModelProvider:
@@ -461,6 +489,7 @@ class PolicyModelProvider:
             records: list[dict[str, object]] = []
             dependencies: dict[str, _Dependency] = {}
             redactions: list[Redaction] = []
+            views: dict[str, ProviderCitationView] = {}
             sensitivity = Sensitivity.PUBLIC
             expiry = self._clock() + call.bounds.timeout_ms / 1000
             for selection in call.evidence:
@@ -478,6 +507,7 @@ class PolicyModelProvider:
                         item.reviewed is not True
                         or not isinstance(item.sensitivity, Sensitivity)
                         or item.sensitivity >= Sensitivity.UNKNOWN
+                        or self._sensitive_text(item.name)
                         or _EVALUATOR.search(item.name)
                     ):
                         _deny()
@@ -529,6 +559,18 @@ class PolicyModelProvider:
                 dependencies[record.evidence_id] = _Dependency(
                     selection, self._fingerprint(record)
                 )
+                views[record.evidence_id] = ProviderCitationView(
+                    record.evidence_id,
+                    record.source_id,
+                    record.revision,
+                    sensitivity,
+                    json.dumps(selected, allow_nan=False),
+                    tuple(
+                        item
+                        for item in redactions
+                        if item.evidence_id == record.evidence_id
+                    ),
+                )
                 expiry = min(expiry, record.expires_at)
                 records.append(
                     {
@@ -548,6 +590,10 @@ class PolicyModelProvider:
                     _deny()
                 self.revalidate(prior._dependencies, transmission=True)
                 content = prior.structured_response(self._scope)
+                for view in prior.citation_views(self._scope):
+                    if view.citation_id in views and views[view.citation_id] != view:
+                        _deny()
+                    views[view.citation_id] = view
                 self._output_safe(content)
                 for dependency in prior._dependencies:
                     previous = dependencies.get(dependency.selection.evidence_id)
@@ -615,7 +661,12 @@ class PolicyModelProvider:
             self._output_safe(result.structured_response())
             metadata["outcome"] = "structured_response_received"
             response = ProtectedModelResponse(
-                result, self._scope, dependency_tuple, sensitivity, self
+                result,
+                self._scope,
+                dependency_tuple,
+                sensitivity,
+                self,
+                tuple(views.values()),
             )
             self._responses.add(response)
             return response
