@@ -15,6 +15,8 @@ The first command runs every case in the versioned [protocol](../../evaluation/i
 
 The second command verifies bounded artifact bytes, exact protocol, implementation/lock hashes and source revisions, then regenerates identical canonical scores without subprocesses, provider requests, tools or a source database. It requires the recorded source checkout. Different fresh executions have normal differing job/call IDs and measured wall times; deterministic rescoring means identical scores from the same saved artifacts.
 
+The first retained run is [investigator_offline_v1](../../evaluation/reports/investigator_offline_v1/manifest.json); its [Sprint 5 review](../sprints/sprint-05-review.md#demonstration-and-reproducibility) records measured results and open gates. Rescore it with `uv run --locked python -m evaluation.investigator rescore --run-dir evaluation/reports/investigator_offline_v1` at the manifest's implementation checkout.
+
 Exit 0 means the offline mechanical contract passed. Exit 1 means scoring finished but a planned outcome or critical boundary check failed; the complete report still includes every attempt. Exit 2 means invalid configuration/artifact/version/hash or execution/storage failure prevented a valid score bundle. `run --mode live` fails explicitly without a fixture fallback. No new live permission is inferred from this task.
 
 ## Predeclared cohort and gate

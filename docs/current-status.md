@@ -1,6 +1,6 @@
 # TRACE current status
 
-Updated: 2026-10-15 against #38 merge `71de366` / PR #82 and live Project Done; #39 implementation is in progress. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
+Updated: 2026-10-15 against #38 merge `71de366` / PR #82 and live Project Done; #39 has a verified offline run; implementation/support review is pending. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
 
 ## Implemented
 
@@ -14,7 +14,7 @@ Updated: 2026-10-15 against #38 merge `71de366` / PR #82 and live Project Done; 
 | Investigation use case | Bounded workflow and atomic private publication merged in [PR #62](https://github.com/krispykrits/TRACE/pull/62); offline demonstrations use hand-authored model/review records |
 | Planning decisions | Azure/AKS, independent .NET testbed/JSON-first ingestion and flexible ML/ranked responses accepted as direction in ADRs 0015, 0017 and 0018 |
 
-Merged [PR #82](https://github.com/krispykrits/TRACE/pull/82) provides captured-window CLI investigation, protected saved display/citation/export and cancellation with original dependency/clearance/retention and current support checks. #39 adds actual-output scoring, a declared ten-case offline protocol and bound independent review samples; its implementation/review evidence remains in the scoped PR. No new paid/live diagnosis, actual human support or operational authentication is claimed.
+Merged [PR #82](https://github.com/krispykrits/TRACE/pull/82) provides captured-window CLI investigation, protected saved display/citation/export and cancellation with original dependency/clearance/retention and current support checks. #39 adds actual-output scoring, saved-artifact rescoring and bound review samples. Its [retained run](../evaluation/reports/investigator_offline_v1/manifest.json) passed 10/10 expected offline checks with zero critical boundary failures; the [Sprint 5 review](sprints/sprint-05-review.md) retains the wrong fixture cause scores and ten unreviewed sampled claims. The scoped PR remains open for implementation/support review. No paid end-to-end diagnosis or actual human support is claimed.
 
 ## Next work
 
