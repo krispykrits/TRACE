@@ -1,6 +1,6 @@
 # Bounded evidence-first investigator
 
-Implemented in [#37 / merged PR #62](https://github.com/krispykrits/TRACE/pull/62), 2026-10-14, following accepted assessment/budget/provider contracts. [ADR 0016](../adr/0016-bounded-investigation-and-private-publication.md) is accepted for this scoped local workflow/publication boundary. Operator-facing inspection/export remains #38; actual model/human quality and release acceptance remain separate.
+Implemented in [#37 / merged PR #62](https://github.com/krispykrits/TRACE/pull/62), 2026-10-14, following accepted assessment/budget/provider contracts. [ADR 0016](../adr/0016-bounded-investigation-and-private-publication.md) is accepted for this scoped local workflow/publication boundary. Operator-facing inspection/export is implemented by the [local CLI](investigator-cli.md) in #38; actual model/human quality and release acceptance remain separate.
 
 ## Application contract and composition
 
@@ -54,7 +54,7 @@ Schema 3 adds `workflow_runs` and `workflow_artifacts`, with investigation/attem
 
 Raw gathered content is private and conservatively `unknown` sensitivity. Validated report/proposal storage inherits original input sensitivity before redaction. Logs and metadata retain correlation/attempt/artifact/version references, selected policy/provider/prompt/tool configuration, usage/cost and fixed outcomes; no raw source, prompt, response, removed value or untrusted exception text enters telemetry. Persisted malformed model output is excluded. `SQLiteWorkflowStore.metadata` checks access scope and exposes content-free descriptors only; it provides no report/body getter.
 
-`WorkflowResult.read(original_provider_scope)` is local protected delivery. It rechecks exact current source projections/access/expiry, protected model dependencies and current human-support bindings, with another source check after review. This uses the independently composed authority, not another investigator tool/model dispatch after terminal state. Changed source content/revision, denied actor, revocation or withdrawn support blocks content. Already authorized dictionaries cannot be erased retroactively. There is no export API here; #38 must implement authenticated restoration/inspection/review persistence/export without treating stored accepted status as standing source/review permission.
+`WorkflowResult.read(original_provider_scope)` is local protected delivery. It rechecks exact current source projections/access/expiry, protected model dependencies and current human-support bindings, with another source check after review. This uses the independently composed authority, not another investigator tool/model dispatch after terminal state. Changed source content/revision, denied actor, revocation or withdrawn support blocks content. Already authorized dictionaries cannot be erased retroactively. The [local CLI](investigator-cli.md) implements saved restoration/inspection/export with private original dependency bindings and current source/support checks. This local trusted-file composition does not implement operational authentication. Stored accepted status never supplies standing source/review permission.
 
 ## Reproducible offline demonstration
 

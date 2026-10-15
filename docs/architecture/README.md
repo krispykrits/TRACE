@@ -7,7 +7,10 @@ This guide describes the current modular application. The [root end-state diagra
 ~~~mermaid
 flowchart TD
     CLI["Public CLI"] --> Demo["Configuration and synthetic replay"]
-    Script["Developer workflow demo"] --> Composition["Explicit bootstrap composition"]
+    CLI --> Composition["Explicit bootstrap composition"]
+    Script["Developer workflow demo"] --> Composition
+    Composition --> Saved["Current-authority saved inspection/export"]
+    Saved --> Evidence
     Composition --> Investigation["Bounded investigation"]
     Investigation --> Tools["Read-only tool catalog"]
     Tools --> Evidence["SQLite evidence and job adapters"]
@@ -27,10 +30,10 @@ The runtime is one Python package, not independently deployed TRACE microservice
 
 | Surface | Current boundary |
 | --- | --- |
-| Public `trace-app` CLI | Help/version, configuration, synthetic Order request and replay commands; [development guide](../development.md#public-cli) |
+| Public `trace-app` CLI | Help/version, configuration, synthetic replay, captured-window investigation, protected report access and cancellation; [development guide](../development.md#public-cli) |
 | Developer scripts | Local persistence/search/context/tools/integration/investigator demonstrations with fixed synthetic grants; outside the runtime wheel |
 | Internal Python application | Scoped evidence/query/timeline/retrieval/tool/provider/assessment/execution/workflow contracts composed explicitly |
-| Operator investigation/inspection/export | Remaining #38 implementation; saved bodies must retain current source/transmission/review/sensitivity checks |
+| Local investigation/inspection/export | [CLI contract](investigator-cli.md): trusted local profile, original dependency/clearance and current source/transmission/support checks; operational authentication remains gated |
 | Operational sources | Planned protected JSON import, then bounded live Azure queries under [the .NET backlog](../planning/dotnet-testbed-backlog.md) |
 | Network API/UI | No public HTTP service or dashboard selected; requires measured need and an ADR |
 | Operational response | Planned ranked options and explicitly approved deterministic catalog execution; [ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md) |
@@ -62,3 +65,5 @@ The initial investigator remains read-only. A separate deterministic executor re
 ## Decisions and history
 
 [ADR index](../adr/README.md) · [Delivery plan](../planning/capstone-project-plan.md) · [Historical reviews](../archive/README.md)
+
+The [local investigator CLI and saved access contract](investigator-cli.md) covers captured-window commands, trusted profile configuration, private exports and restart/cancellation behavior.

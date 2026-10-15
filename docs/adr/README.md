@@ -22,6 +22,7 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0016](0016-bounded-investigation-and-private-publication.md) | Fixed evidence-first workflow, complete repeated admission and private atomic publication | Accepted in #37 / merged PR #62; operational inspection remains #38 |
 | [0017](0017-dotnet-testbed-and-json-first-evidence.md) | Independent .NET Order/Payment testbed, JSON-first then live Azure source ingestion and owner-led investigation | Accepted owner direction; #69-#76 implementation/usefulness pending |
 | [0018](0018-flexible-ml-and-ranked-response-options.md) | Use-case-appropriate evaluated ML and ranked incident-response options with an explicit recommendation | Accepted owner direction, 2026-10-15; ML/response implementation and acceptance pending |
+| [0019](0019-local-cli-and-saved-report-access.md) | Local CLI, durable dependency bindings and current-authority saved disclosure | Proposed in #38 implementation; owner review pending |
 
 ## Reading and maintaining ADRs
 

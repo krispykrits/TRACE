@@ -151,4 +151,10 @@ uv run --locked python -m scripts.demo_investigator \
 
 Use a fresh private output path. The demonstration covers answerable, insufficient-evidence and timeout cases using hand-authored model/review records.
 
+Investigate and inspect saved results through the [local investigator CLI](docs/architecture/investigator-cli.md). One-command offline reproduction (fresh directory):
+
+~~~sh
+uv run --locked python -m scripts.investigator_fixture --directory /tmp/trace-cli-example
+~~~
+
 The [bounded investigation use case](docs/architecture/bounded-investigator.md) connects scoped evidence, provider policy, finite execution and protected assessment publication. These offline demonstrations do not establish live diagnostic quality or grant operational execution authority.

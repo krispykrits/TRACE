@@ -289,46 +289,7 @@ class AssessmentValidator:
         return report, citations, tasks
 
     def _support(self, scope: ProviderScope, tasks: list[dict[str, Any]]) -> str:
-        verdicts: list[str] = []
-        for task in tasks:
-            decisions = self._reviews.read(scope, task["binding_id"])
-            if not isinstance(decisions, tuple) or len(decisions) > 10:
-                raise AssessmentBoundaryError("invalid_review")
-            reviewers: set[str] = set()
-            current: set[str] = set()
-            for decision in decisions:
-                if (
-                    not isinstance(decision, SupportDecision)
-                    or decision.binding_id != task["binding_id"]
-                    or decision.claim_id != task["claim_id"]
-                    or decision.kind != "human_review"
-                    or decision.rubric_version != RUBRIC_VERSION
-                    or decision.verdict
-                    not in ("supported", "unsupported", "indeterminate")
-                    or not isinstance(decision.reviewer_id, str)
-                    or not decision.reviewer_id
-                    or len(decision.reviewer_id) > 128
-                    or decision.reviewer_id in reviewers
-                    or not isinstance(decision.rationale, str)
-                    or not decision.rationale.strip()
-                    or len(decision.rationale) > 2000
-                ):
-                    raise AssessmentBoundaryError("invalid_review")
-                reviewers.add(decision.reviewer_id)
-                current.add(decision.verdict)
-            verdicts.append(
-                "unreviewed"
-                if not current
-                else "disputed"
-                if len(current) > 1
-                else next(iter(current))
-            )
-        if "unsupported" in verdicts:
-            return "unsupported"
-        for pending in ("disputed", "indeterminate", "unreviewed"):
-            if pending in verdicts:
-                return pending
-        return "supported"
+        return check_claim_support(self._reviews, scope, tasks)
 
     def recheck_support(self, scope: ProviderScope, tasks: list[dict[str, Any]]) -> str:
         """Current review decisions for already validated, locally retained bindings."""
@@ -399,3 +360,47 @@ class AssessmentValidator:
             },
         )
         return result
+
+
+def check_claim_support(
+    reviews: SupportReviewReader, scope: ProviderScope, tasks: list[dict[str, Any]]
+) -> str:
+    verdicts: list[str] = []
+    for task in tasks:
+        decisions = reviews.read(scope, task["binding_id"])
+        if not isinstance(decisions, tuple) or len(decisions) > 10:
+            raise AssessmentBoundaryError("invalid_review")
+        reviewers: set[str] = set()
+        current: set[str] = set()
+        for decision in decisions:
+            if (
+                not isinstance(decision, SupportDecision)
+                or decision.binding_id != task["binding_id"]
+                or decision.claim_id != task["claim_id"]
+                or decision.kind != "human_review"
+                or decision.rubric_version != RUBRIC_VERSION
+                or decision.verdict not in ("supported", "unsupported", "indeterminate")
+                or not isinstance(decision.reviewer_id, str)
+                or not decision.reviewer_id
+                or len(decision.reviewer_id) > 128
+                or decision.reviewer_id in reviewers
+                or not isinstance(decision.rationale, str)
+                or not decision.rationale.strip()
+                or len(decision.rationale) > 2000
+            ):
+                raise AssessmentBoundaryError("invalid_review")
+            reviewers.add(decision.reviewer_id)
+            current.add(decision.verdict)
+        verdicts.append(
+            "unreviewed"
+            if not current
+            else "disputed"
+            if len(current) > 1
+            else next(iter(current))
+        )
+    if "unsupported" in verdicts:
+        return "unsupported"
+    for pending in ("disputed", "indeterminate", "unreviewed"):
+        if pending in verdicts:
+            return pending
+    return "supported"

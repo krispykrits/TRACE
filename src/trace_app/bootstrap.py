@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import os
 import secrets
 import time
 from collections.abc import Mapping
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Callable
 
@@ -40,6 +41,12 @@ from trace_app.investigation.execution import (
     ExecutionIdentity,
     ExecutionPolicy,
     ExecutionSession,
+)
+from trace_app.investigation.local_service import LocalInvestigator
+from trace_app.investigation.models import (
+    EvidenceSnapshot,
+    Investigation,
+    StoreStateError,
 )
 from trace_app.investigation.provider import (
     AdmissionGuard,
@@ -242,4 +249,143 @@ def create_demo_order_workflow() -> OrderWorkflow:
         customers=CustomerFixture(),
         payments=PaymentFixture(),
         notifications=NotificationFixture(),
+    )
+
+
+def create_local_investigator(
+    profile_path: Path,
+    *,
+    clock: Callable[[], float] = time.time,
+    fixture_provider: Callable[
+        [ProviderScope, EvidenceAuthority, ExecutionSession], PolicyModelProvider
+    ]
+    | None = None,
+) -> LocalInvestigator:
+    """Owner-managed local sources; offline models require an external explicit harness."""
+    from trace_app.adapters.sources.local_investigator import (
+        LocalEvidenceAuthority,
+        LocalInvestigatorProfile,
+        LocalSupportReviews,
+    )
+    from trace_app.adapters.storage.sqlite.investigations import (
+        SQLiteInvestigationStore,
+    )
+    from trace_app.adapters.storage.sqlite.reports import SQLiteReportReader
+    from trace_app.investigation.provider_policy import SourceAccessPolicy
+    from trace_app.investigation.reports import ReportAccess
+    from trace_app.investigation.tools import ToolScope
+    from trace_app.investigation.workflow import WORKFLOW_PROMPT
+    from trace_app.investigation.workflow_prompt import ASSESSMENT_PROMPT
+
+    profile = LocalInvestigatorProfile(profile_path, clock=clock)
+    jobs = SQLiteInvestigationStore(profile.evidence_db)
+
+    def snapshot() -> EvidenceSnapshot:
+        profile.current()
+        with SQLiteInvestigationStore(profile.evidence_db, read_only=True) as store:
+            source_job = store.get_investigation(
+                profile.source_investigation_id,
+                access_scope=profile.evidence.access_scope,
+            )
+            profile.check_job(source_job)
+            return store.get_snapshot(
+                profile.source_investigation_id,
+                access_scope=profile.evidence.access_scope,
+            )
+
+    def reports(investigation_id: str) -> ReportAccess:
+        scope = profile.scope(investigation_id)
+        return ReportAccess(
+            SQLiteReportReader(profile.evidence_db),
+            SourceAccessPolicy(
+                LocalEvidenceAuthority(profile, scope), scope, clock=clock
+            ),
+            LocalSupportReviews(profile),
+            scope,
+            profile.evidence.access_scope,
+            profile.clearance,
+        )
+
+    def workflow(job: Investigation, provider_name: str) -> BoundedInvestigation:
+        if job.active_attempt_id is None:
+            raise StoreStateError("An active attempt is required.")
+        scope = profile.scope(job.investigation_id)
+        identity = ExecutionIdentity(
+            job.investigation_id,
+            job.active_attempt_id,
+            "cli-" + job.investigation_id,
+            profile.evidence.access_scope,
+        )
+        authority = LocalEvidenceAuthority(profile, scope)
+        if provider_name not in ("azure", "evidence-only") and not (
+            provider_name == "offline-fixture" and fixture_provider is not None
+        ):
+            raise ValueError(
+                "Offline fixtures require the explicit development harness."
+            )
+        pricing = ModelPricing("azure-luna-global-ceiling-2026-09-22.v1", 250, 750)
+        execution = create_execution_session(
+            evidence_db=profile.evidence_db,
+            identity=identity,
+            pricing=pricing,
+            policy=profile.policy,
+            clock=clock,
+        )
+        tools = create_tool_session(
+            evidence_db=profile.evidence_db,
+            corpus_db=profile.corpus_db,
+            index_root=profile.index_root,
+            scope=ToolScope(
+                job.investigation_id,
+                identity.correlation_id,
+                profile.evidence,
+                profile.knowledge,
+            ),
+            policy=ToolPolicy(max_attempts=profile.policy.max_tool_calls),
+            execution=execution,
+            read_clock=lambda: datetime.fromtimestamp(clock(), UTC),
+        )
+        provider = None
+        if provider_name == "offline-fixture" and fixture_provider is not None:
+            provider = fixture_provider(scope, authority, execution)
+        if provider_name == "azure":
+            if os.environ.get("TRACE_ALLOW_PAID_LIVE") != "1":
+                raise ValueError("Azure requires explicit paid-live opt-in.")
+            data = profile.current()["azure"]
+            provider = create_azure_model_provider_from_files(
+                Path(data["setup_path"]),
+                Path(data["secrets_path"]),
+                authority=authority,
+                scope=scope,
+                prompts={WORKFLOW_PROMPT: ASSESSMENT_PROMPT},
+                journal_path=Path(data["journal_path"]),
+                monthly_limit_nusd=data["monthly_limit_nusd"],
+                initial_spend_nusd=data["initial_spend_nusd"],
+                execution=execution,
+                read_clock=clock,
+            )
+        return create_investigation_workflow(
+            evidence_db=profile.evidence_db,
+            tools=tools,
+            provider=provider,
+            authority=authority,
+            reviews=LocalSupportReviews(profile),
+            execution=execution,
+            scope=scope,
+            options=WorkflowOptions(evidence_only=provider_name == "evidence-only"),
+            clock=clock,
+        )
+
+    return LocalInvestigator(
+        jobs,
+        profile.evidence,
+        snapshot,
+        workflow,
+        reports,
+        profile.check_job,
+        clock=clock,
+        lease_seconds=(profile.policy.deadline_ms + 999) // 1000 + 5,
+        allowed_providers=("azure", "evidence-only", "offline-fixture")
+        if fixture_provider
+        else ("azure", "evidence-only"),
     )

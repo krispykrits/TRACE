@@ -617,20 +617,36 @@ class SQLiteInvestigationStore:
         *,
         at: datetime,
         lease_seconds: int = 30,
+        investigation_id: str | None = None,
+        access_scope: str | None = None,
     ) -> Investigation | None:
         timestamp = _at(at)
+        if (investigation_id is None) != (access_scope is None):
+            raise StoreInputError(
+                "Targeted claim requires an investigation and scope together."
+            )
+        if investigation_id is not None:
+            self._scoped_row(investigation_id, access_scope or "")
         if type(lease_seconds) is not int or lease_seconds <= 0:
             raise StoreInputError("lease_seconds must be a positive integer.")
         lease_until = _at(at + timedelta(seconds=lease_seconds))
         with self._transaction():
-            self._recover_locked(timestamp)
+            if investigation_id is None:
+                self._recover_locked(timestamp)
             row = self._db.execute(
                 """SELECT * FROM investigations WHERE status='queued'
                    AND attempt_count < max_attempts
                    AND (expires_at IS NULL OR expires_at > ?)
                    AND created_at <= ?
+                   AND (? IS NULL OR (investigation_id=? AND access_scope=?))
                    ORDER BY created_at, investigation_id LIMIT 1""",
-                (timestamp, timestamp),
+                (
+                    timestamp,
+                    timestamp,
+                    investigation_id,
+                    investigation_id,
+                    access_scope,
+                ),
             ).fetchone()
             if row is None:
                 return None

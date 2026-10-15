@@ -1,6 +1,6 @@
 # TRACE current status
 
-Verified: 2026-10-15 against main `698c56b`, repository source, merged PR history and open issues. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
+Updated: 2026-10-15 for #38 implementation on main base `d6559ac`; owner PR review is pending. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
 
 ## Implemented
 
@@ -14,11 +14,11 @@ Verified: 2026-10-15 against main `698c56b`, repository source, merged PR histor
 | Investigation use case | Bounded workflow and atomic private publication merged in [PR #62](https://github.com/krispykrits/TRACE/pull/62); offline demonstrations use hand-authored model/review records |
 | Planning decisions | Azure/AKS, independent .NET testbed/JSON-first ingestion and flexible ML/ranked responses accepted as direction in ADRs 0015, 0017 and 0018 |
 
-The public CLI currently exposes configuration and synthetic workflow/replay commands. The investigation use case is an internal Python composition with a developer demonstration. Investigator-facing inspection/export and end-to-end actual-output scoring remain open.
+The #38 feature branch adds captured-window investigation, protected saved display/citation/export and cancellation through the public CLI, with explicit provider selection and a separate offline simulation harness. Original dependency/clearance/retention and current support checks survive restart. Owner review and the required check evidence are recorded in its PR; no new paid/live investigation or operational authentication is claimed. End-to-end actual-output scoring remains #39.
 
 ## Next work
 
-1. Complete Sprint 5 [#38 CLI and protected report access](https://github.com/krispykrits/TRACE/issues/38) and [#39 actual-output scoring/integration](https://github.com/krispykrits/TRACE/issues/39).
+1. Review [#38 CLI and protected report access](https://github.com/krispykrits/TRACE/issues/38), then complete [#39 actual-output scoring/integration](https://github.com/krispykrits/TRACE/issues/39).
 2. Execute the separate Sprint 6 acceptance track [#63–#68](planning/capstone-project-plan.md#backlogs-and-dependencies), after declaring thresholds, authorized run scope and actual review coverage.
 3. Follow [#55–#60](planning/azure-cloud-backlog.md) and [#70–#76](planning/dotnet-testbed-backlog.md) for cloud delivery and monitored services, in their recorded dependency order.
 

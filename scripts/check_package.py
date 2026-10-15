@@ -52,6 +52,11 @@ def main() -> int:
                 "trace_app/investigation/execution.py",
                 "trace_app/adapters/storage/sqlite/execution.py",
                 "trace_app/investigation/workflow.py",
+                "trace_app/investigation/reports.py",
+                "trace_app/investigation/local_service.py",
+                "trace_app/cli/investigator.py",
+                "trace_app/adapters/storage/sqlite/reports.py",
+                "trace_app/adapters/sources/local_investigator.py",
                 "trace_app/investigation/workflow_prompt.py",
                 "trace_app/adapters/storage/sqlite/workflow.py",
                 "trace_app/adapters/storage/sqlite/workflow_schema.py",
@@ -130,6 +135,43 @@ def main() -> int:
         )
         if console.stdout != version.stdout:
             raise RuntimeError("Console and module entry points disagree.")
+        help_result = subprocess.run(
+            [str(environment / "bin/trace-app"), "--help"],
+            cwd=temporary,
+            env=child_env,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        if not all(
+            command in help_result.stdout
+            for command in ("investigate", "report", "cancel-investigation")
+        ):
+            raise RuntimeError("Installed investigator commands are missing.")
+        invalid = subprocess.run(
+            [
+                str(environment / "bin/trace-app"),
+                "investigate",
+                "--service",
+                "order",
+                "--environment",
+                "test",
+                "--provider",
+                "azure",
+                "--window-start",
+                "invalid",
+                "--window-end",
+                "invalid",
+            ],
+            cwd=temporary,
+            env=child_env,
+            capture_output=True,
+            text=True,
+        )
+        if invalid.returncode != 2 or invalid.stdout:
+            raise RuntimeError(
+                "Installed investigator did not reject invalid input before setup."
+            )
         env_file = temporary / "settings.env"
         env_file.write_text("TRACE_ENVIRONMENT=test\n")
         demo = subprocess.run(
@@ -161,7 +203,7 @@ def main() -> int:
                 str(python),
                 "-I",
                 "-c",
-                "import importlib.util; assert importlib.util.find_spec('evaluation') is None; assert importlib.util.find_spec('tests') is None",
+                "import importlib.util; assert importlib.util.find_spec('evaluation') is None; assert importlib.util.find_spec('tests') is None; assert importlib.util.find_spec('scripts') is None",
             ],
             cwd=temporary,
             env=child_env,

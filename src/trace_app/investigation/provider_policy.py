@@ -339,13 +339,211 @@ class ProtectedModelResponse:
         self._owner.revalidate(self._dependencies, transmission=True)
         return self.structured_response(scope)
 
+    def storage_binding(self, scope: ProviderScope) -> dict[str, object]:
+        """Private durable dependency fingerprints, never a grant or public export."""
+        self.structured_response(scope)
+        return self._owner._binding(self._dependencies, self.sensitivity)
+
     def citation_views(self, scope: ProviderScope) -> tuple[ProviderCitationView, ...]:
         self.structured_response(scope)
         return self._views
 
 
-class PolicyModelProvider:
+class SourceAccessPolicy:
+    """Shared live/saved dependency validation, without a model or dispatch handle."""
+
+    def __init__(
+        self,
+        authority: EvidenceAuthority,
+        scope: ProviderScope,
+        *,
+        clock: Callable[[], float] = time.time,
+    ) -> None:
+        self._authority, self._scope, self._clock = authority, scope, clock
+
+    def _sensitive_text(self, value: str) -> bool:
+        return bool(_EVALUATOR.search(value)) or any(
+            pattern.search(value) for _, pattern in _TEXT_RULES
+        )
+
+    def _record(
+        self, selection: EvidenceSelection, *, transmission: bool
+    ) -> AuthorizedEvidence:
+        record = self._authority.resolve(self._scope, selection.evidence_id)
+        if (
+            not isinstance(record, AuthorizedEvidence)
+            or record.evidence_id != selection.evidence_id
+            or record.revision != selection.revision
+            or record.access_allowed is not True
+            or record.identifiers_reviewed is not True
+            or not isinstance(record.kind, SourceKind)
+            or not math.isfinite(record.expires_at)
+            or record.expires_at <= self._clock()
+        ):
+            _deny()
+        assert record is not None
+        for value in (record.evidence_id, record.source_id, record.revision):
+            _id(value)
+            if self._sensitive_text(value):
+                _deny()
+        if transmission and (
+            record.transmission_allowed is not True
+            or record.kind
+            in (SourceKind.CUSTOMER, SourceKind.EMPLOYEE, SourceKind.EVALUATOR)
+            or (
+                record.kind
+                in (SourceKind.RUNBOOK, SourceKind.CONFIGURATION, SourceKind.CODE)
+                and record.source_owner_allowed is not True
+            )
+        ):
+            _deny()
+        if (
+            not isinstance(record.fields, tuple)
+            or len(record.fields) > 256
+            or any(not isinstance(item, EvidenceField) for item in record.fields)
+            or len({item.name for item in record.fields}) != len(record.fields)
+        ):
+            _deny()
+        available = {item.name for item in record.fields}
+        if not set(selection.fields) <= available or any(
+            not item.reviewed or not isinstance(item.sensitivity, Sensitivity)
+            for item in record.fields
+            if item.name in selection.fields
+        ):
+            _deny()
+        return record
+
+    @staticmethod
+    def _fingerprint(record: AuthorizedEvidence) -> str:
+        value = [
+            record.source_id,
+            record.revision,
+            record.kind,
+            [
+                (item.name, item.value, int(item.sensitivity), item.reviewed)
+                for item in record.fields
+            ],
+        ]
+        return hashlib.sha256(
+            json.dumps(value, allow_nan=False, sort_keys=True).encode()
+        ).hexdigest()
+
+    def revalidate(
+        self,
+        dependencies: tuple[_Dependency, ...],
+        *,
+        transmission: bool,
+    ) -> None:
+        for dependency in dependencies:
+            record = self._record(dependency.selection, transmission=transmission)
+            if self._fingerprint(record) != dependency.fingerprint:
+                _deny()
+
+    def bind(
+        self,
+        selections: tuple[EvidenceSelection, ...],
+        *,
+        expected_content: Mapping[str, str] | None = None,
+    ) -> dict[str, object]:
+        records = [
+            self._record(selection, transmission=False) for selection in selections
+        ]
+        if expected_content is not None and (
+            set(expected_content) != {selection.evidence_id for selection in selections}
+            or any(
+                not any(
+                    item.name == "content"
+                    and item.value == expected_content[record.evidence_id]
+                    for item in record.fields
+                )
+                for record in records
+            )
+        ):
+            _deny()
+        sensitivity = max(
+            (f.sensitivity for record in records for f in record.fields),
+            default=Sensitivity.UNKNOWN,
+        )
+        return self._binding(
+            tuple(
+                _Dependency(selection, self._fingerprint(record))
+                for selection, record in zip(selections, records, strict=True)
+            ),
+            sensitivity,
+        )
+
+    def _binding(
+        self, dependencies: tuple[_Dependency, ...], sensitivity: Sensitivity
+    ) -> dict[str, object]:
+        return {
+            "version": "saved-source-access.v1",
+            "principal_id": self._scope.principal_id,
+            "investigation_id": self._scope.investigation_id,
+            "sensitivity": sensitivity.name.lower(),
+            "dependencies": [
+                {
+                    "evidence_id": d.selection.evidence_id,
+                    "revision": d.selection.revision,
+                    "fields": list(d.selection.fields),
+                    "fingerprint": d.fingerprint,
+                }
+                for d in dependencies
+            ],
+        }
+
+    def check_saved(
+        self, binding: dict, *, transmission: bool, clearance: Sensitivity
+    ) -> None:
+        if (
+            binding.get("version") != "saved-source-access.v1"
+            or binding.get("principal_id") != self._scope.principal_id
+            or binding.get("investigation_id") != self._scope.investigation_id
+        ):
+            _deny()
+        try:
+            sensitivity = Sensitivity[binding["sensitivity"].upper()]
+            dependencies = tuple(
+                _Dependency(
+                    EvidenceSelection(
+                        d["evidence_id"], d["revision"], tuple(d["fields"])
+                    ),
+                    d["fingerprint"],
+                )
+                for d in binding["dependencies"]
+            )
+        except (KeyError, ValueError, TypeError):
+            _deny()
+        if (
+            sensitivity > clearance
+            or sensitivity >= Sensitivity.SECRET
+            or not dependencies
+            or len(dependencies) > 256
+        ):
+            _deny()
+        for dependency in dependencies:
+            record = self._record(dependency.selection, transmission=transmission)
+            actual = max(
+                (
+                    item.sensitivity
+                    for item in record.fields
+                    if item.name in dependency.selection.fields
+                ),
+                default=Sensitivity.UNKNOWN,
+            )
+            if (
+                record.kind
+                in (SourceKind.CUSTOMER, SourceKind.EMPLOYEE, SourceKind.EVALUATOR)
+                or actual > sensitivity
+                or self._fingerprint(record) != dependency.fingerprint
+            ):
+                _deny()
+
+
+class PolicyModelProvider(SourceAccessPolicy):
     """Only references enter; source text, grants and prompts resolve independently."""
+
+    def configuration_metadata(self) -> dict[str, object]:
+        return self._configuration.to_dict()
 
     @property
     def scope(self) -> ProviderScope:
@@ -409,75 +607,6 @@ class PolicyModelProvider:
         ):
             if self._sensitive_text(value):
                 raise ModelProviderError(ModelErrorCode.CONFIGURATION)
-
-    def _record(
-        self, selection: EvidenceSelection, *, transmission: bool
-    ) -> AuthorizedEvidence:
-        record = self._authority.resolve(self._scope, selection.evidence_id)
-        if (
-            not isinstance(record, AuthorizedEvidence)
-            or record.evidence_id != selection.evidence_id
-            or record.revision != selection.revision
-            or record.access_allowed is not True
-            or record.identifiers_reviewed is not True
-            or not isinstance(record.kind, SourceKind)
-            or not math.isfinite(record.expires_at)
-            or record.expires_at <= self._clock()
-        ):
-            _deny()
-        assert record is not None
-        for value in (record.evidence_id, record.source_id, record.revision):
-            _id(value)
-            if self._sensitive_text(value):
-                _deny()
-        if transmission and (
-            record.transmission_allowed is not True
-            or record.kind
-            in (SourceKind.CUSTOMER, SourceKind.EMPLOYEE, SourceKind.EVALUATOR)
-            or (
-                record.kind
-                in (SourceKind.RUNBOOK, SourceKind.CONFIGURATION, SourceKind.CODE)
-                and record.source_owner_allowed is not True
-            )
-        ):
-            _deny()
-        if (
-            not isinstance(record.fields, tuple)
-            or len(record.fields) > 256
-            or any(not isinstance(item, EvidenceField) for item in record.fields)
-            or len({item.name for item in record.fields}) != len(record.fields)
-        ):
-            _deny()
-        available = {item.name for item in record.fields}
-        if not set(selection.fields) <= available:
-            _deny()
-        return record
-
-    @staticmethod
-    def _fingerprint(record: AuthorizedEvidence) -> str:
-        value = [
-            record.source_id,
-            record.revision,
-            record.kind,
-            [
-                (item.name, item.value, int(item.sensitivity), item.reviewed)
-                for item in record.fields
-            ],
-        ]
-        return hashlib.sha256(
-            json.dumps(value, allow_nan=False, sort_keys=True).encode()
-        ).hexdigest()
-
-    def revalidate(
-        self,
-        dependencies: tuple[_Dependency, ...],
-        *,
-        transmission: bool,
-    ) -> None:
-        for dependency in dependencies:
-            record = self._record(dependency.selection, transmission=transmission)
-            if self._fingerprint(record) != dependency.fingerprint:
-                _deny()
 
     def _sensitive_text(self, value: str) -> bool:
         return (

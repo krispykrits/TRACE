@@ -9,7 +9,7 @@ Use [current status](../current-status.md) for progress and [development](../dev
 | CLI/replay and knowledge demos | Local synthetic development/test behavior |
 | SQLite evidence/jobs/workflow artifacts | Private local storage; schema-1/2 job databases migrate to schema 3 through writable startup |
 | Azure connector | Explicit trusted composition/private files and separate paid-check authorization; historical synthetic check only |
-| Bounded investigator | Internal use case and offline demonstration; operator-facing protected inspection/export remains #38 |
+| Bounded investigator | [Local CLI](../architecture/investigator-cli.md) with explicit provider, current-authority saved inspection/export, cancellation and no automatic paid replay; trusted local files |
 | Hosted runtime/source integration | AKS, shared PostgreSQL, pod identity, Azure collection and operational source acceptance remain planned |
 
 ## Local handling
