@@ -11,6 +11,7 @@ from pathlib import Path
 _ENVIRONMENT_NAMES = frozenset({"development", "test", "production"})
 _LOG_LEVELS = frozenset({"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"})
 _SUPPORTED_KEYS = frozenset({"TRACE_ENVIRONMENT", "TRACE_LOG_LEVEL", "TRACE_ENV_FILE"})
+_PROCESS_ONLY_KEYS = frozenset({"TRACE_INVESTIGATOR_PROFILE", "TRACE_ALLOW_PAID_LIVE"})
 _DOTENV_KEY = re.compile(r"^[A-Z_][A-Z0-9_]*$")
 
 
@@ -95,7 +96,10 @@ def load_settings(
 
     for source in (file_values, process_environment, command_overrides):
         for key in source:
-            if key.startswith("TRACE_") and key not in _SUPPORTED_KEYS:
+            allowed = _SUPPORTED_KEYS | (
+                _PROCESS_ONLY_KEYS if source is process_environment else frozenset()
+            )
+            if key.startswith("TRACE_") and key not in allowed:
                 raise ConfigurationError(
                     f"Unsupported configuration variable {key}; remove it or use a documented setting."
                 )

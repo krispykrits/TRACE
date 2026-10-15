@@ -46,6 +46,7 @@ The credential-free GitHub Actions job runs the same quality checks on Ubuntu 24
 | `TRACE_ENVIRONMENT` | Required: `development`, `test` or `production` |
 | `TRACE_LOG_LEVEL` | Optional, default `INFO`; standard DEBUG through CRITICAL levels |
 | `--env-file` / `TRACE_ENV_FILE` | Explicit settings file; the CLI option takes precedence |
+| `TRACE_INVESTIGATOR_PROFILE` / `TRACE_ALLOW_PAID_LIVE` | Process-only investigator/provider settings; foundation/demo commands ignore them without reading profile/provider files |
 
 Value precedence is built-in defaults → selected dotenv file → process environment → CLI overrides. With no selected file, a missing working-directory `.env` is allowed. An explicitly selected file must be readable.
 

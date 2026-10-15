@@ -454,3 +454,38 @@ class InvestigatorTargetedClaimTests(unittest.TestCase):
                     ).status,
                     "running",
                 )
+
+
+class InvestigatorLegacyCommandTests(unittest.TestCase):
+    def test_replay_ignores_investigator_only_process_settings(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="trace-cli-legacy-") as directory:
+            env_file = Path(directory) / "empty.env"
+            env_file.write_text("")
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "trace_app.cli",
+                    "replay-dependency",
+                    "--env-file",
+                    str(env_file),
+                    "--environment",
+                    "test",
+                    "--seed",
+                    "17",
+                    "--mode",
+                    "normal",
+                ],
+                cwd=directory,
+                env={
+                    "PATH": os.environ.get("PATH", os.defpath),
+                    "TRACE_INVESTIGATOR_PROFILE": "/private/nonexistent-profile.json",
+                    "TRACE_ALLOW_PAID_LIVE": "1",
+                },
+                capture_output=True,
+                text=True,
+                timeout=15,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertNotIn("/private", result.stdout + result.stderr)
+            self.assertTrue(json.loads(result.stdout)["evidence"]["records"])
