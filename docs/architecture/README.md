@@ -1,76 +1,64 @@
-# TRACE architecture view
+# TRACE architecture
 
-## Planned final capabilities — owner clarification, 2026-10-15
+This guide describes the current modular application. The [root end-state diagram](../../README.md#end-state-architecture) shows the planned final product; [current status](../current-status.md) records implementation/release progress.
 
-[ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md) governs flexible ML selection and ranked response options. The final product uses a justified evaluated ML capability selected from suitable methods and presents applicable rollback, corrective modification, mitigation, further-investigation and observe/escalate options, with a clearly marked recommended response and evidence/risk/verification rationale. Recommendations, engineer selection, reviewed code delivery and explicitly approved catalog execution have separate boundaries. See the [root end-state diagram](../../README.md#end-state-architecture).
+## Current implementation
 
-These capabilities remain planned S10-S14 work; no current assessment schema, tool authority or runtime package is extended by this records change.
+~~~mermaid
+flowchart TD
+    CLI["Public CLI"] --> Demo["Configuration and synthetic replay"]
+    Script["Developer workflow demo"] --> Composition["Explicit bootstrap composition"]
+    Composition --> Investigation["Bounded investigation"]
+    Investigation --> Tools["Read-only tool catalog"]
+    Tools --> Evidence["SQLite evidence and job adapters"]
+    Tools --> Knowledge["Authorized retrieval and quoted context"]
+    Knowledge --> Corpus["SQLite corpus and local index adapters"]
+    Investigation --> Policy["Policy-admitted model provider"]
+    Policy --> Azure["Azure transport and private spending journal"]
+    Investigation --> Publication["Protected assessment and private publication"]
+    Publication --> Evidence
+~~~
 
-## Current implementation view
+The investigation use case is merged in [PR #62](https://github.com/krispykrits/TRACE/pull/62). Its offline demo uses actual local storage/tool boundaries with hand-authored model/review records. The separate synthetic Azure connector check establishes its native contract, not end-to-end diagnostic quality.
 
-The owner-selected [independent .NET testbed and JSON-first evidence direction](../adr/0017-dotnet-testbed-and-json-first-evidence.md) is planned under [#69-#76](../planning/dotnet-testbed-backlog.md). Order/Payment workloads run separately; TRACE keeps one Python application. Future sources normalize exported JSON first, then scoped Azure query results, preserving current evidence and authority boundaries. No .NET service/source adapter is implemented by this records update.
+The runtime is one Python package, not independently deployed TRACE microservices. Core contracts/use cases are independent of frameworks and concrete systems; bootstrap selects adapters. [Package layout](package-layout.md) and [ADR 0010](../adr/0010-capability-packages-and-adapter-boundaries.md) define and enforce dependency direction.
 
-The [capability package layout](package-layout.md) and [ADR 0010](../adr/0010-capability-packages-and-adapter-boundaries.md) define dependency direction and composition; make architecture-check and make package-check enforce this during every future PR.
+## Interfaces
 
-Status: Sprint 4 evidence tooling and Sprint 5 provider/assessment/budget enablers merged; #37 bounded investigation proposed for owner review, 2026-10-14. Local implementation and offline demonstrations do not establish operational or release acceptance.
+| Surface | Current boundary |
+| --- | --- |
+| Public `trace-app` CLI | Help/version, configuration, synthetic Order request and replay commands; [development guide](../development.md#public-cli) |
+| Developer scripts | Local persistence/search/context/tools/integration/investigator demonstrations with fixed synthetic grants; outside the runtime wheel |
+| Internal Python application | Scoped evidence/query/timeline/retrieval/tool/provider/assessment/execution/workflow contracts composed explicitly |
+| Operator investigation/inspection/export | Remaining #38 implementation; saved bodies must retain current source/transmission/review/sensitivity checks |
+| Operational sources | Planned protected JSON import, then bounded live Azure queries under [the .NET backlog](../planning/dotnet-testbed-backlog.md) |
+| Network API/UI | No public HTTP service or dashboard selected; requires measured need and an ADR |
+| Operational response | Planned ranked options and explicitly approved deterministic catalog execution; [ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md) |
 
-```mermaid
-flowchart LR
-    User[Engineer] --> CLI[trace-app CLI]
-    CLI --> Config[Configuration loader]
-    CLI --> Log[JSON logging and redaction]
-    CLI --> Demo[OrderWorkflow demo]
-    CLI --> Replay[Seeded dependency replay]
-    Replay --> Demo
-    Replay --> Evidence[Synthetic evidence bundle]
-    Evidence --> Store[SQLite snapshot and job state]
-    Demo --> Customer[Customer fixture]
-    Demo --> Payment[Payment fixture]
-    Demo --> Notification[Notification fixture]
-    SearchDemo[Developer search CLI] --> Search[Authorized exact knowledge search]
-    Search --> Corpus[SQLite corpus and current source policy]
-    Search --> Encoder[Optional cached CPU embeddings]
-    ContextDemo[Developer context CLI] --> Context[Bounded quoted context]
-    Context --> Search
-    Context --> Corpus
-    Log -. planned AKS collection .-> CloudLogs["Azure Monitor Logs"]
-    Composition[Explicit application composition] --> Investigation[Bounded read-only investigation]
-    Investigation --> Tools[Scoped read-only tool catalog]
-    Tools --> Store
-    Tools --> Context
-    Investigation --> Provider[Policy-gated model provider]
-    Provider --> Azure[Azure hosted connector]
-    Investigation --> Assessment[Current citation and support validation]
-    Assessment --> Private[Private workflow artifacts]
-    CLI -. later authenticated inspection .-> Private
-    Investigation -. later source adapters .-> Sources[Authorized evidence sources]
-    Investigation -. later report .-> User
-    Approved[Exact action approval] -. final capstone only .-> Executor[Separate deterministic remediation executor]
-```
+Corpus publication, withdrawal and retention purge are trusted administration, not model tools. CLI filters or file paths never supply authorization. Current next-check proposals cannot execute writes or grant remediation authority.
 
-Solid arrows describe implemented local behavior, including the proposed #37 composition; dotted arrows are planned boundaries or deployment work. [ADR 0001](../adr/0001-repository-runtime-and-local-tooling.md) selects one modular Python application with capability-owned contracts and explicit edge adapters. [ADR 0015](../adr/0015-azure-aks-cloud-deployment.md) selects Terraform-managed Azure/container/AKS cloud delivery and Azure telemetry; exact resources, shared-state migration and hosted acceptance remain #55-#60 gates. The Azure connector has separate native health evidence; the new investigator uses explicitly scripted offline model/review records for its demonstration. Authenticated inspection, operational source adapters, an HTTP API and the remediation executor remain separate work. The local [knowledge search](knowledge-retrieval.md) adapts Volume 4 lexical/semantic/hybrid baselines with a pinned optional cached embedding model. SQLite persists synthetic snapshots, jobs, durable budgets and private workflow artifacts; it is not a real-source integration. [ADR 0004](../adr/0004-synchronous-synthetic-order-workflow.md) records the synchronous demo boundary.
+## Capability contracts
 
-The Local/Cloud MVP investigation remains read-only. The final capstone's [approved production remediation scope](../planning/production-remediation-scope.md) requires a separate deterministic executor with proposal-bound approval, state revalidation, bounded execution and outcome verification. A source filter or investigation access cannot grant mutation authority.
+| Capability | Detailed guides |
+| --- | --- |
+| Evidence and scenarios | [Data contracts](data-contracts.md), [Order workflow](order-payment-workflow.md), [replay envelope](dependency-replay-evidence.md), [development scenarios](development-scenarios.md) |
+| Persistence and observation | [SQLite state](sqlite-investigation-store.md), [bounded queries](bounded-evidence-queries.md), [timelines](incident-timelines.md) |
+| Knowledge | [Corpus](knowledge-corpus.md), [retrieval](knowledge-retrieval.md), [passage evaluation/context](retrieval-evaluation-context.md) |
+| Tools and integration | [Read-only catalog](investigation-tools.md), [scripted cited package](scripted-evidence-package.md) |
+| AI investigation | [Provider/data policy](model-provider.md), [validated assessments](validated-assessments.md), [shared execution budgets](investigation-budgets.md), [bounded investigator](bounded-investigator.md) |
+| Evaluation | [Development contracts](development-evaluation.md), [artifact/reproduction guide](../../evaluation/README.md) |
+| Hosting and operation | [Azure cloud design](azure-cloud.md), [deployment](../../deploy/README.md), [operations](../operations/README.md), [security](../security/README.md) |
 
-- [Order–Payment workflow](order-payment-workflow.md) shows the implemented request path and fixture limits.
-- [Evidence and data contracts](data-contracts.md) distinguish settings, logs, workflow records and incident evidence.
-- [Dependency replay contract](dependency-replay-evidence.md) defines the version 1 envelope, replay rules and evaluator separation.
-- [Development scenarios](development-scenarios.md) describe regression, degradation, missing/late telemetry, noncausal deployments and evaluator split/isolation rules.
-- [SQLite investigation store](sqlite-investigation-store.md) defines persistence, retry/recovery, access and deletion rules.
-- [Bounded evidence queries](bounded-evidence-queries.md) define local service/time filters, trusted scope and distinct incomplete/empty/failure results.
-- [Incident timelines](incident-timelines.md) define UTC normalization, deterministic observation ordering, duplicate policy and scoped citation resolution.
-- [Knowledge corpus](knowledge-corpus.md) defines source adapters, curated inputs, stable chunk provenance, atomic generations and current access/freshness/tombstone checks.
-- [Knowledge retrieval](knowledge-retrieval.md) defines authorized lexical/semantic/hybrid search, citation checks, index rebuilds and measured development defaults.
-- [Development evaluation](development-evaluation.md) defines candidate reports, offline fixture scoring, evaluator isolation, citation-support review and the baseline comparison protocol.
-- [Model provider](model-provider.md), [validated assessments](validated-assessments.md), [investigation budgets](investigation-budgets.md) and [bounded investigator](bounded-investigator.md) define the Sprint 5 application boundaries and their separate acceptance evidence.
-- [Interfaces and API contracts](interfaces.md) describe the current CLI and the deferred application/source APIs.
-- [Development guide](../development.md) gives runnable local commands and the current quality gate.
-- [Reuse review](../planning/production-usefulness-review.md) and [approved amendment](../planning/production-roadmap-amendment.md) explain why educational components must enter through TRACE-owned contracts.
+## Planned boundaries
 
-The [passage evaluation and context contract](retrieval-evaluation-context.md) records #17's configured candidate limits, current source revalidation, exact byte budget and separate citation map. Evaluator-only labels/reviews remain outside runtime imports; human review gates acceptance.
+Azure/containers/AKS, shared PostgreSQL/pgvector and hosted telemetry follow [ADR 0015](../adr/0015-azure-aks-cloud-deployment.md). Resources, migration/shared admission, pod identity, restore and hosted acceptance remain #55–#60.
 
-The [read-only tool catalog](investigation-tools.md) describes #18 typed schemas, trusted authorization, externally enforced bounds, worker termination, partial/error outcomes and audit; [ADR 0011](../adr/0011-read-only-tool-execution.md) records the execution boundary.
+Independent .NET Order/Payment workloads follow [ADR 0017](../adr/0017-dotnet-testbed-and-json-first-evidence.md). Exported JSON precedes scoped live Azure evidence queries. The monitored services are separate from TRACE's Python runtime and its own application logs.
 
-The [scripted evidence package](scripted-evidence-package.md) composes scoped reads, observed timelines and revalidated knowledge references for the #19 Sprint 4 gate; [review and Sprint 5 handoff](../sprints/sprint-04-review.md) keep development, provider, operational and remediation acceptance separate.
+A justified evaluated ML capability can use classical ML, deep learning, pretrained or other suitable methods. The final product ranks applicable responses and marks the recommendation with evidence/uncertainty, benefit, risks, prerequisites and verification/recovery. Recommendations, engineer selection, reviewed code delivery and approved operational execution remain distinct.
 
-The [Azure cloud architecture](azure-cloud.md) records the planned container/registry, Workload Identity, shared-state/admission, telemetry and release boundaries. Historical AWS ADRs are superseded; current local contracts and evaluator/source isolation remain in force.
+The initial investigator remains read-only. A separate deterministic executor retains concrete approval, state revalidation, finite execution, reconciliation, outcome verification and audit under [the remediation scope](../planning/production-remediation-scope.md).
+
+## Decisions and history
+
+[ADR index](../adr/README.md) · [Delivery plan](../planning/capstone-project-plan.md) · [Historical reviews](../archive/README.md)

@@ -67,4 +67,4 @@ An operational historical-replay cohort must be separately permissioned by a nam
 
 Issue #13 owns the full timeline contract and authorized citation behavior; #14 owns scorer schemas and failure-aware scoring. This story supplies fixtures and expected outcomes, without claiming either capability complete, a Local MVP release accepted, or final benchmark results.
 
-The separate [#17 passage evaluation suite](retrieval-evaluation-context.md) uses 100 requests in 15 related knowledge-query families, with proposed passage/claim judgments and owner review required. It remains entirely development/evaluator material; no final-test family or operational acceptance is created.
+The separate [#17 passage evaluation suite](retrieval-evaluation-context.md) uses 100 requests in 15 related knowledge-query families, with AI-origin passage/claim proposals and the separately recorded owner endorsement of the v4 bundle. It remains entirely development/evaluator material; no final-test family or operational acceptance is created.

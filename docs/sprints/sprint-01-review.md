@@ -1,6 +1,8 @@
 # Sprint 1 foundation review
 
-Date: 2026-09-25. Status: evidence draft for owner review. Scope: [Sprint 1 in the capstone plan](../planning/capstone-project-plan.md#sprint-1--foundation), [issue #6](https://github.com/krispykrits/TRACE/issues/6). The live TRACE Project lists #1–#5 as Done and #6 as In review on this date. A Project state or closed issue does not replace a missing acceptance check.
+> Historical review snapshot: original statuses, measurements and limitations below are dated evidence. PR #27 was subsequently merged on 2026-09-25. Azure/AKS and ADR 0018 later superseded the AWS and ML-selection direction. [Merge record](https://github.com/krispykrits/TRACE/pull/27); [current status](../current-status.md) and [current plan](../planning/capstone-project-plan.md) own present guidance.
+
+Date: 2026-09-25. Status: evidence draft for owner review. Scope: [Sprint 1 in the capstone plan](https://github.com/krispykrits/TRACE/blob/698c56be84872337aab31ac158c40403df974e56/docs/planning/capstone-project-plan.md#sprint-1--foundation), [issue #6](https://github.com/krispykrits/TRACE/issues/6). The live TRACE Project lists #1–#5 as Done and #6 as In review on this date. A Project state or closed issue does not replace a missing acceptance check.
 
 ## Completed work and acceptance evidence
 
@@ -39,7 +41,7 @@ This demonstrates the **synthetic/offline foundation**. It does not verify Cloud
 
 ## Decisions, architecture and debt
 
-- [ADR 0001](../adr/0001-repository-runtime-and-local-tooling.md) and [the implementation review](../planning/production-usefulness-review.md)/[approved amendment](../planning/production-roadmap-amendment.md) set one modular TRACE package and selective educational reuse behind TRACE-owned contracts. V1 supplies triage vocabulary/fixtures; V2 classical ML is a later evaluated candidate; V3 deep learning is conditional; V4 retrieval is adapted; V5/V6 are design inputs. The new [architecture view](../architecture/README.md) distinguishes implemented CLI/config/logging from planned investigation, data/API and executor boundaries.
+- [ADR 0001](../adr/0001-repository-runtime-and-local-tooling.md) and [the implementation review](https://github.com/krispykrits/TRACE/blob/698c56be84872337aab31ac158c40403df974e56/docs/planning/production-usefulness-review.md)/[approved amendment](https://github.com/krispykrits/TRACE/blob/698c56be84872337aab31ac158c40403df974e56/docs/planning/production-roadmap-amendment.md) set one modular TRACE package and selective educational reuse behind TRACE-owned contracts. V1 supplies triage vocabulary/fixtures; V2 classical ML is a later evaluated candidate; V3 deep learning is conditional; V4 retrieval is adapted; V5/V6 are design inputs. The new [architecture view](../architecture/README.md) distinguishes implemented CLI/config/logging from planned investigation, data/API and executor boundaries.
 - [ADR 0002](../adr/0002-terraform-and-ec2-cloud-deployment.md) selects Terraform/EC2, while topology, Terraform state/access, cost, identity, release, rollback and teardown remain S7/S8 design gates. [ADR 0003](../adr/0003-cloudwatch-hosted-logging.md) selects hosted logs; delivery remains unverified.
 - Debt: reconcile #3's closed/Done status with its hosted acceptance gap. Keep provider/artifact readiness and source APIs unclaimed until implemented. No numeric quality, latency or cost target is frozen without the relevant owner/reviewer.
 

@@ -36,7 +36,7 @@ Every later selection or prior response passes admission again. Protected respon
 
 These boundaries assume trusted application composition and a controlled filesystem. They do not authenticate an operator, derive real-source permissions, or sandbox arbitrary Python. No production authority is inferred from repository access. Operational source adapters must supply independently derived grants rather than forwarding caller claims. No operational source is currently authorized by this implementation.
 
-## Deployment details needed from the owner
+## Private provider configuration
 
 The owner has supplied the project/inference endpoints, deployment name, model version, region and deployment type. Actual addresses are in Git-ignored `.env.provider-setup.local`; the API key is separately in `.env.provider-secrets.local`. Both must be private (mode 0600). Project URLs ending in `/api/projects/<project>` are not model API bases. Accepted inference bases are HTTPS Azure resource hosts ending in `/openai/v1/`, with no embedded credentials, query, fragment or alternate port. [Microsoft v1 endpoint and authentication documentation](https://learn.microsoft.com/en-us/azure/foundry/openai/api-version-lifecycle).
 
@@ -54,7 +54,7 @@ AZURE_OPENAI_AUTH_METHOD=api_key
 
 `MODEL_ID` and `CONFIGURATION_ID` have the displayed defaults; other fields are required. The secret file contains `AZURE_OPENAI_API_KEY=<private value>`. Never share the value in chat, GitHub, source or diagnostics. This adapter supports the selected Luna/Global Standard pricing contract only; incompatible settings fail explicitly. `trace-app check-config` still covers environment/log configuration, not provider readiness. The composition function additionally requires a trusted scope, independent evidence authority, registered prompt catalog, shared private journal path, approved monthly allowance and initial known spending estimate. There is no implicit fake/source authority or automatic Entra fallback.
 
-Entra sign-in remains blocked with owner-reported 53003; using it again requires an approved identity/flow/environment identified by the tenant's authorized sign-in-log review. No Conditional Access or Azure authentication setting was modified. [Microsoft Conditional Access troubleshooting](https://learn.microsoft.com/en-us/entra/identity/conditional-access/troubleshoot-conditional-access).
+The recorded October 13 local sign-in attempt returned 53003, and the owner authorized the API-key path used for that check. This is historical check evidence, not a current account-health diagnosis. TRACE has not verified the future AKS pod token path; #58 owns that acceptance under the account's authorized identity/flow restrictions. No Conditional Access or Azure authentication setting was modified. [Microsoft Conditional Access troubleshooting](https://learn.microsoft.com/en-us/entra/identity/conditional-access/troubleshoot-conditional-access).
 
 Applicable operational credential ownership/rotation, network/quota/account restrictions, source rights, provider processing/retention, authenticated grant derivation and audit retention/deletion remain owner-dependent production/pilot gates. `store=false` does not establish zero provider retention or resource-local processing. Review [Foundry data privacy](https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/openai/data-privacy) before real-data use.
 
@@ -104,7 +104,7 @@ On **2026-10-13**, the actual TRACE connector/policy/process/journal live check 
 
 Three preceding configuration-rejected connector checks were preserved; the last identified the JSON-mode input requirement. Their usage was unavailable and their reservations remain charged conservatively. Including the prior direct 23-input/24-output smoke estimate, the private ledger reserves/estimates **$0.00190975** for known TRACE checks; this is not an Azure invoice. No further paid check runs automatically. The synthetic result verifies this connector's native contract; deterministic negative/bypass tests verify the policy behavior. Neither proves operational-source permissions, diagnostic quality, Operational Pilot usefulness, Cloud MVP or production remediation acceptance.
 
-## Assessment consumer — 2026-10-14
+## Assessment and workflow consumers
 
 [Story #35](validated-assessments.md) adds strict v2 assessment validation and scoped support-review packets. Protected responses now retain their exact admitted citation projections and value-free redaction provenance, including later history, accessible only after fresh source checks. Assessment acceptance/read/export preserves those dependencies and original sensitivity; model text or a valid citation ID cannot supply human support or declassification. Runtime review/inspection/persistence remains scoped as documented in ADR 0013 and #38.
 

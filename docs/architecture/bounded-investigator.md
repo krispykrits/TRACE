@@ -1,6 +1,6 @@
 # Bounded evidence-first investigator
 
-Scoped story [#37](https://github.com/krispykrits/TRACE/issues/37), following accepted #36 / merged PR #53. [ADR 0016](../adr/0016-bounded-investigation-and-private-publication.md) records the proposed workflow/publication decision.
+Implemented in [#37 / merged PR #62](https://github.com/krispykrits/TRACE/pull/62), 2026-10-14, following accepted assessment/budget/provider contracts. [ADR 0016](../adr/0016-bounded-investigation-and-private-publication.md) is accepted for this scoped local workflow/publication boundary. Operator-facing inspection/export remains #38; actual model/human quality and release acceptance remain separate.
 
 ## Application contract and composition
 

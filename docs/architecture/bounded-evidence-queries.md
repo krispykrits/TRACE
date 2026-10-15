@@ -1,6 +1,6 @@
 # Bounded local evidence queries
 
-Status: Sprint 3 [story #11](https://github.com/krispykrits/TRACE/issues/11), proposed for review. This is an internal Python read boundary over SQLite synthetic snapshots. It does not connect to real operational sources or expose an HTTP/investigator tool API.
+Implemented in Sprint 3 [#11](https://github.com/krispykrits/TRACE/issues/11), merged in [PR #33](https://github.com/krispykrits/TRACE/pull/33). This internal Python boundary reads authorized SQLite synthetic snapshots. The [read-only tool catalog](investigation-tools.md) now wraps it; operational source adapters and HTTP endpoints remain separate work.
 
 ## Reproduce the query
 

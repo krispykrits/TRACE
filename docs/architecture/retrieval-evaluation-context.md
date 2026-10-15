@@ -1,6 +1,6 @@
 # Passage evaluation and bounded knowledge context
 
-Status: implementation awaiting code review for [#17](https://github.com/krispykrits/TRACE/issues/17), in [PR #45](https://github.com/krispykrits/TRACE/pull/45), 2026-10-12. The owner selected the thresholds below and relayed AI review findings for correction. The [revision record](../../evaluation/retrieval/judgment-revisions.md) traces the applied corrections; the owner subsequently endorsed the full v4 bundle, and the frozen lexical acceptance run passed. The PR remains open for code review and owner merge. This increment builds on merged [#16 / PR #44](https://github.com/krispykrits/TRACE/pull/44), [authorized search](knowledge-retrieval.md) and [corpus policy](knowledge-corpus.md).
+Implemented in [#17 / merged PR #45](https://github.com/krispykrits/TRACE/pull/45), 2026-10-12. The owner endorsed the corrected v4 review bundle and the frozen lexical acceptance passed. The [revision record](../../evaluation/retrieval/judgment-revisions.md) retains review provenance; exact historical rescoring uses the recorded checkout in [the evaluation guide](../../evaluation/README.md). Current search and corpus behavior are defined in [retrieval](knowledge-retrieval.md) and [corpus policy](knowledge-corpus.md).
 
 ## Frozen protocol and development evidence
 

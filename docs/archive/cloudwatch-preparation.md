@@ -1,4 +1,6 @@
-# TRACE hosted application logs
+# Archived CloudWatch preparation
+
+Superseded historical instructions. [Original version](https://github.com/krispykrits/TRACE/blob/698c56be84872337aab31ac158c40403df974e56/deploy/cloudwatch/README.md). Azure/AKS and Azure Monitor are the current direction under [ADR 0015](../adr/0015-azure-aks-cloud-deployment.md); follow the [deployment guide](../../deploy/README.md). Historical commands/settings below describe the old checkout and grant no current deployment authority. The unmodified legacy Terraform/example files remain under `deploy/cloudwatch/` for source history.
 
 > **Superseded historical preparation — 2026-10-14.** The owner selected Azure/container/AKS in [ADR 0015](../../docs/adr/0015-azure-aks-cloud-deployment.md). This AWS example is retained for decision history, not as TRACE's active deployment path. Do not use its account/region, retention, budget or apply commands as Azure authorization. Current hosted collection/acceptance is #59 under [cloud responsibilities](../README.md).
 

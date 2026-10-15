@@ -1,4 +1,6 @@
-# TRACE production-usefulness review
+# Archived educational implementation review
+
+Historical source assessment, 2026-09-23. [Original version](https://github.com/krispykrits/TRACE/blob/698c56be84872337aab31ac158c40403df974e56/docs/planning/production-usefulness-review.md). Current requirements are in the [charter](../charter.md), [delivery plan](../planning/capstone-project-plan.md) and [ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md). Source findings/test limitations below are retained; this is not a current implementation or acceptance report.
 
 Current selection policy: [ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md), owner-approved 2026-10-15, supersedes mandatory classical-ML or blanket optional-DL interpretations of this review. V2/V3 remain candidate references; select a justified use case and method with appropriate comparative evidence. The source findings and test results below remain the September 23 snapshot.
 
@@ -10,7 +12,7 @@ Keep TRACE's approved MVP-first delivery order. Reuse selected components throug
 
 Start with a read-only investigator that accepts a service and incident window, assembles an auditable evidence timeline, identifies supported hypotheses and missing information, and suggests the next useful check. Its first value should be faster evidence collection and less manual navigation. Reliable abstention is useful even when a root cause cannot be established.
 
-The project owner approved this review and all recommendations on 2026-09-23. The companion [roadmap amendment](production-roadmap-amendment.md) records the adopted changes. Findings and test results below are the review snapshot; approval does not mark implementation work complete.
+The project owner approved this review and all recommendations on 2026-09-23. The companion [roadmap amendment](https://github.com/krispykrits/TRACE/blob/698c56be84872337aab31ac158c40403df974e56/docs/planning/production-roadmap-amendment.md) records the adopted changes. Findings and test results below are the review snapshot; approval does not mark implementation work complete.
 
 ## Inventory and reuse decision
 
@@ -82,7 +84,7 @@ The corpus has 300 synthetic documents and only 20 frozen test queries with agen
 5. Expand Evidence beyond content plus an optional timestamp: source record/revision, observed_at, collected_at, service/environment, query window, retrieval/tool version, access classification, integrity hash and redaction status. Represent missing and truncated source results explicitly.
 6. Keep authorization outside prompts and apply it to tools, evidence reads, exports and citations. If PostgreSQL row security is selected as defense in depth, test the actual runtime role: owners and privileged roles may bypass normal policies. See [PostgreSQL row security documentation](https://www.postgresql.org/docs/18/ddl-rowsecurity.html).
 7. Start with one implementation repository and a modular application, separating worker/API deployment only where needed. Pin imported code/artifact versions; do not depend on editable sibling directories. The generic ML package name src needs repackaging or a narrow adapter before integration.
-8. Keep investigation read-only. Review approval of an assessment is distinct from authorizing a future action. The subsequent owner-approved [scope extension](production-remediation-scope.md) requires real production remediation for final completion through a separate deterministic executor; simulation is only test evidence.
+8. Keep investigation read-only. Review approval of an assessment is distinct from authorizing a future action. The subsequent owner-approved [scope extension](https://github.com/krispykrits/TRACE/blob/698c56be84872337aab31ac158c40403df974e56/docs/planning/production-remediation-scope.md) requires real production remediation for final completion through a separate deterministic executor; simulation is only test evidence.
 
 The documents are reference architectures, not instructions to execute their implementation steps now. In particular, Volume 6's statement that its gates precede Volume 7 does not override the user's decision to implement those capabilities inside TRACE.
 

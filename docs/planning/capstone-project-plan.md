@@ -1,26 +1,14 @@
-# TRACE capstone project plan — MVP-first delivery
+# TRACE capstone delivery plan
 
-## Approved planning direction
+Current owner decisions through 2026-10-15. The MVP-first direction was adopted on 2026-09-22 and refined through ADRs 0015, 0017 and 0018. This plan is the canonical delivery and acceptance record; [current status](../current-status.md) owns progress, and [the charter](../charter.md) owns stable scope and unresolved inputs.
 
-The project owner approved an MVP-first revision on September 22, 2026. This supersedes the previous strictly sequential 18-sprint roadmap. The master prompt remains the source for final capstone capabilities; this approved revision changes delivery order and initial scope. No implementation or cloud provisioning is performed by this planning update.
+## Delivery policy
 
-**Product promise:** evidence-supported incident diagnosis. Reports distinguish observations, most likely explanation and supporting evidence, competing hypotheses, missing evidence, uncertainty and next useful check. TRACE does not promise that temporal correlation establishes root cause.
+Build an evidence-first investigation slice before expanding subsystems: deterministic evidence → bounded queries/retrieval/tools → cited assessment → evaluation. Reports distinguish observations, supported/competing hypotheses, missing evidence, uncertainty and next checks.
 
-Build one complete thin investigation before broad subsystem expansion. Preserve bottom-up dependencies inside that slice: deterministic evidence → bounded queries/tools → grounded investigation → automated evaluation. ML is required for the final capstone but is not a prerequisite for the first useful investigator.
+Use one modular Python application. Adapt educational components through TRACE-owned contracts; Volumes 5/6 are design inputs. Choose a justified evaluated ML contribution from suitable methods, preserving appropriate baselines and negative findings. [ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md) requires ranked applicable response options with a clearly recommended action.
 
-## Approved production-usefulness amendment — September 23, 2026
-
-The owner approved the [implementation review](production-usefulness-review.md) and [production roadmap amendment](production-roadmap-amendment.md), including all recommendations. The amendment is part of this plan: its sprint additions and stronger acceptance gates apply to the delivery table below. The MVP-first order and five-arm capstone requirements remain. Resize affected increments against actual capacity; no additional calendar commitments are implied.
-
-Use this TRACE repository for a modular Python application with TRACE-owned contracts and reproducibly versioned reuse. Preserve the educational projects as references. Volume 5 and Volume 6 are design-only inputs whose capabilities will be implemented within TRACE, not prerequisites that already exist. Reuse Volume 4 retrieval through adapters and treat Volumes 2 and 3 as candidate ML references. Select the incident-analysis use case and suitable ML method through measured evidence; classical ML, deep learning, pretrained models and other suitable ML approaches are eligible under [ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md). Replace simulated investigation, heuristic causal confidence and development fallback behavior before production reuse.
-
-**Independent Operational Pilot gate:** authorized real or sanitized historical incident replay followed by read-only shadow use with a named operator/team; comparison with their current workflow and a deterministic evidence bundle; predeclared quality, latency and cost criteria; access isolation, recoverability, support ownership and operator feedback. Local MVP, Cloud MVP and Full Capstone acceptance do not substitute for this gate. Access unavailable means operational usefulness remains unvalidated. The operational pilot is distinct from S15's validation-only experimental pilot and may overlap releases once its prerequisites are met.
-
-Bring source-neutral provenance and time/access semantics into S2; durable investigation state and failure-aware scoring into S3; real-source retrieval contracts, freshness/revocation and authorization across evidence reads/citations into S4; bounded model/tool execution and usage telemetry into S5. S6 adds human-reviewed support cases and the deterministic evidence-bundle reference. Before hosted investigations, prove recoverable dispatch, worker crash/duplicate handling, restore, retention/deletion and rollout rollback. ML evaluation must measure real-base-rate alert burden, detection delay and downstream benefit; detector failure must preserve the evidence-only workflow.
-
-Repository strategy is approved; packaging/runtime specifics, pilot user and authorized sources, workload/budget thresholds, capacity and university constraints still need recorded decisions. Offline contract/replay work can proceed without credentials; live-provider and operational-pilot acceptance cannot be satisfied by stubs. Existing backlog acceptance criteria are amended in place, and no story is completed by this planning approval.
-
-## Three releases and acceptance gates
+## Releases and acceptance
 
 | Release | Target | Required scope and acceptance evidence |
 | --- | --- | --- |
@@ -28,9 +16,11 @@ Repository strategy is approved; packaging/runtime specifics, pilot user and aut
 | **Cloud MVP** | End of S9 | The same workflow containerized on Terraform-managed Azure AKS, with shared Azure PostgreSQL/pgvector state after tested SQLite/journal migration, intentional image-digest promotion, scoped workload identity, secrets, observability, independent cost controls, recovery and verified teardown/recreation. |
 | **Full capstone** | End of S18 | Broader benchmark, evaluated use-case-appropriate ML and retrieval, ranked response options with a clearly recommended action, all five comparison arms, hardened operations/security, frozen-protocol quantitative study, architectural justification and final defense; all 15 final capabilities retained, plus verified authorized production remediation. |
 
-Release thresholds for quality, reliability, latency and cost must be recorded before the relevant acceptance run. University rubric, deadline, weekly capacity, sprint duration and Azure infrastructure budget remain charter decisions; the owner selected Azure AI Foundry and a $20/month model spending cap on 2026-10-13. No dates or numerical quality targets are invented here. Local MVP acceptance is not evidence of full capstone completion.
+Quality/reliability/latency/cost thresholds and actual review coverage must be declared before each applicable acceptance run. The owner's frozen retrieval thresholds apply only to their recorded protocol. The $20/month model cap is separate from Azure infrastructure/account spending.
 
-## MVP scope and deliberate deferrals
+The independent Operational Pilot and real production-remediation requirement below retain separate evidence. Planning approval, synthetic demonstrations and green CI are not release or operational acceptance.
+
+## Scope by release
 
 | Area | Local/cloud MVP | Full capstone or conditional expansion |
 | --- | --- | --- |
@@ -44,11 +34,11 @@ Release thresholds for quality, reliability, latency and cost must be recorded b
 | Actions | Read-only investigation and recommendations; no operational execution tool | Rank applicable rollback, corrective modification, mitigation, further-investigation and observe/escalate options; mark the recommended response. Code fixes follow reviewed PR/tests/release. At least one real explicitly approved production remediation uses the separate deterministic executor after staging validation |
 | Azure / AKS | Owner-selected containers on Terraform-managed AKS, shared PostgreSQL/pgvector, workload identity, cost/access controls and teardown | Review exact cluster/runtime, region/network, resource sizing/state and release design from measured requirements under ADR 0015; add services only with evidence |
 
-Select ML methods from measured use-case needs under ADR 0018. Do not introduce multi-agent orchestration, Kafka, a separate vector service, caching, microservices or an elaborate dashboard without evidence. Azure/container/AKS deployment is owner-selected in [ADR 0015](../adr/0015-azure-aks-cloud-deployment.md), retaining Terraform and the modular application. Local SQLite remains; cloud hosting moves to Azure PostgreSQL Flexible Server with pgvector, superseding only the AWS-hosting portions of ADRs 0002/0003/0005/0006. Exact cluster/runtime shape, workload identity, shared admission/migration, region/network, resource sizes, costs/retention and release/restore remain S7-S9/#55-#60 gates. Existing lexical/semantic/hybrid retrieval and source/citation rights remain. The current Local MVP interface is a CLI; a bounded AKS Job is the first shape to review, not an automatic public API or microservice split.
+Keep Customer/Notification lightweight until scenarios justify expansion. Azure/AKS, Terraform, PostgreSQL/pgvector and the modular runtime are selected; exact resources, identity, migration and operating acceptance remain cloud gates. A public API, broker, dashboard or service split requires measured need and an ADR.
 
-## Full delivery path — 18 provisional sprints
+## Full delivery path
 
-These are scope increments, not time estimates. Current/next work is refined against actual capacity; the owner also requested Azure/AKS cloud story refinement on 2026-10-14. [#55-#60](azure-cloud-backlog.md) provide concrete future acceptance without committing dates or marking implementation complete. Re-size/split increments and update dependencies/release gates together.
+These 18 increments divide scope, not calendar time. Refine and resize work against capacity; dependencies and gates must change together.
 
 | Sprint | Goal | Principal deliverables | Demo / exit gate | Dependencies |
 | --- | --- | --- | --- | --- |
@@ -71,46 +61,32 @@ These are scope increments, not time estimates. Current/next work is refined aga
 | 17 | Controlled experimental study | Run frozen five-arm study; analyze paired results/variability, failures, quality/latency/cost tradeoffs and ML benefit. | Reproduce tables from saved artifacts; separate unseen-variant and unseen-family results; disclose negative results and synthetic limitations. | S16 |
 | 18 | Final demonstration and defense | Report, architecture/ADRs, evidence index, operations guide, demo recording/fallback and defense rehearsal. | All 15 final capabilities evidenced; selected results reproduced; decisions, limitations and teardown explained. | S17 |
 
-### Delivery path
+## Backlogs and dependencies
 
-```mermaid
-flowchart LR
- A["S1–3 Foundation and evidence"] --> B["S4–6 Local MVP"]
- B --> C["S7–9 Cloud MVP"]
- C --> D["S10–14 Benchmark, ML and full evaluation"]
- D --> E["S15–17 Pilot, freeze and study"]
- E --> F["S18 Full capstone"]
-```
+| Track | Scoped work and order |
+| --- | --- |
+| Sprint 5 handoff | [#34–#37](https://github.com/krispykrits/TRACE/issues/37) establish provider/assessment/budget/workflow contracts; [#38](https://github.com/krispykrits/TRACE/issues/38) exposes protected CLI/report access; [#39](https://github.com/krispykrits/TRACE/issues/39) scores actual output and verifies integration |
+| Sprint 6 acceptance | [#63](https://github.com/krispykrits/TRACE/issues/63) protocol/thresholds before measurement; #64 comparisons → #65 actual human review; #66 recovery and #67 security; #68 clean-environment release after #63–#67 and S5 |
+| Azure Cloud MVP | [#55–#60](azure-cloud-backlog.md): measured design, immutable image, shared state/admission, pod identity/releases, hosted telemetry and cloud acceptance |
+| Monitored .NET services | [#70–#76](dotnet-testbed-backlog.md): local services → telemetry/JSON → controlled recordings → protected import → AKS telemetry → bounded live queries → owner-led replay/shadow comparison |
+| Full capstone | Refine S10–S18 issues when capacity and prerequisites are known; preserve the ML/response and study gates rather than creating placeholder implementation stories |
 
-The earlier master-prompt phases are capability categories rather than mandatory implementation order under this approved revision. Reliable evidence is still mandatory before LLM integration. The complete ML subsystem and five-arm study are deferred beyond the MVP, not removed.
+The project owner is the planned .NET service owner and initial investigating engineer. Testbed source belongs under `testbed/dotnet/` when implemented, with separate .NET CI and no Python runtime/wheel dependency. Exported JSON precedes live Azure queries. Generated incident evidence remains separate from broader operational-purpose validation.
 
-## Monitored .NET workload refinement — 2026-10-14
+## Cross-cutting acceptance
 
-The owner approved lightweight independently running .NET Order/Payment services, exported JSON before live Azure queries and the owner as service owner/initial investigator. [ADR 0017](../adr/0017-dotnet-testbed-and-json-first-evidence.md) and [#69-#76](dotnet-testbed-backlog.md) define the added S7-S9 track and dependencies. Workload source belongs under `testbed/dotnet/` when implemented, with its own build/test lane; TRACE remains one modular Python application. Existing Local MVP fixtures/frozen reports remain separate. Resize scope against capacity without inventing dates or treating generated incidents as independent production-usefulness evidence.
+These requirements apply throughout implementation:
 
-## Current and next sprint plans
+- Source-neutral evidence preserves identity/revision, event/collection UTC time, service/environment, correlation, units/windows, provenance and completeness. Missing telemetry never becomes an observation.
+- Trusted grants are independent of caller filters; authorization/freshness/revocation apply to tools, search, direct evidence reads and saved citations.
+- Keep evaluation labels, fault schedules and held-out answers outside runtime inputs, retrieval, prompts and images.
+- Bound model/tool calls, context/results, retries/corrections, tokens, deadlines and spending. Preserve actual/unknown usage and failures; do not invent successful results or cost.
+- Persist evidence/jobs/attempts and protected reports. Prove idempotency, recoverable dispatch, cancellation, duplicate/crash/unknown-outcome handling, restore, retention/deletion and rollout rollback for the relevant runtime.
+- Hosted execution uses scoped identities and shared durable admission; pod retries or independent local journals cannot bypass the model cap. Include queue wait in end-to-end latency where applicable.
+- Apply the [provider policy](../architecture/model-provider.md#required-production-enforcement--2026-10-13) on every request/history/result: independent source/transmission checks, bounded reviewed redaction, citations/private provenance, content-free audit and input-sensitive protected responses.
+- Record tests, adversarial/failure evidence, operating ownership and blocked prerequisites. A skipped/fake live check or synthetic reviewer cannot satisfy a required actual-provider/human gate.
 
-### Sprint 1 — Foundation
-Goal: clean runnable/testable foundation, with scaffolding the first implementation task.
-Backlog: charter/minimum decisions (#1), repository/environment skeleton (#2), configuration/logging (#3), local tasks/integration foundation (#4), CI (#5), ADR/docs/IaC foundations (#6).
-Dependencies: record minimum charter and package/runtime decisions for the approved TRACE repository before skeleton implementation.
-Tests: clean setup, meaningful smoke/integration checks, invalid configuration/redaction checks and deliberate CI failure evidence.
-Docs/decisions: charter, reuse inventory, repository/package ADRs, setup, local commands, review and IaC templates.
-Risks: excessive scaffolding and speculative infrastructure.
-Demo/gate: fresh checkout runs/checks/tests; CI and docs prove repeatability; no cloud provisioning or domain behavior before the foundation.
-
-### Sprint 2 — Minimal synthetic workflow
-Goal: explain the causal chain in an Order → Payment request and reproduce one downstream failure.
-Backlog: narrowed happy path (#7), seeded dependency failure/evidence contract (#8).
-Customer and Notification are fixtures, not required independently running services.
-Dependencies: S1 accepted; owner records service/communication choices.
-Tests: request contracts, correlation propagation, happy/failure integration, replay/reset, evidence schema, deterministic timestamps and ground-truth exclusion.
-Docs/decisions: workflow diagram, service ADR, fixture limitations, scenario/evidence schema.
-Risks: artificial causal shortcuts, uncontrolled clocks/randomness and ground-truth leakage.
-Demo/gate: reset and replay both paths with stable logical events; inspect evaluator-only cause separately from investigator-visible evidence.
-Next refinement: S3 adds regression, missing-evidence and noncausal distractor cases plus evidence query/scoring foundations.
-
-## Evaluation from the first investigator
+## Evaluation
 
 - S3 defines the result/ground-truth contract, scorer fixtures and split policy; S5 scores the first end-to-end investigator automatically. Do not postpone evaluation until the full comparison harness.
 - S6 compares an LLM-only reference with integrated RAG/tools on the development suite. This is an MVP diagnostic comparison, not the final ablation study.
@@ -124,86 +100,42 @@ Next refinement: S3 adds regression, missing-evidence and noncausal distractor c
 - Include successful/unrelated deployments near incidents, similar symptoms with different causes, and incomplete telemetry. Reward justified uncertainty instead of forcing one root-cause answer.
 - Pilot on development/validation data, freeze thresholds/configurations/analysis in S16, then access final test data in S17. Repeat stochastic runs and report uncertainty. Document synthetic-to-real generalization limitations.
 
-## Risks and replanning
+For the selected ML task, use task-specific metrics; detection additionally needs realistic alert burden and delay. S14 versions/reviews response alternatives, ranking and recommendation rationale, including incomplete evidence and noncausal deployments. A recommended investigation/escalation is valid when corrective action is unsupported. Runtime/evaluator mechanics are defined in [development evaluation](../architecture/development-evaluation.md) and [the evaluation guide](../../evaluation/README.md).
 
-Unknown capacity/deadline/budget may change sprint count. Synthetic shortcuts may overstate usefulness; use distractors, alternative causes and isolated test cohorts. Model failures require bounded execution and deterministic schema/tool safeguards. Azure infrastructure cost requires a separate approved budget and resource/retention/teardown accounting from the first cloud release; the $20 model cap is not a cluster budget.
+## Independent Operational Pilot
 
-Tests, security, observability, documentation and ADRs accompany every sprint; hardening is not their first appearance. If scope must shrink, cut optional infrastructure, UI polish and model complexity first. Preserve final required capabilities unless the owner explicitly approves a revised capstone scope. At each release, compare actual progress with the university rubric and replan remaining increments.
+Require authorized real or sanitized historical replay followed by read-only shadow use with a named operator/team. Compare against the operator's current workflow and a deterministic evidence bundle. Predeclare usefulness, quality, reliability, latency and cost criteria, review coverage and permitted source/transmission/retention policy.
 
-## GitHub organization
+Acceptance includes operator feedback, access isolation, recovery/restore and support ownership. Missing representative access/evidence remains an explicit blocker. This gate is separate from Local/Cloud MVP, Full Capstone and S15's validation-only experimental pilot; it may overlap releases when ready.
 
-[TRACE Project](https://github.com/users/krispykrits/projects/2) tracks work status and Release. [Native milestones](https://github.com/krispykrits/TRACE/milestones) represent all 18 provisional sprints. Issues #1–#6 belong to Sprint 01; #7–#8 belong to Sprint 02. The roadmap issue #9 spans releases and has no sprint milestone.
+## Response and production-remediation gate
 
-Project Status is authoritative; redundant status labels are removed. Sprint/type/release labels remain repository filters. Preserve existing iteration assignments; milestones do not imply committed dates. Empty future milestones require story refinement and do not imply completion.
+The final product ranks applicable rollback, corrective modification, mitigation, further-investigation and observe/escalate options and identifies the recommended response. Code/configuration proposals follow reviewed PR/tests/release. Supported operational actions use the separate deterministic catalog/executor and concrete action-specific approval.
 
-## Operating rules and definition of done
+Final completion requires at least one verified, explicitly authorized remediation on an operational-purpose production workload after staging validation. Preserve proposal-bound approval, state revalidation, bounded/idempotent/reconciled execution, actual resource and health verification, recovery/escalation and audit. A simulated/staging-only action does not satisfy production acceptance. [The remediation scope](production-remediation-scope.md) owns the detailed controls and S14–S18 evidence requirements.
 
-Use issues for actionable backlog and sprint tracking. Keep future phases at roadmap level until refinement. Each story records acceptance criteria, tests, documentation, dependencies, decisions, risk, and demonstration. Board-ready status convention: Backlog → Ready → In progress → Review → Done; blocked work states its blocker explicitly.
-
-Close a story only with acceptance evidence, reviewed code where applicable, relevant lint/type/tests passing, updated docs/ADRs, appropriate error/configuration/security/observability handling, no critical regression, and a reproducible demo. Planning-only items substitute reviewed artifacts for code checks.
-
-Sprint review records completed/incomplete items, test evidence, architecture changes, debt, ADRs, lessons, evaluation impact and next-sprint blockers. Update this roadmap based on evidence.
-
-## Final evidence checklist
+## Full-capstone evidence checklist
 
 - [ ] Seeded incident suite and isolated ground truth
 - [ ] Stable, queryable telemetry/evidence
-- [ ] Appropriate baselines and use-case-specific ML evaluation results
-- [ ] Independent semantic retrieval results
-- [ ] Controlled tool contract and safety results
-- [ ] Grounded investigation with citations, uncertainty and ranked response options identifying the recommended action
-- [ ] Deterministic timeline and investigation workflow
+- [ ] Appropriate baselines and use-case-specific ML evaluation
+- [ ] Independent semantic retrieval evaluation
+- [ ] Controlled tool contracts and boundary evidence
+- [ ] Cited investigation, uncertainty and ranked recommended responses
+- [ ] Deterministic timeline and bounded workflow
 - [ ] Automated five-arm evaluation
-- [ ] Repeatable Azure AKS container deployment and teardown
-- [ ] End-to-end platform observability
-- [ ] Automated tests and CI/CD promotion evidence
-- [ ] Quantitative study with limitations
-- [ ] ADRs and rejected alternatives
+- [ ] Repeatable Azure AKS deployment and teardown
+- [ ] End-to-end observability
+- [ ] Tests and CI/CD promotion evidence
+- [ ] Frozen quantitative study with limitations
+- [ ] ADRs and justified alternatives
 - [ ] Operations/security documentation
-- [ ] Rehearsed final demonstration and defense
+- [ ] Reproducible final demonstration and defense
 
-## Independent operational-usefulness evidence
+The real production-remediation requirement and independent Operational Pilot retain the separate gates above.
 
-- [ ] Named pilot operator/team and authorized source access
-- [ ] Historical replay and read-only shadow-use evidence
-- [ ] Comparison with existing operator workflow and deterministic evidence bundle
-- [ ] Predeclared utility, quality, reliability, latency and cost thresholds met
-- [ ] Access isolation, recovery/restore and support ownership demonstrated
+## Planning and review rules
 
-These items gate production-usefulness claims independently of academic completion.
+[Project Status](https://github.com/users/krispykrits/projects/2) is authoritative for work status. Milestones are provisional sprints; future dates, capacity, infrastructure budget, rubric and remaining thresholds are [owner inputs](../charter.md#open-inputs-and-decision-gates).
 
-## Real production remediation — approved scope extension
-
-The owner requested real production remediation on September 23. The [remediation scope and acceptance gates](production-remediation-scope.md) supersede the earlier simulated-only capstone boundary. Initial investigation releases remain read-only. Final completion requires at least one verified, explicitly authorized production remediation after staging validation, with proposal-bound approval, state revalidation, idempotent/reconciled execution, health verification and recovery/escalation. A staging/demo action alone does not satisfy production acceptance. Refine capacity and target access before committing dates.
-
-## S4 retrieval acceptance protocol — 2026-10-12
-
-For scoped [#17](https://github.com/krispykrits/TRACE/issues/17), the owner supplied candidate K=20, final context passage limit=5, primary K=5, secondary K=10, minimum 100 queries, Recall@5 ≥0.90, MRR@5 ≥0.80 and Recall@10 ≥0.95 before measurement. The [versioned protocol and human-review gate](../architecture/retrieval-evaluation-context.md) bind development judgments; the owner endorsed the complete v4 passage/claim bundle and the [frozen lexical acceptance report](../../evaluation/reports/retrieval_passage_acceptance_v4.json) passed at Recall@5 0.9544, MRR@5 0.9137 and Recall@10 0.9881 on 100 queries with zero failures and six verified freshness exclusions. PR #45 remains open for code review and owner merge. This protocol does not supply operational-pilot thresholds or final-study acceptance, and does not authorize a reranker or production mutation.
-
-For #18, the [read-only catalog](../architecture/investigation-tools.md) implements validated arguments, independent source grants, direct evidence/citation resolution, configurable local safety bounds and metadata-only audit through a fixed worker with read-only database connections. [ADR 0011](../adr/0011-read-only-tool-execution.md) records the proposed authority/deadline boundary. Its limits are implementation bounds, not owner operational performance/cost thresholds. Production mutation, hosted audit delivery and real-source access remain their separate approved gates.
-
-The [#19 Sprint 4 review](../sprints/sprint-04-review.md) links the scripted observed timeline/context package, independently scoped reference revalidation, tool-choice/API fixtures and assembled security/failure cases. Owner review/merge accepts this scoped integration gate before Sprint 5; provider/model/budget/data-access decisions and live acceptance remain #34 gates. This evidence-only workflow adds no LLM investigator or production mutation and does not satisfy formal Local MVP release, Operational Pilot or final remediation acceptance.
-
-On 2026-10-13, #19 / PR #49 owner merge (`a9db329`) and live Project Done were verified. Sprint 5 #34 proceeds through implementation subtask [#50](https://github.com/krispykrits/TRACE/issues/50) / [PR #51](https://github.com/krispykrits/TRACE/pull/51), now covering the [Azure connector, provider contract and deterministic admission](../architecture/model-provider.md). The owner selected Azure AI Foundry / GPT-6 Luna, deployment `gpt-6-luna`, $20/month, resource API-key fallback and the category-based transmission policy. Configuration/credentials remain private. The actual TRACE synthetic connector check passed with valid JSON/citation, 143 input / 90 output tokens and 2,400 ms; the dated version remains owner-reported. Local spending reservations/estimates, private provenance and per-call audit are implemented. PR/operational identity/source/processing/retention acceptance remain separate; no Operational Pilot evidence is inferred.
-
-The owner's [production enforcement requirements](../architecture/model-provider.md#required-production-enforcement--2026-10-13), `trace-provider-data-policy.v1`, are implemented at the provider application boundary for each call and later evidence/history: independently current access/transmission grants, reviewed bounded redaction, stable citations/private provenance, content-free usage/outcome audit and input-derived protected responses. Negative/bypass, revocation, output-access and audit/privacy tests accompany the implementation. [The production amendment](production-roadmap-amendment.md#production-provider-enforcement-addition--2026-10-13) still governs S5–S6: #35/#37/#38 must preserve those controls when implementing assessment/workflow/persistence/inspection, while #36 adds investigation-wide budgets and recovery accounting. Operational authority/retention and remediation permissions are not expanded.
-
-## S5 provider acceptance and assessment story — 2026-10-14
-
-The owner merged PR #51 at `a0172ad` and closed #34; live Project Done was verified. This accepts the Local MVP synthetic provider boundary, with operational identity/source/processing/retention and pilot gates retained separately. The owner merged PR #52 at `04efa37`; #35 is closed and Project Done. Its [strict assessment validation](../architecture/validated-assessments.md), independent current cited-source checks and protected review packets are accepted for Local MVP in ADR 0013. Synthetic reviewer decisions remain separate from human endorsement or operational-quality evidence.
-
-The #36 enabler implements [shared investigation budgets and usage/cost records](../architecture/investigation-budgets.md). ADR 0014 records durable admission against the current job/attempt, one deadline and model/tool/retry/correction/token bounds, with private correlated records and versioned estimates. Deterministic clocks/fakes and actual SQLite state/journal checks supply local evidence; no new paid call or investigator loop is included. #37 composes both ports with the same session; #38 retains inspection/export rights and review persistence. The approved $20/month provider journal remains distinct from account-wide billing and Azure infrastructure budgets.
-
-On 2026-10-14, the owner merged PR #53 at `5cf913e`; #36 is closed and Project Done, accepting ADR 0014 for the Local MVP enabler. Story #37 is In review in [PR #62](https://github.com/krispykrits/TRACE/pull/62), implementing the [bounded investigator and private publication](../architecture/bounded-investigator.md), with ADR 0016, repeated complete admission and original-sensitivity protection through optional read-only check/correction/history. Workflow completion with an unreviewed proposal remains assessment-pending; failures retain evidence without fabricated diagnosis. Scripted offline model/review demonstrations are separate from actual model/human quality, S6 release and operational/cloud/remediation acceptance.
-
-## Owner cloud direction and refined backlog — 2026-10-14
-
-The owner selected Azure instead of AWS and deployment in containers on AKS, then authorized records/user-story updates. [ADR 0015](../adr/0015-azure-aks-cloud-deployment.md) supersedes EC2, RDS hosting and CloudWatch while retaining Terraform, Local SQLite, PostgreSQL/pgvector and the modular application. [#55-#60](azure-cloud-backlog.md) refine S7-S9 design, image/registry, shared-state/admission, workload identity/release, hosted telemetry and acceptance. Historical #1/#3/#6/#10/#16/#29 local/decision acceptance remains; no future implementation or cloud resource is accepted by this update. Subscription/region/cluster shape/infrastructure budget/retention and operational source rights remain explicit gates. Project Status and undated native milestone grouping are preserved.
-
-## Flexible ML and ranked response clarification — 2026-10-15
-
-The owner approved the revised root README and related records in [#78](https://github.com/krispykrits/TRACE/issues/78). [ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md) supersedes mandatory classical-ML and blanket optional-DL wording. S10-S11 select the justified use case/method and evaluation; S13-S17 retain the five-arm comparison and held-out isolation.
-
-S14 delivers multiple applicable evidence-supported response options, ranking and an explicitly recommended response. Each records evidence/uncertainty, expected benefit, risks, prerequisites, verification and recovery. Further investigation or observe/escalate can be recommended when corrective action is unsupported. Proposed code/configuration fixes follow reviewed PR/tests/release; supported operational actions use tested catalog adapters, action-specific human approval and the deterministic executor. One validated execution path establishes initial acceptance without limiting future catalog extension.
-
-These are future capabilities, not claims about current assessment schemas or CLI behavior. Initial Local/Cloud MVP read-only scope, independent Operational Pilot, real production-remediation requirement, source/transmission protections, $20/month model cap and separate infrastructure spending gates remain. No method, target/action, date or numerical threshold is invented by this clarification.
+Use scoped stories with acceptance criteria, dependencies, tests, documentation, risks and demonstration. Close implementation only with reviewed code, relevant checks, reproducible evidence and no unresolved critical blocker. Record incomplete work and lessons using the [sprint review template](../sprints/sprint-review-template.md). Keep historical review snapshots and merge details outside this active plan.
