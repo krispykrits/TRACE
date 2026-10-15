@@ -60,6 +60,26 @@ class ConfigurationTests(unittest.TestCase):
 
         self.assertEqual(settings.log_level, "INFO")
 
+    def test_investigator_process_settings_do_not_become_foundation_authority(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            env_file = self._empty_env_file(directory)
+            settings = load_settings(
+                environ={
+                    "TRACE_ENVIRONMENT": "test",
+                    "TRACE_INVESTIGATOR_PROFILE": "/private/nonexistent-profile.json",
+                    "TRACE_ALLOW_PAID_LIVE": "1",
+                },
+                dotenv_path=env_file,
+            )
+            self.assertEqual(settings.environment, "test")
+            env_file.write_text("TRACE_INVESTIGATOR_PROFILE=/private/profile.json\n")
+            with self.assertRaises(ConfigurationError):
+                load_settings(
+                    environ={"TRACE_ENVIRONMENT": "test"}, dotenv_path=env_file
+                )
+
     def test_missing_required_environment_is_actionable(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             env_file = self._empty_env_file(directory)

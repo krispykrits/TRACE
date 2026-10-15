@@ -31,7 +31,7 @@ The current provider implementation blocks customer/employee/evaluator sources a
 
 Never record raw prompts/responses/provider errors, removed sensitive values, evaluator answers or credentials. Audit/logs retain permitted identifiers, nonnegative integer/null usage and explicit outcomes. Known credentials in field names are rejected before provenance writes.
 
-Accepted assessments and pending review packets inherit source sensitivity and admitted redacted citation/provenance views. Reads/exports revalidate original provider dependencies plus current evidence/knowledge policy and support bindings. The bounded workflow preserves these rules; #38 must implement authenticated restoration/inspection/review persistence/export without a scope-only stored-body bypass.
+Accepted assessments and pending review packets inherit source sensitivity and admitted redacted citation/provenance views. Reads/exports revalidate original provider dependencies plus current evidence/knowledge policy and support bindings. The [local investigator CLI](../architecture/investigator-cli.md) restores saved results through original dependency fingerprints, independently resolved current sources/grants, input-derived clearance and current support decisions. JSON output additionally checks transmission rights; no scope-only stored-body read is exposed. Owner-managed local file composition remains trusted and does not implement operational authentication.
 
 ## Hosted and real-data acceptance
 

@@ -2,7 +2,7 @@
 
 Use CPython 3.12 on Linux, uv 0.12.17 and GNU make. Run commands from the repository root. `pyproject.toml`/`uv.lock` own dependency versions; [package layout](architecture/package-layout.md) owns import boundaries.
 
-The current public CLI handles configuration and synthetic Order/replay commands. The internal bounded investigator, Azure connector, protected assessments and durable budgets are implemented; the operator-facing investigation/inspection/export CLI remains #38.
+The public CLI handles configuration, synthetic Order/replay commands and local captured-window investigation, protected saved inspection/export and cancellation. See the [investigator CLI contract](architecture/investigator-cli.md) for trusted profile setup and one-command offline reproduction.
 
 ## Setup and first run
 
@@ -46,8 +46,11 @@ The credential-free GitHub Actions job runs the same quality checks on Ubuntu 24
 | `TRACE_ENVIRONMENT` | Required: `development`, `test` or `production` |
 | `TRACE_LOG_LEVEL` | Optional, default `INFO`; standard DEBUG through CRITICAL levels |
 | `--env-file` / `TRACE_ENV_FILE` | Explicit settings file; the CLI option takes precedence |
+| `TRACE_INVESTIGATOR_PROFILE` / `TRACE_ALLOW_PAID_LIVE` | Process-only investigator/provider settings; foundation/demo commands ignore them without reading profile/provider files |
 
 Value precedence is built-in defaults → selected dotenv file → process environment → CLI overrides. With no selected file, a missing working-directory `.env` is allowed. An explicitly selected file must be readable.
+
+Investigator commands instead use the owner-managed `TRACE_INVESTIGATOR_PROFILE` and explicit `--environment`/`--provider`; they do not read dotenv settings. [Their profile and exit contract](architecture/investigator-cli.md) is separate.
 
 Dotenv parsing accepts blank/comment lines and `KEY=VALUE`, removes matching surrounding quotes and performs no shell evaluation, variable expansion or inline-comment interpretation. Unknown `TRACE_` settings and invalid values fail without echoing their contents.
 
@@ -68,6 +71,9 @@ Environment/log validation is separate from model readiness. The [provider guide
 | `trace-app demo-order` | Validated synthetic Order → Payment request |
 | `trace-app replay-dependency` | Seeded dependency evidence export |
 | `trace-app replay-scenario` | Explicit development case export, with optional distractor omission |
+| `trace-app investigate` | Explicit Azure/evidence-only investigation over a configured development/test capture |
+| `trace-app report` | Current-authority saved display, citation resolution or private JSON export |
+| `trace-app cancel-investigation` | Durable cancellation of a queued/running job |
 
 ~~~sh
 uv run --locked trace-app demo-order --environment test --order-id order-001 --customer-id customer-001 --amount-cents 1250

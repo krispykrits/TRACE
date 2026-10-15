@@ -30,7 +30,7 @@ from trace_app.investigation.workflow import (
 
 
 class SQLiteWorkflowStore:
-    """Raw artifact bodies have no public getter; #38 must add current source/review access."""
+    """Private persistence; artifact content is delivered only through ReportAccess."""
 
     def __init__(self, path: Path) -> None:
         self._store = SQLiteInvestigationStore(path)
@@ -91,7 +91,12 @@ class SQLiteWorkflowStore:
                 )
 
     def retain(
-        self, identity: ExecutionIdentity, package: EvidencePackage, *, at: datetime
+        self,
+        identity: ExecutionIdentity,
+        package: EvidencePackage,
+        *,
+        at: datetime,
+        access_binding: dict[str, object] | None = None,
     ) -> str:
         if (
             package.investigation_id != identity.investigation_id
@@ -110,6 +115,7 @@ class SQLiteWorkflowStore:
             "workflow_version": WORKFLOW_VERSION,
             "package_status": package.status,
             "sensitivity": "unknown",
+            "evidence_access": access_binding,
             "mutation_authority": False,
         }
         with self._store._transaction():
@@ -234,7 +240,9 @@ class SQLiteWorkflowStore:
                     "A stale attempt cannot fail or publish the current job."
                 )
             status = (
-                "expired"
+                "cancelled"
+                if code == "cancelled"
+                else "expired"
                 if row["lease_until"] <= timestamp
                 or row["expires_at"] is not None
                 and row["expires_at"] <= timestamp

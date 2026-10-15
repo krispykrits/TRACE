@@ -105,7 +105,7 @@ class Store:
                 active_attempt_id=None,
             )
 
-    def retain(self, identity, package, *, at):
+    def retain(self, identity, package, *, at, access_binding=None):
         self.active(identity)
         self.packages.append(package)
         return f"artifact-{len(self.packages)}"

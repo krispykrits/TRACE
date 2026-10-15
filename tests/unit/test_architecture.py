@@ -66,6 +66,15 @@ class ArchitectureTests(unittest.TestCase):
                 "from evaluation.scoring import evaluate",
                 "from tests.fixtures.execution import MemoryLedger",
             ],
+            "investigation/reports.py": [
+                "from trace_app.adapters.storage.sqlite.reports import SQLiteReportReader",
+                "from trace_app.adapters.sources.local_investigator import LocalSupportReviews",
+                "from scripts.investigator_fixture import prepare",
+            ],
+            "investigation/local_service.py": [
+                "from trace_app.adapters.storage.sqlite.investigations import SQLiteInvestigationStore",
+                "from trace_app.bootstrap import create_local_investigator",
+            ],
             "investigation/workflow.py": [
                 "from trace_app.adapters.storage.sqlite.workflow import SQLiteWorkflowStore",
                 "from scripts.demo_investigator import ScriptedModel",
@@ -73,6 +82,8 @@ class ArchitectureTests(unittest.TestCase):
                 "from tests.fixtures.workflow import fixture",
             ],
             "adapters/models/provider.py": [
+                "from trace_app.investigation.reports import ReportAccess",
+                "from trace_app.investigation.local_service import LocalInvestigator",
                 "from trace_app.investigation.workflow import BoundedInvestigation",
                 "from trace_app.investigation.execution import ExecutionSession",
                 "from trace_app.investigation.assessment_validation import AssessmentValidator",

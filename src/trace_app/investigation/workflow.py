@@ -53,6 +53,7 @@ from trace_app.investigation.provider_policy import (
     ProtectedModelResponse,
     ProviderCall,
     ProviderScope,
+    SourceAccessPolicy,
     SourceKind,
 )
 from trace_app.investigation.tools import (
@@ -126,7 +127,12 @@ class WorkflowStore(Protocol):
         self, identity: ExecutionIdentity, name: str, *, at: datetime
     ) -> None: ...
     def retain(
-        self, identity: ExecutionIdentity, package: EvidencePackage, *, at: datetime
+        self,
+        identity: ExecutionIdentity,
+        package: EvidencePackage,
+        *,
+        at: datetime,
+        access_binding: dict[str, object] | None = None,
     ) -> str: ...
     def publish(self, publication: WorkflowPublication, *, at: datetime) -> None: ...
     def fail(self, identity: ExecutionIdentity, code: str, *, at: datetime) -> str: ...
@@ -418,9 +424,7 @@ class BoundedInvestigation:
                 f"{job.request.service} incident errors latency deployments"
             )
             package = self._gather(query, knowledge_query)
-            artifacts.append(
-                self.store.retain(self.execution.identity, package, at=self._at())
-            )
+            artifacts.append(self._retain(package))
             self.check_source_access(package)
             if self.options.evidence_only:
                 self.execution.stop("completed")
@@ -451,11 +455,7 @@ class BoundedInvestigation:
                     package = merge_packages(
                         package, self._gather(query, knowledge_query)
                     )
-                    artifacts.append(
-                        self.store.retain(
-                            self.execution.identity, package, at=self._at()
-                        )
-                    )
+                    artifacts.append(self._retain(package))
                     package, selections = select_context(
                         package, self.scope, (response,)
                     )
@@ -514,6 +514,12 @@ class BoundedInvestigation:
                     "bundle_version": BUNDLE_VERSION,
                     "artifact_id": uuid.uuid4().hex,
                     "citation_ids": list(report.references()),
+                    "response_access": response.storage_binding(self.scope),
+                    "evidence_access": self._binding(package),
+                    "review_tasks": [
+                        {"binding_id": t["binding_id"], "claim_id": t["claim_id"]}
+                        for t in tasks
+                    ],
                     "evidence_artifact_ids": list(artifacts),
                     "mutation_authority": False,
                 }
@@ -533,6 +539,8 @@ class BoundedInvestigation:
                 self.store.publish(publication, at=self._at())
                 artifacts.append(publication.artifact_id)
                 status = "completed"
+        except KeyboardInterrupt:
+            failure = "cancelled"
         except ModelProviderError as error:
             failure = error.code.value
         except ExecutionRejected as error:
@@ -595,6 +603,33 @@ class BoundedInvestigation:
             validation.outcome,
             failure,
             tuple(artifacts),
+        )
+
+    def _binding(self, package: EvidencePackage) -> dict[str, object]:
+        content = source_content(package)
+        return SourceAccessPolicy(self.authority, self.scope, clock=self._clock).bind(
+            tuple(
+                EvidenceSelection(identity, revision, ("content",))
+                for identity, (revision, _) in content.items()
+            ),
+            expected_content={
+                identity: value for identity, (_, value) in content.items()
+            },
+        )
+
+    def _retain(self, package: EvidencePackage) -> str:
+        # Retain failed/denied evidence privately too, but never disclose an unbound artifact.
+        try:
+            binding = self._binding(package)
+            binding["configuration"] = (
+                self.provider.configuration_metadata()
+                if self.provider
+                else {"provider": "none", "mode": "evidence_only"}
+            )
+        except Exception:
+            binding = None
+        return self.store.retain(
+            self.execution.identity, package, at=self._at(), access_binding=binding
         )
 
     def _gather(self, query: EvidenceQuery, knowledge_query: str) -> EvidencePackage:

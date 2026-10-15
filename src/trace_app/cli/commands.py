@@ -87,6 +87,9 @@ def _parser() -> argparse.ArgumentParser:
     scenario_parser.add_argument("--case", required=True, choices=CASE_IDS)
     scenario_parser.add_argument("--seed", required=True, type=int)
     scenario_parser.add_argument("--without-distractor", action="store_true")
+    from trace_app.cli.investigator import add_commands
+
+    add_commands(commands)
     return parser
 
 
@@ -98,6 +101,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.print_help()
         return 0
     parsed = parser.parse_args(arguments)
+    from trace_app.cli.investigator import COMMANDS, run
+
+    if parsed.command in COMMANDS:
+        return run(parsed)
     if parsed.command not in {
         "check-config",
         "demo-order",

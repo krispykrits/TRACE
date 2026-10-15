@@ -4,6 +4,8 @@
 - **Date:** 2026-10-14 (America/New_York)
 - **Scope:** Local MVP read-only application use case; operational identity and #38 inspection remain separate
 
+Later implementation note (2026-10-15): #38 / [ADR 0019](0019-local-cli-and-saved-report-access.md) adds trusted-local saved restoration/inspection/export with original dependency bindings and current authority/support checks. Operational authentication remains a separate gate; the original #37 scope below is preserved.
+
 ## Context
 
 The owner merged PR #53 at `5cf913e`; #36 is closed and Project Done. Source-neutral evidence/timeline/context, controlled tools, per-request provider admission, assessment validation and durable budgets are implemented. They need one prescribed workflow, with private outcomes and no paid-call replay or model-created permissions. Valid reports without trusted human support remain proposals.
