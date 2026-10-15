@@ -1,6 +1,12 @@
 # TRACE current status
 
-Last refreshed: 2026-10-14
+Last refreshed: 2026-10-15
+
+## Owner scope clarification — 2026-10-15
+
+The owner approved the complete root README with an end-state diagram, removal of its two production-focused sections and retention of runnable examples under Local development. [Planning #78](https://github.com/krispykrits/TRACE/issues/78) / [ADR 0018](adr/0018-flexible-ml-and-ranked-response-options.md) record flexible ML selection and ranked evidence-supported responses with a clearly recommended action. No ML family is mandatory; code proposals follow reviewed change delivery and operational actions remain explicitly approved catalog execution.
+
+The documentation aligns S10-S11 selection/evaluation and S14 response-contract/staging work, retaining the five-arm study, independent pilot and production-remediation gates. Runtime schemas/code, dependencies, frozen artifacts and cloud resources are unchanged. Implementation, selected ML/targets/actions and numerical thresholds remain future acceptance work. Earlier dated status entries below retain their historical context; live Project Status remains authoritative.
 
 ## Direction
 

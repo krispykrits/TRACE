@@ -1,5 +1,13 @@
 # TRACE architecture view
 
+## Planned final capabilities — owner clarification, 2026-10-15
+
+[ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md) governs flexible ML selection and ranked response options. The final product uses a justified evaluated ML capability selected from suitable methods and presents applicable rollback, corrective modification, mitigation, further-investigation and observe/escalate options, with a clearly marked recommended response and evidence/risk/verification rationale. Recommendations, engineer selection, reviewed code delivery and explicitly approved catalog execution have separate boundaries. See the [root end-state diagram](../../README.md#end-state-architecture).
+
+These capabilities remain planned S10-S14 work; no current assessment schema, tool authority or runtime package is extended by this records change.
+
+## Current implementation view
+
 The owner-selected [independent .NET testbed and JSON-first evidence direction](../adr/0017-dotnet-testbed-and-json-first-evidence.md) is planned under [#69-#76](../planning/dotnet-testbed-backlog.md). Order/Payment workloads run separately; TRACE keeps one Python application. Future sources normalize exported JSON first, then scoped Azure query results, preserving current evidence and authority boundaries. No .NET service/source adapter is implemented by this records update.
 
 The [capability package layout](package-layout.md) and [ADR 0010](../adr/0010-capability-packages-and-adapter-boundaries.md) define dependency direction and composition; make architecture-check and make package-check enforce this during every future PR.

@@ -35,3 +35,9 @@ The [#18 catalog](investigation-tools.md) wraps log, metric, deployment and know
 ## Sprint 4 cited package
 
 The [scripted evidence package](scripted-evidence-package.md) uses the read-only invoker port to query three evidence kinds and knowledge, then resolve every selected event and quoted passage. Canonical source data/hash are separate from real execution IDs/audit; failures release no package, while source/context gaps remain partial. It produces no assessment and exposes no model/provider or mutation endpoint. Evaluator-only tool-choice cases are outside the runtime wheel.
+
+## Planned response selection — 2026-10-15
+
+[ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md) requires ranked applicable response options and a clearly identified recommended response in the final product. Each option carries evidence/uncertainty, expected benefit, risks, prerequisites, verification/recovery and a delivery route: recommendation only, reviewed code/configuration change, or supported catalog action. Engineer selection and concrete execution approval are separate records/decisions. Further investigation can be recommended without operational execution.
+
+This is future S14 contract work. Version the eventual schema and preserve current protected v1/v2 assessment/review/CLI contracts; do not add a public API or treat current next-check proposals as write authority.
