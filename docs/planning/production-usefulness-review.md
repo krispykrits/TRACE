@@ -1,5 +1,7 @@
 # TRACE production-usefulness review
 
+Current selection policy: [ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md), owner-approved 2026-10-15, supersedes mandatory classical-ML or blanket optional-DL interpretations of this review. V2/V3 remain candidate references; select a justified use case and method with appropriate comparative evidence. The source findings and test results below remain the September 23 snapshot.
+
 Date: 2026-09-23. Scope: source review of the local educational implementations, supplied Volume 5/6 architectures, and TRACE GitHub planning at commit e8f08e8c62f68e7da682356cb171087d7417ca0c. This is a planning assessment, not production certification. No application implementation or cloud resources were changed.
 
 ## Recommendation

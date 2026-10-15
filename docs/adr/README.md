@@ -21,6 +21,7 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0015](0015-azure-aks-cloud-deployment.md) | Azure/containers/AKS, shared PostgreSQL/pgvector, Workload Identity and Azure telemetry | Owner-selected direction; #55-#60 design/implementation/acceptance pending |
 | [0016](0016-bounded-investigation-and-private-publication.md) | Fixed evidence-first workflow, complete repeated admission and private atomic publication | Proposed in #37; operational inspection remains #38 |
 | [0017](0017-dotnet-testbed-and-json-first-evidence.md) | Independent .NET Order/Payment testbed, JSON-first then live Azure source ingestion and owner-led investigation | Accepted owner direction; #69-#76 implementation/usefulness pending |
+| [0018](0018-flexible-ml-and-ranked-response-options.md) | Use-case-appropriate evaluated ML and ranked incident-response options with an explicit recommendation | Accepted owner direction, 2026-10-15; ML/response implementation and acceptance pending |
 
 ## Open decision register
 
@@ -38,6 +39,8 @@ These are gates, not inferred decisions. The [charter](../charter.md) is the ful
 | Azure infrastructure/model spending constraints and measured workload | Project owner and relevant reviewer, before paid evaluation or provisioning | Model cap is $20/month through Azure AI Foundry; TRACE-local model reservations/usage estimates and a synthetic live contract are accepted in #34; account-wide billing, operational retention and Azure infrastructure budget remain separate |
 | AKS topology, identity, Terraform state and application release/recovery | Project team and account owner, S7/S8 after budget/workload inputs | [ADR 0015](0015-azure-aks-cloud-deployment.md) and #55-#58; exact resources/account/budget and apply remain gated |
 | Azure telemetry collection/workspace, permitted readers, retention/ingestion and alerts | Project owner/account owner, before hosted collection | [ADR 0015](0015-azure-aks-cloud-deployment.md) and #59; no old CloudWatch retention or $5 threshold selects Azure values |
+| ML use case/method and task-specific evaluation | Project team and relevant reviewer, S10-S11 before comparative measurement | ADR 0018 permits classical ML, deep learning, pretrained and other suitable ML methods; suitable baselines, data rights, thresholds and downstream ablation remain required |
+| Ranked response schema, review rubric and supported action adapters | Project team, S14 before staging/action acceptance | ADR 0018 requires applicable alternatives and a clearly recommended response; no current schema or execution authority is expanded |
 | Production action/target, service owner and approver | Project owner and service owner, before action-specific design and execution | No standing mutation permission; see [approved scope](../planning/production-remediation-scope.md) |
 
 The [implementation review](../planning/production-usefulness-review.md) and [approved amendment](../planning/production-roadmap-amendment.md) define the reuse and Operational Pilot constraints behind these gates.

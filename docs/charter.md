@@ -1,11 +1,13 @@
 # TRACE charter
 
+Scope clarification approved 2026-10-15: [ADR 0018](adr/0018-flexible-ml-and-ranked-response-options.md) records flexible ML selection and ranked incident-response options. Initial read-only releases and independent pilot/production-remediation gates are retained.
+
 Status: Sprint 1 decision record, 2026-09-23  
 Repository: [krispykrits/TRACE](https://github.com/krispykrits/TRACE)
 
 ## Purpose
 
-TRACE is an incident intelligence and controlled-response platform that helps an engineer investigate incidents and carry out explicitly approved remediation. Its first useful workflow accepts a service and incident window, builds an auditable timeline, presents supported and competing hypotheses, identifies missing evidence, and suggests the next useful check. The initial Local/Cloud MVP investigation workflow remains read-only. Final capstone completion also requires at least one real, explicitly approved and verified production remediation through a separate deterministic executor. Temporal correlation alone is not root-cause proof; unsupported or insufficient evidence must produce uncertainty or abstention.
+TRACE is an incident intelligence and controlled-response platform that helps an engineer investigate incidents and carry out explicitly approved remediation. Its first useful workflow accepts a service and incident window, builds an auditable timeline, presents supported and competing hypotheses, identifies missing evidence, and suggests the next useful check. The completed product ranks applicable rollback, corrective code/configuration, mitigation, further-investigation and observe/escalate options, clearly marks the recommended response and explains evidence, uncertainty, benefit, risks, prerequisites, verification and recovery. The initial Local/Cloud MVP investigation workflow remains read-only. Final capstone completion also requires at least one real, explicitly approved and verified production remediation through a separate deterministic executor. Temporal correlation alone is not root-cause proof; unsupported or insufficient evidence must produce uncertainty or abstention.
 
 ## Users and workflow
 
@@ -21,7 +23,7 @@ TRACE is an incident intelligence and controlled-response platform that helps an
 | --- | --- |
 | **Local MVP (S1–S6)** | Reproducible synthetic incidents, SQLite-backed investigation/evidence state, small measured retrieval corpus, bounded read-only tools, explicit investigator workflow, cited structured assessment, deterministic timeline, abstention, automated development scoring and documented setup. |
 | **Cloud MVP (S7–S9)** | The same workflow containerized on Azure AKS through Terraform, with PostgreSQL/pgvector shared state, scoped workload identity, intentional release/rollback, observability, independent cost controls, recovery and verified teardown/recreation. |
-| **Full capstone (S10–S18)** | All 15 master-prompt capabilities, broader scenario coverage, evaluated classical ML and retrieval, five comparison arms, hardened operations/security, frozen-protocol study, final defense, and verified authorized production remediation after staging validation. |
+| **Full capstone (S10–S18)** | All 15 master-prompt capabilities, broader scenario coverage, evaluated use-case-appropriate ML and retrieval, ranked response options with a clearly recommended action, five comparison arms, hardened operations/security, frozen-protocol study, final defense, and verified authorized production remediation after staging validation. |
 | **Operational Pilot (independent)** | Authorized historical replay and read-only shadow use with a named operator/team; comparison to their current workflow and a deterministic evidence bundle; operator-reviewed utility, quality, reliability, latency and cost evidence; access isolation, recovery, support ownership and feedback. |
 
 Passing a synthetic evaluation, deploying to Azure AKS or finishing the capstone does not itself satisfy the Operational Pilot gate. The [production remediation scope](planning/production-remediation-scope.md) separately requires execution on an authorized workload serving a real operational purpose; simulation or staging-only execution does not satisfy that requirement. A missing production target/access remains a final acceptance blocker, not a reason to invent or force a production incident.
@@ -30,7 +32,7 @@ Passing a synthetic evaluation, deploying to Azure AKS or finishing the capstone
 
 - Use this TRACE repository for one modular Python application with TRACE-owned contracts.
 - Treat Volumes 1–4 as educational reference implementations. Reuse selected components only through versioned, installable boundaries; do not depend on editable sibling directories.
-- Volume 1 triage supplies vocabulary and fixtures; the Volume 2 classical detector is a later evaluated candidate; Volume 3 deep learning is conditional on measured benefit; Volume 4 retrieval is adapted behind TRACE contracts.
+- Volume 1 triage supplies vocabulary and fixtures; Volumes 2 and 3 supply candidate ML components; Volume 4 retrieval is adapted behind TRACE contracts. Select ML for a justified incident-analysis use case using measured quality, reliability, latency, cost and operational complexity against appropriate baselines. Classical ML, deep learning, pretrained models and other suitable ML methods are candidates; no algorithm family or educational implementation is mandatory. See [ADR 0018](adr/0018-flexible-ml-and-ranked-response-options.md).
 - Volumes 5 and 6 are design inputs. Their capabilities will be implemented within TRACE; they are not existing dependencies.
 - Preserve source provenance, event/collection times, authorization scope, stable identifiers, redaction, bounded read-only operations, and separation between investigator-visible evidence and evaluator-only labels.
 - Keep ML and the full five-arm study as final requirements, but outside the Local MVP critical path.
@@ -61,10 +63,10 @@ The package manager choice (`uv`) is a Sprint 1 default to make environment recr
 Definitions are agreed now; numeric targets are set with the relevant reviewer/operator before each acceptance run and then frozen for that run.
 
 - **Evidence usefulness:** time to first useful evidence and time to a defensible next check, compared with the current workflow and a deterministic evidence bundle.
-- **Diagnostic quality:** correct identification where answerable, supporting-citation quality, unsupported-claim rate, disclosure of missing evidence, and justified abstention.
+- **Diagnostic quality:** correct identification where answerable, supporting-citation quality, unsupported-claim rate, disclosure of missing evidence, and justified abstention. Final response evaluation also reviews alternative applicability, ranking and recommended-action rationale, risks/prerequisites and verification/recovery; human selection never substitutes for action-specific execution approval.
 - **Remediation quality:** evidence of actual resource change and intended health outcome; unauthorized/stale approval rejection, duplicate/crash reconciliation, failure/recovery handling and complete proposal-to-verification audit trail. Set numeric limits for the chosen action before acceptance.
 - **Operational quality:** successful/recoverable investigations, access-boundary regressions, latency and cost per investigation.
-- **Retrieval and ML:** retrieval Recall@K/MRR; detector precision/recall/F1, false alerts per service-day and detection delay; downstream diagnostic or tool-use benefit over simpler baselines.
+- **Retrieval and ML:** retrieval Recall@K/MRR; task-appropriate ML quality/reliability/latency/cost and downstream diagnostic or tool-use benefit against suitable baselines. Detection use cases additionally measure precision/recall/F1, false alerts per service-day and delay; these are not universal metrics for every ML task.
 - **Study quality:** paired results, explicit failed-run accounting, uncertainty/repeatability, separate unseen variants and unseen-family cohorts, and untouched final-test data until protocol freeze.
 
 Thresholds must be written before the related acceptance run. Full-study thresholds, configurations, cohort definitions and analysis freeze before final-test access.

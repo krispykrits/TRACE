@@ -127,3 +127,11 @@ Operational comparison remains blocked on a named operator/team and source owner
 ## Runtime assessment extension — 2026-10-14
 
 [#35](validated-assessments.md) implements `assessment.v2` with a version-1 candidate projection for this evaluator. Historical schema/scorer reports and recorded hashes are preserved. Runtime citation validity and independently trusted support review remain separate; synthetic test reviewer records demonstrate gate behavior without claiming actual human support results or the two-reviewer study protocol. Sampled support packets include exact statements, original sanitized citation/provenance views and contradictions under input-derived access/sensitivity. Do not turn evaluator expectations into runtime approval or merge projection-only artifacts with full protected reports.
+
+## Planned final ML and response evaluation — 2026-10-15
+
+[ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md) records the owner-approved selection policy. S10-S11 define a justified ML task, suitable candidates, appropriate baselines and predeclared task/downstream quality, reliability, latency, cost and complexity criteria. Detection tasks additionally evaluate realistic alert burden and delay. Use grouped data/model/prompt/configuration/artifact provenance and preserve held-out isolation, negative findings and evidence-only recovery. No algorithm family is required.
+
+S14 separately versions and evaluates multiple applicable response options and a clearly recommended response. Human review assesses evidentiary support, alternative applicability/ranking, uncertainties, benefit/risk, prerequisites, verification/recovery and justified further-investigation/escalation. Recommendations and review/selection do not authorize execution; actual resource/health changes and action-approval boundary tests require separate staging/production evidence.
+
+This section defines future acceptance work. It adds no fields to the implemented v1/v2 contracts and no metric or threshold to frozen reports; existing synthetic scorer results are not ranked-response or ML acceptance.
