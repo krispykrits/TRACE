@@ -1,0 +1,76 @@
+{
+  "reviews": [
+    {
+      "binding_id": "4f524a8b8d897442dc5e04164e0a4a80f28e8e6995513c72cb4f821f168b51ba",
+      "reviewer_id": "christian",
+      "kind": "human_review",
+      "verdict": "indeterminate",
+      "rationale": "The reviewer stated that this claim is too vague to assess whether its cited evidence supports it. Recorded by Codex from the reviewer\u2019s explicit instruction applying this judgment to all ten sampled claims."
+    },
+    {
+      "binding_id": "548d242bb65719f065361e43661c323b9c2059217097248947e4a84e21c32ac8",
+      "reviewer_id": "christian",
+      "kind": "human_review",
+      "verdict": "indeterminate",
+      "rationale": "The reviewer stated that this claim is too vague to assess whether its cited evidence supports it. Recorded by Codex from the reviewer\u2019s explicit instruction applying this judgment to all ten sampled claims."
+    },
+    {
+      "binding_id": "244b6b9010f9f1d098f864dcb1497360409cc8ac3063f67d9d3110f19f5c26f4",
+      "reviewer_id": "christian",
+      "kind": "human_review",
+      "verdict": "indeterminate",
+      "rationale": "The reviewer stated that this claim is too vague to assess whether its cited evidence supports it. Recorded by Codex from the reviewer\u2019s explicit instruction applying this judgment to all ten sampled claims."
+    },
+    {
+      "binding_id": "b796c3476d877b114ddc99dfc7bf4d38440b78ad60e9950e83035535f0244ab0",
+      "reviewer_id": "christian",
+      "kind": "human_review",
+      "verdict": "indeterminate",
+      "rationale": "The reviewer stated that this claim is too vague to assess whether its cited evidence supports it. Recorded by Codex from the reviewer\u2019s explicit instruction applying this judgment to all ten sampled claims."
+    },
+    {
+      "binding_id": "d20836ee2a53c7e4c9976b32308b031010d09263d9ab4b10cd9f19b26da5b5b0",
+      "reviewer_id": "christian",
+      "kind": "human_review",
+      "verdict": "indeterminate",
+      "rationale": "The reviewer stated that this claim is too vague to assess whether its cited evidence supports it. Recorded by Codex from the reviewer\u2019s explicit instruction applying this judgment to all ten sampled claims."
+    },
+    {
+      "binding_id": "8983d78b0fc4e9322df903a459f60abd414ca8cf393b611c23927ade578a344e",
+      "reviewer_id": "christian",
+      "kind": "human_review",
+      "verdict": "indeterminate",
+      "rationale": "The reviewer stated that this claim is too vague to assess whether its cited evidence supports it. Recorded by Codex from the reviewer\u2019s explicit instruction applying this judgment to all ten sampled claims."
+    },
+    {
+      "binding_id": "cd7a67a1e61b448cb0eba07d19f4436c610423ad38d4c4b734f9273cb49b91b1",
+      "reviewer_id": "christian",
+      "kind": "human_review",
+      "verdict": "indeterminate",
+      "rationale": "The reviewer stated that this claim is too vague to assess whether its cited evidence supports it. Recorded by Codex from the reviewer\u2019s explicit instruction applying this judgment to all ten sampled claims."
+    },
+    {
+      "binding_id": "8d5183fb51586672787f5ad7eabc1a447babe444aa1f69fa3ee4cb7f3bcfbd74",
+      "reviewer_id": "christian",
+      "kind": "human_review",
+      "verdict": "indeterminate",
+      "rationale": "The reviewer stated that this claim is too vague to assess whether its cited evidence supports it. Recorded by Codex from the reviewer\u2019s explicit instruction applying this judgment to all ten sampled claims."
+    },
+    {
+      "binding_id": "209ae2712bb5f6a8e70428198cc3bf667fe1eb1c99ef5088f8034320083ee44a",
+      "reviewer_id": "christian",
+      "kind": "human_review",
+      "verdict": "indeterminate",
+      "rationale": "The reviewer stated that this claim is too vague to assess whether its cited evidence supports it. Recorded by Codex from the reviewer\u2019s explicit instruction applying this judgment to all ten sampled claims."
+    },
+    {
+      "binding_id": "fee2aebb3dba9d7d2bea269e76cd275d7c3f527f13df2c47219e2d4e8219dbac",
+      "reviewer_id": "christian",
+      "kind": "human_review",
+      "verdict": "indeterminate",
+      "rationale": "The reviewer stated that this claim is too vague to assess whether its cited evidence supports it. Recorded by Codex from the reviewer\u2019s explicit instruction applying this judgment to all ten sampled claims."
+    }
+  ],
+  "sample_sha256": "3185921099fe16d1d4e18219b3b76e9b350d8f6956e640120b6ab4ad9c7386fe",
+  "schema_version": "investigator-support-review.v1"
+}

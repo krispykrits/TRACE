@@ -1,6 +1,6 @@
 # TRACE current status
 
-Updated: 2026-10-15 against #38 merge `71de366` / PR #82 and live Project Done; #39 has a verified offline run; implementation/support review is pending. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
+Updated: 2026-10-15 against #38 merge `71de366` / PR #82 and live Project Done; #39 / PR #83 is In review with an offline run and recorded guided human judgments. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
 
 ## Implemented
 
@@ -14,11 +14,11 @@ Updated: 2026-10-15 against #38 merge `71de366` / PR #82 and live Project Done; 
 | Investigation use case | Bounded workflow and atomic private publication merged in [PR #62](https://github.com/krispykrits/TRACE/pull/62); offline demonstrations use hand-authored model/review records |
 | Planning decisions | Azure/AKS, independent .NET testbed/JSON-first ingestion and flexible ML/ranked responses accepted as direction in ADRs 0015, 0017 and 0018 |
 
-Merged [PR #82](https://github.com/krispykrits/TRACE/pull/82) provides captured-window CLI investigation, protected saved display/citation/export and cancellation with original dependency/clearance/retention and current support checks. #39 adds actual-output scoring, saved-artifact rescoring and bound review samples. Its [retained run](../evaluation/reports/investigator_offline_v1/manifest.json) passed 10/10 expected offline checks with zero critical boundary failures; the [Sprint 5 review](sprints/sprint-05-review.md) retains the wrong fixture cause scores and ten unreviewed sampled claims. The scoped PR remains open for implementation/support review. No paid end-to-end diagnosis or actual human support is claimed.
+Merged [PR #82](https://github.com/krispykrits/TRACE/pull/82) provides captured-window CLI investigation, protected saved display/citation/export and cancellation with original dependency/clearance/retention and current support checks. #39 adds actual-output scoring, saved-artifact rescoring and bound review samples. Its [retained run](../evaluation/reports/investigator_offline_v1/manifest.json) passed 10/10 expected offline checks with zero critical boundary failures. The [Sprint 5 review](sprints/sprint-05-review.md) preserves the wrong fixture cause scores and a separate [guided owner review](../evaluation/reports/investigator_offline_v1_human_review_v1/README.md): all ten sampled claims indeterminate because their wording was too vague to assess; no determinate support rate. [PR #83](https://github.com/krispykrits/TRACE/pull/83) remains open for implementation/integration review. Paid end-to-end diagnosis and positive human support remain unmeasured.
 
 ## Next work
 
-1. Review/complete [#39 actual-output scoring/integration](https://github.com/krispykrits/TRACE/issues/39), retaining explicit live-diagnosis and actual human-review blockers.
+1. Review/complete [#39 actual-output scoring/integration](https://github.com/krispykrits/TRACE/issues/39), including the recorded human findings and explicit live-diagnosis/quality limits.
 2. Execute the separate Sprint 6 acceptance track [#63–#68](planning/capstone-project-plan.md#backlogs-and-dependencies), after declaring thresholds, authorized run scope and actual review coverage.
 3. Follow [#55–#60](planning/azure-cloud-backlog.md) and [#70–#76](planning/dotnet-testbed-backlog.md) for cloud delivery and monitored services, in their recorded dependency order.
 
