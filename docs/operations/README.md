@@ -1,9 +1,39 @@
-# Current operational boundary
+# Operating boundary
 
-TRACE currently supports a local CLI, synthetic replay, SQLite state, curated knowledge and offline evaluation. The [development guide](../development.md) supplies supported commands; [package layout](../architecture/package-layout.md) identifies the implementation boundaries. Run the deterministic quality gates before promoting a code change.
+Use [current status](../current-status.md) for progress and [development](../development.md) for runnable local commands.
 
-The owner selected Azure/container/AKS cloud hosting on 2026-10-14; [ADR 0015](../adr/0015-azure-aks-cloud-deployment.md) and [cloud backlog](../planning/azure-cloud-backlog.md) govern the pending implementation. No AKS runtime, PostgreSQL migration/restore, hosted Azure telemetry or operational-source acceptance is verified. See [infrastructure responsibilities](../../deploy/README.md) for account/budget/plan, release, recovery and teardown gates. Existing synthetic local/Foundry demonstrations do not establish hosted acceptance.
+## What can be operated now
 
-Add service-specific deployment, startup/readiness, migration, backup/restore, retention/deletion, rollback and escalation procedures here when their implementations are introduced. Each procedure must identify the exact environment/release, owner, prerequisites, commands, expected outcomes and verification evidence. Record blocked or untested steps explicitly. Do not describe a local deletion method as backup deletion or an issued provider request as verified recovery.
+| Capability | Current operating limit |
+| --- | --- |
+| CLI/replay and knowledge demos | Local synthetic development/test behavior |
+| SQLite evidence/jobs/workflow artifacts | Private local storage; schema-1/2 job databases migrate to schema 3 through writable startup |
+| Azure connector | Explicit trusted composition/private files and separate paid-check authorization; historical synthetic check only |
+| Bounded investigator | Internal use case and offline demonstration; operator-facing protected inspection/export remains #38 |
+| Hosted runtime/source integration | AKS, shared PostgreSQL, pod identity, Azure collection and operational source acceptance remain planned |
 
-Cloud runbooks must include image digest/config identity, pod/service-account authority, migration/shared-spending admission, graceful termination and unknown-attempt reconciliation, log access/retention, secret rotation, rollback/restore and residual-resource cost checks. AKS restarts are not permission to replay paid calls. Initial investigation stays read-only and final remediation retains exact-action approval.
+## Local handling
+
+- Use fresh private output paths for demonstrations; do not overwrite accepted/frozen artifacts.
+- Preserve existing job/provider/execution journals after interruption. Deleting or switching a journal cannot reset spending or authorize an uncertain paid replay.
+- Open older job databases once through writable `SQLiteInvestigationStore` before read-only workers; unsupported newer schemas fail explicitly. [The storage contract](../architecture/sqlite-investigation-store.md) owns migration/deletion semantics.
+- Inspect current job/attempt/lease and unknown outcomes through trusted application contracts. A completed job can still require support review; no report or successful API submission proves service recovery.
+- Keep database, private config/key files, output and backup access restricted. Application terminal deletion is not proof that filesystem copies or backups were erased.
+- Report source/provider/storage failures and missing permissions explicitly. Do not replace them with fixtures or unsupported diagnosis.
+
+There is no accepted operational backup/restore, automatic retention, hosted collector recovery or production runbook yet. Those procedures must be introduced with their implementation and measured evidence.
+
+## Hosted runbook requirements
+
+[Deployment](../../deploy/README.md), [cloud design](../architecture/azure-cloud.md) and [#55–#60](../planning/azure-cloud-backlog.md) own the Azure acceptance sequence.
+
+Each procedure must identify environment/release, accountable owner, prerequisites, exact commands, expected outcome and verification. Cover:
+
+- Image digest/config identity, startup/readiness and graceful termination.
+- Pod identity and least privilege, credential ownership/rotation and account restrictions.
+- Schema/shared-state migration, spending admission, duplicate/crash handling and uncertain-call reconciliation.
+- Backup/restore/vector rebuild, source revocation, retention/deletion including derived data/backups.
+- Log correlation/access/retention, collector outage/recovery and content-free audit.
+- Release rollback, escalation/stop/recovery and teardown/recreation with residual billable resources.
+
+Kubernetes retries do not authorize paid replay. Keep infrastructure/account cost separate from the $20/month application model cap. Initial investigation remains read-only; real remediation uses [exact-action approval and outcome verification](../planning/production-remediation-scope.md).

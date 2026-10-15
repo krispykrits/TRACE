@@ -6,9 +6,11 @@
 - **Decision owner:** Project owner
 - **Scope:** Investigation execution state and bounded evidence snapshots; this does not select an incident log source or a retrieval index.
 
+Local SQLite implementation was accepted in [PR #32](https://github.com/krispykrits/TRACE/pull/32). Current startup migrates job state to schema 3; see [the SQLite contract](../architecture/sqlite-investigation-store.md). The original RDS/context text below is historical; Azure/shared-state acceptance remains #57.
+
 ## Context
 
-The Local MVP needs durable evidence and investigation state in Sprint 3 [issue #10](https://github.com/krispykrits/TRACE/issues/10), after issue #8 defines the evidence contract. The Cloud MVP moves the same workflow to Terraform-managed EC2 in S7–S9. The [approved amendment](../planning/production-roadmap-amendment.md) requires recoverable dispatch, duplicate handling, backup/restore and retention/deletion before hosted investigations. The owner selected SQLite for the Local MVP and a later switch to PostgreSQL through Amazon RDS. Cloud workload, overall spending limits, access policy and database sizing remain open [charter](../charter.md) gates.
+The Local MVP needs durable evidence and investigation state in Sprint 3 [issue #10](https://github.com/krispykrits/TRACE/issues/10), after issue #8 defines the evidence contract. The Cloud MVP moves the same workflow to Terraform-managed EC2 in S7–S9. The [delivery requirements](../planning/capstone-project-plan.md) requires recoverable dispatch, duplicate handling, backup/restore and retention/deletion before hosted investigations. The owner selected SQLite for the Local MVP and a later switch to PostgreSQL through Amazon RDS. Cloud workload, overall spending limits, access policy and database sizing remain open [charter](../charter.md) gates.
 
 ## Decision
 
@@ -37,7 +39,7 @@ SQLite keeps Local MVP setup within the existing Python runtime and works well f
 
 ## Evidence and limits
 
-The owner's 2026-09-25 selection sets the direction. [Issue #10](https://github.com/krispykrits/TRACE/issues/10), the [capstone plan](../planning/capstone-project-plan.md) and the [production-usefulness amendment](../planning/production-roadmap-amendment.md) supply the acceptance and migration gates. [SQLite's usage guidance](https://www.sqlite.org/whentouse.html) describes its local-storage and single-writer fit; [Amazon RDS resilience guidance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/disaster-recovery-resiliency.html) describes backup and restore options. The issue #10 PR proposes a tested Local SQLite schema and store. No RDS database, cross-database migration or measured production workload exists yet.
+The owner's 2026-09-25 selection sets the direction. [Issue #10](https://github.com/krispykrits/TRACE/issues/10), the [capstone plan](../planning/capstone-project-plan.md) and the [delivery requirements](../planning/capstone-project-plan.md) supply the acceptance and migration gates. [SQLite's usage guidance](https://www.sqlite.org/whentouse.html) describes its local-storage and single-writer fit; [Amazon RDS resilience guidance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/disaster-recovery-resiliency.html) describes backup and restore options. The issue #10 PR proposes a tested Local SQLite schema and store. No RDS database, cross-database migration or measured production workload exists yet.
 
 ## Revisit conditions
 

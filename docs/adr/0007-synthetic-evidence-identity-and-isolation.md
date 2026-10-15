@@ -1,6 +1,6 @@
 # ADR 0007: Stable synthetic evidence identity and evaluator isolation
 
-Status: Accepted with merged issue #8 PR #31, 2026-10-05. Revisit when S3 persistence or an authorized real source tests the contract.
+Status: Accepted with merged issue #8 PR #31, 2026-10-05. S3 persistence is implemented; revisit when an authorized operational adapter or a contract change tests additional source semantics.
 
 ## Context
 

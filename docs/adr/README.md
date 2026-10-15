@@ -19,28 +19,14 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0013](0013-assessment-validation-and-support-review.md) | Strict v2 assessments, current citations and independent protected support review | Accepted in #35 / merged PR #52 for Local MVP; frozen v1 scoring remains unchanged |
 | [0014](0014-durable-investigation-budgets.md) | Shared durable model/tool admission, usage reservations and content-free cost estimates | Accepted in #36 / merged PR #53 for the Local MVP enabler; distributed cloud admission remains #57 acceptance |
 | [0015](0015-azure-aks-cloud-deployment.md) | Azure/containers/AKS, shared PostgreSQL/pgvector, Workload Identity and Azure telemetry | Owner-selected direction; #55-#60 design/implementation/acceptance pending |
-| [0016](0016-bounded-investigation-and-private-publication.md) | Fixed evidence-first workflow, complete repeated admission and private atomic publication | Proposed in #37; operational inspection remains #38 |
+| [0016](0016-bounded-investigation-and-private-publication.md) | Fixed evidence-first workflow, complete repeated admission and private atomic publication | Accepted in #37 / merged PR #62; operational inspection remains #38 |
 | [0017](0017-dotnet-testbed-and-json-first-evidence.md) | Independent .NET Order/Payment testbed, JSON-first then live Azure source ingestion and owner-led investigation | Accepted owner direction; #69-#76 implementation/usefulness pending |
 | [0018](0018-flexible-ml-and-ranked-response-options.md) | Use-case-appropriate evaluated ML and ranked incident-response options with an explicit recommendation | Accepted owner direction, 2026-10-15; ML/response implementation and acceptance pending |
 
-## Open decision register
+## Reading and maintaining ADRs
 
-[ADR 0010](0010-capability-packages-and-adapter-boundaries.md) records the owner-authorized capability layout, adapter composition, test categories and automated import/package checks; implementation is merged in #46 / PR #47.
+An ADR records a scoped decision and its rationale. Its original context, alternatives and measurements may describe an earlier implementation. Current capability/status belongs in [architecture](../architecture/README.md) and [current status](../current-status.md).
 
-These are gates, not inferred decisions. The [charter](../charter.md) is the full owner/input register; update the relevant ADR when a design choice is made.
+Use [the template](template.md) for a consequential decision. Update acceptance/supersession metadata when evidence changes; retain the original decision text and link a replacement for changed direction. A selection ADR can be accepted while implementation remains pending.
 
-| Input | Owner and gate | Current effect |
-| --- | --- | --- |
-| University rubric/deadline and weekly capacity/sprint length | Project owner, before calendar or scope commitment | Sprint numbers are increments, not dates |
-| Pilot operator/team, service, data-access owner and source permission | Owner is confirmed .NET testbed service owner/initial investigator under ADR 0017; exact source/transmission/retention precede ingestion or shadow use | Planned Order/Payment JSON-first track is #69-#76; controlled-testbed and broader Operational Pilot usefulness remain unvalidated |
-| Runtime additions, model/provider and source adapters | Project team, when a specific capability is designed and evaluated | Numerical/lexical dependencies and optional local encoder accepted in [ADR 0009](0009-local-exact-knowledge-retrieval.md); Azure AI Foundry / GPT-6 Luna and $20/month model cap selected in [ADR 0012](0012-model-provider-contract-and-bounded-call.md); Azure adapter/live synthetic contract accepted in #34; operational source/identity/retention gates remain open |
-| Shared Azure PostgreSQL sizing/migration/roles/admission | Project team and account owner, S7–S9/#55/#57 | Local SQLite is implemented under ADR 0005; [ADR 0015](0015-azure-aks-cloud-deployment.md) selects the Azure hosting baseline; shared migration/concurrency/restore acceptance remains pending |
-| Vector index, embedding versions and retrieval limits | Project team and owner, #16 then S7–S9 | ADR 0006 retains PostgreSQL/pgvector semantics with Azure hosting in [ADR 0015](0015-azure-aks-cloud-deployment.md); [ADR 0009](0009-local-exact-knowledge-retrieval.md) records the accepted local baseline; cloud extension/rebuild/citation acceptance remains #57 |
-| Azure infrastructure/model spending constraints and measured workload | Project owner and relevant reviewer, before paid evaluation or provisioning | Model cap is $20/month through Azure AI Foundry; TRACE-local model reservations/usage estimates and a synthetic live contract are accepted in #34; account-wide billing, operational retention and Azure infrastructure budget remain separate |
-| AKS topology, identity, Terraform state and application release/recovery | Project team and account owner, S7/S8 after budget/workload inputs | [ADR 0015](0015-azure-aks-cloud-deployment.md) and #55-#58; exact resources/account/budget and apply remain gated |
-| Azure telemetry collection/workspace, permitted readers, retention/ingestion and alerts | Project owner/account owner, before hosted collection | [ADR 0015](0015-azure-aks-cloud-deployment.md) and #59; no old CloudWatch retention or $5 threshold selects Azure values |
-| ML use case/method and task-specific evaluation | Project team and relevant reviewer, S10-S11 before comparative measurement | ADR 0018 permits classical ML, deep learning, pretrained and other suitable ML methods; suitable baselines, data rights, thresholds and downstream ablation remain required |
-| Ranked response schema, review rubric and supported action adapters | Project team, S14 before staging/action acceptance | ADR 0018 requires applicable alternatives and a clearly recommended response; no current schema or execution authority is expanded |
-| Production action/target, service owner and approver | Project owner and service owner, before action-specific design and execution | No standing mutation permission; see [approved scope](../planning/production-remediation-scope.md) |
-
-The [implementation review](../planning/production-usefulness-review.md) and [approved amendment](../planning/production-roadmap-amendment.md) define the reuse and Operational Pilot constraints behind these gates.
+The [charter input register](../charter.md#open-inputs-and-decision-gates) owns unresolved owner/resource/threshold/permission decisions. The [delivery plan](../planning/capstone-project-plan.md) owns release gates; avoid duplicating those registers here. [Archived source reviews](../archive/README.md) retain historical context.

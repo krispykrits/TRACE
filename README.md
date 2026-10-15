@@ -92,11 +92,9 @@ Individual issues are stories/tasks; milestones are sprints. Project Status is t
 | **Cloud MVP** | 7–9 | Containerized Azure AKS deployment, shared state, workload identity, observability, recovery, cost controls and teardown; independent .NET testbed with JSON-first evidence and later live Azure queries |
 | **Full capstone** | 10–18 | Broader scenarios, evaluated ML suited to the selected use case, five-arm study, ranked response options, approved remediation, production hardening and final defense |
 
-- [Complete project plan and release gates](https://github.com/krispykrits/TRACE/blob/main/docs/planning/capstone-project-plan.md)
-- [Azure/AKS cloud direction](https://github.com/krispykrits/TRACE/blob/main/docs/adr/0015-azure-aks-cloud-deployment.md) and [cloud stories](https://github.com/krispykrits/TRACE/blob/main/docs/planning/azure-cloud-backlog.md)
-- [.NET testbed and source-integration stories](https://github.com/krispykrits/TRACE/blob/main/docs/planning/dotnet-testbed-backlog.md)
-- [Reliability, security and evaluation amendment](https://github.com/krispykrits/TRACE/blob/main/docs/planning/production-roadmap-amendment.md)
-- [Implementation reuse review](https://github.com/krispykrits/TRACE/blob/main/docs/planning/production-usefulness-review.md)
+- [Complete project plan and release gates](docs/planning/capstone-project-plan.md)
+- [Azure/AKS cloud direction](docs/adr/0015-azure-aks-cloud-deployment.md) and [cloud stories](docs/planning/azure-cloud-backlog.md)
+- [.NET testbed and source-integration stories](docs/planning/dotnet-testbed-backlog.md)
 - [MVP-first delivery tracker](https://github.com/krispykrits/TRACE/issues/9)
 - [Charter and minimum decisions](https://github.com/krispykrits/TRACE/issues/1)
 
@@ -108,20 +106,22 @@ The repository currently contains planning records, a Python CLI, synthetic work
 
 ## Local development
 
-Use the [development guide](https://github.com/krispykrits/TRACE/blob/main/docs/development.md) for the Python 3.12/uv setup, safe local environment example, configuration precedence and structured logging conventions.
+Start with the [documentation map](docs/README.md) and [current implementation status](docs/current-status.md).
 
-The [package layout and dependency rules](https://github.com/krispykrits/TRACE/blob/main/docs/architecture/package-layout.md) govern current and future code. Capability contracts and use cases remain independent of concrete adapters. Fast CI enforces import boundaries and tests the installed runtime wheel.
+Use the [development guide](docs/development.md) for the Python 3.12/uv setup, safe local environment example, configuration precedence and structured logging conventions.
+
+The [package layout and dependency rules](docs/architecture/package-layout.md) govern current and future code. Capability contracts and use cases remain independent of concrete adapters. Fast CI enforces import boundaries and tests the installed runtime wheel.
 
 Key implementation references:
 
-- [Synthetic Order–Payment workflow](https://github.com/krispykrits/TRACE/blob/main/docs/architecture/order-payment-workflow.md)
-- [SQLite investigation store](https://github.com/krispykrits/TRACE/blob/main/docs/architecture/sqlite-investigation-store.md)
-- [Authorized knowledge retrieval](https://github.com/krispykrits/TRACE/blob/main/docs/architecture/knowledge-retrieval.md)
-- [Bounded context and retrieval evaluation](https://github.com/krispykrits/TRACE/blob/main/docs/architecture/retrieval-evaluation-context.md)
-- [Architecture view](https://github.com/krispykrits/TRACE/blob/main/docs/architecture/README.md) and [ADR index](https://github.com/krispykrits/TRACE/blob/main/docs/adr/README.md)
-- [Infrastructure responsibilities](https://github.com/krispykrits/TRACE/blob/main/deploy/README.md)
-- [Operations](https://github.com/krispykrits/TRACE/blob/main/docs/operations/README.md) and [security boundaries](https://github.com/krispykrits/TRACE/blob/main/docs/security/README.md)
-- [Sprint 1 evidence review](https://github.com/krispykrits/TRACE/blob/main/docs/sprints/sprint-01-review.md)
+- [Synthetic Order–Payment workflow](docs/architecture/order-payment-workflow.md)
+- [SQLite investigation store](docs/architecture/sqlite-investigation-store.md)
+- [Authorized knowledge retrieval](docs/architecture/knowledge-retrieval.md)
+- [Bounded context and retrieval evaluation](docs/architecture/retrieval-evaluation-context.md)
+- [Architecture view](docs/architecture/README.md) and [ADR index](docs/adr/README.md)
+- [Infrastructure responsibilities](deploy/README.md)
+- [Operations](docs/operations/README.md) and [security boundaries](docs/security/README.md)
+- [Sprint 1 evidence review](docs/sprints/sprint-01-review.md)
 
 ### Synthetic tool demonstration
 
@@ -129,7 +129,7 @@ Key implementation references:
 uv run --locked python scripts/demo_tools.py
 ```
 
-Demonstrates six synthetic tools and rejection of unauthorized, over-limit and shell requests. The [tool catalog](https://github.com/krispykrits/TRACE/blob/main/docs/architecture/investigation-tools.md) describes typed inputs, read-only source grants, time/result bounds, audit and current operational limits.
+Demonstrates six synthetic tools and rejection of unauthorized, over-limit and shell requests. The [tool catalog](docs/architecture/investigation-tools.md) describes typed inputs, read-only source grants, time/result bounds, audit and current operational limits.
 
 ### Scripted evidence package
 
@@ -140,7 +140,7 @@ uv run --locked python scripts/demo_integration.py \
 make integration-s4
 ```
 
-Produces the scripted cited timeline/context package and verifies the assembled boundary with independent evaluator fixtures. See the [integration contract](https://github.com/krispykrits/TRACE/blob/main/docs/architecture/scripted-evidence-package.md) and [Sprint 4 review](https://github.com/krispykrits/TRACE/blob/main/docs/sprints/sprint-04-review.md).
+Produces the scripted cited timeline/context package and verifies the assembled boundary with independent evaluator fixtures. See the [integration contract](docs/architecture/scripted-evidence-package.md) and [Sprint 4 review](docs/sprints/sprint-04-review.md).
 
 ### Offline investigation demonstration
 
@@ -151,4 +151,4 @@ uv run --locked python -m scripts.demo_investigator \
 
 Use a fresh private output path. The demonstration covers answerable, insufficient-evidence and timeout cases using hand-authored model/review records.
 
-The [bounded investigation use case](https://github.com/krispykrits/TRACE/blob/main/docs/architecture/bounded-investigator.md) connects scoped evidence, provider policy, finite execution and protected assessment publication. These offline demonstrations do not establish live diagnostic quality or grant operational execution authority.
+The [bounded investigation use case](docs/architecture/bounded-investigator.md) connects scoped evidence, provider policy, finite execution and protected assessment publication. These offline demonstrations do not establish live diagnostic quality or grant operational execution authority.

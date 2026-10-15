@@ -32,7 +32,7 @@ The Local MVP remains credential-free and uses a small exact-search baseline. Cl
 
 ## Evidence and limits
 
-The owner confirmed PostgreSQL with pgvector on 2026-09-25. The [pgvector project](https://github.com/pgvector/pgvector) documents exact search and optional HNSW/IVFFlat indexes; the [RDS PostgreSQL extension catalog](https://docs.aws.amazon.com/AmazonRDS/latest/PostgreSQLReleaseNotes/postgresql-extensions.html) lists supported `pgvector` versions. The [production-usefulness review](../planning/production-usefulness-review.md) recommends preserving the small exact-search baseline and moving storage behind an adapter only when needed. No TRACE retrieval benchmark, target dimensions, RDS version, cost estimate or authorized operational corpus has been selected yet.
+The owner confirmed PostgreSQL with pgvector on 2026-09-25. The [pgvector project](https://github.com/pgvector/pgvector) documents exact search and optional HNSW/IVFFlat indexes; the [RDS PostgreSQL extension catalog](https://docs.aws.amazon.com/AmazonRDS/latest/PostgreSQLReleaseNotes/postgresql-extensions.html) lists supported `pgvector` versions. The [production-usefulness review](../archive/2026-09-23-reuse-review.md) recommends preserving the small exact-search baseline and moving storage behind an adapter only when needed. No TRACE retrieval benchmark, target dimensions, RDS version, cost estimate or authorized operational corpus has been selected yet.
 
 ## Revisit conditions
 

@@ -6,7 +6,7 @@
 
 ## Context
 
-The first Order → Payment path needs understandable operational context for later incident fixtures. The [charter](../charter.md) calls for one modular Python application and a CLI first; Customer and Notification remain lightweight fixtures. The [approved amendment](../planning/production-roadmap-amendment.md) requires source-neutral service/environment and correlation identities at workflow boundaries. No pilot source, payment provider, queue, persistent order store or independent service deployment is approved for this increment.
+The first Order → Payment path needs understandable operational context for later incident fixtures. The [charter](../charter.md) calls for one modular Python application and a CLI first; Customer and Notification remain lightweight fixtures. The [delivery requirements](../planning/capstone-project-plan.md) requires source-neutral service/environment and correlation identities at workflow boundaries. No pilot source, payment provider, queue, persistent order store or independent service deployment is approved for this increment.
 
 ## Decision
 
@@ -29,7 +29,7 @@ The CLI can demonstrate Order → Payment behavior and failure propagation with 
 
 ## Evidence
 
-[Unit and contract tests](../../tests/unit/test_order_workflow.py) exercise validation, boundary context propagation, rejection and dependency failures. [Process integration tests](../../tests/integration/test_cli_process.py) run the real CLI, validate the accepted result and correlated service logs, and reject unsafe input/production use. The [implementation review](../planning/production-usefulness-review.md) and [approved amendment](../planning/production-roadmap-amendment.md) constrain claims and future adapters.
+[Unit and contract tests](../../tests/unit/test_order_workflow.py) exercise validation, boundary context propagation, rejection and dependency failures. [Process integration tests](../../tests/integration/test_cli_process.py) run the real CLI, validate the accepted result and correlated service logs, and reject unsafe input/production use. The [implementation review](../archive/2026-09-23-reuse-review.md) and [delivery requirements](../planning/capstone-project-plan.md) constrain claims and future adapters.
 
 ## Revisit conditions
 

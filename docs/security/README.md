@@ -1,22 +1,44 @@
-# Current trust boundaries
+# Security and trust boundaries
 
-Core evidence and knowledge use cases accept trusted context separately from query filters. Source access, service/environment, freshness, withdrawal and saved citations are checked by the existing contracts/adapters. Retrieved text stays untrusted data; scores do not establish answerability or authority. See [package boundaries](../architecture/package-layout.md) and [production remediation scope](../planning/production-remediation-scope.md).
+The local application assumes trusted composition, an authorized caller and a controlled filesystem. These contracts protect scoped data paths; they do not supply operational authentication, a multitenant network service or a complete Python/OS sandbox.
 
-Current local contexts assume an authorized caller and controlled filesystem. They do not authenticate an operator, sandbox Python code or provide a multitenant network service. SQLite administration and corpus publication are trusted adapter operations, not investigator tools. The runtime wheel excludes evaluator labels and tests; fast architecture checks forbid runtime imports of them. Source/file access and prompt-injection resistance still require behavioral tests and review.
+## Implemented controls
 
-Before real-data or hosted use, document authenticated identity/grant derivation, least-privilege source/database/provider roles, redaction and permitted transmission, retention/deletion including derived vectors and backups, access-controlled audit ownership, and adversarial acceptance evidence. Changes to credentials, tool authority, persistence, export or source policy must include negative boundary tests. AI findings never constitute human endorsement or mutation approval.
+| Boundary | Control and source of truth |
+| --- | --- |
+| Evidence/knowledge reads | Trusted grants are separate from filters; service/environment, freshness, withdrawal/revision and saved citations are checked by [queries](../architecture/bounded-evidence-queries.md), [corpus](../architecture/knowledge-corpus.md) and [retrieval](../architecture/knowledge-retrieval.md) |
+| Evaluator isolation | Labels/answers/tests are outside the runtime wheel; import checks and behavioral tests protect source/input paths; [package rules](../architecture/package-layout.md) |
+| Provider transmission | Independent current source access and Azure transmission grants, reviewed fields, bounded redaction and fail-closed admission before dispatch/history/reuse; [provider policy](../architecture/model-provider.md#owner-approved-transmission-policy--2026-10-13) |
+| Transport | Short-lived signed preparation is checked by process and Azure adapters; verified TLS, bounded call/result and content-free errors; no unsigned direct request |
+| Protected responses | Original input sensitivity survives redaction; current source/revision/transmission rights apply to content reads, exports and later context reuse |
+| Assessment/support review | Strict report/reference validation and independent current support bindings; sanitized private review packets, not model-supplied reviewer approval; [assessment guide](../architecture/validated-assessments.md) |
+| Execution/publication | Current job/attempt/lease, finite shared budgets and atomic private outcomes; unknown dispatch blocks replay; [budgets](../architecture/investigation-budgets.md), [workflow](../architecture/bounded-investigator.md) |
+| Credentials/audit | Explicit private setup/key/journal files, mode 0600, authentication-only credential use and content-free usage/outcome/provenance metadata |
 
-On 2026-10-13 the owner approved [the transmission policy and mandatory controls](../architecture/model-provider.md). The implemented application gate now resolves independently scoped current source access and Azure transmission grants, requires reviewed classifications, bounds/redacts selected evidence, preserves citations and writes a private value-free provenance ledger before dispatch. Missing, revoked, unreviewed or forbidden sources produce zero HTTP requests. Short-lived signed preparation is required by both process and Azure transport; later selections/history pass admission again. Generated responses preserve original input sensitivity and recheck access/transmission/revision for reads, exports and reuse. Deterministic negative/bypass and actual SQLite/process tests exercise these paths; the synthetic live check establishes the native connector contract only.
+The current provider implementation blocks customer/employee/evaluator sources and has no exception/declassification path. Unknown/unreviewed classifications fail closed. The source owner must independently authorize Azure transmission for relevant internal code/runbooks/configuration.
 
-Private explicit config/key files and the audit/spending journal require local mode 0600. Credentials appear only in HTTPS authentication. JSON logs/audit store permitted identifiers, numeric usage and outcomes, never raw prompts/responses/errors or removed values. Exact usage metrics no longer disappear under token-name redaction. `store=false` is an implemented request setting, not a guarantee of zero Azure service retention. Applicable processing/retention and real-source permissions remain open.
+## Limits that remain explicit
 
-This does not solve authenticated operator/grant derivation, distributed revocation races, multitenant audit access/retention or arbitrary-Python/filesystem compromise. Unknown field classifications are denied; scanners alone cannot find every name, personal record or credential in prose. Real operational adapters must independently classify/review fields and derive current source-owner grants; the test authority is never a production default. #35/#37/#38 must carry protected responses into assessment/workflow/storage/export without bypasses. No operational pilot or production remediation authorization follows from these tests.
+- Pattern scanners cannot establish that arbitrary prose is free of secrets or personal data; source-side field classification/review is mandatory.
+- Local scope and file permissions do not authenticate an operator or derive real-source grants. Direct filesystem/application-composition access remains trusted.
+- Dispatch-time checks cannot instantly revoke a request already executing remotely, and stopping a local worker cannot prove remote cancellation or absence of charges.
+- Authorized dictionaries already read cannot be erased retroactively. Hosted identity, audit access/retention, distributed revocation and backup deletion require their own implementation/evidence.
+- `store=false` is a request setting, not proof of zero provider retention or resource-local processing.
+- Provider tests do not certify unrelated corpus-integrity/database-error findings or operational source integrations. Independent source, grant and storage failure cases retain their own scope.
+- Synthetic support records and AI findings never constitute actual human endorsement or mutation approval.
 
-Previously reviewed corpus-integrity and database-error findings retain their own follow-up scope. This provider implementation resolves the numeric token-usage logging case only; it does not certify unrelated source integrations.
+## Logs, review and disclosure
 
-For #35, accepted assessments and pending review packets carry the original response sensitivity and admitted redacted citation views. Reads/exports revalidate original provider dependencies plus current evidence/knowledge source access/revision/time policy; exports retain transmission checks. Reviewer decisions come from a trusted independent port, are bound to exact sanitized content/provenance and cannot be supplied by the model or evaluator fixture labels. Known credentials in field names are now denied before journal provenance writes. Raw context/removed values are not published through review bindings or resolver metadata. Operational review authentication/storage/retention and #38 inspection remain separate gates.
+Never record raw prompts/responses/provider errors, removed sensitive values, evaluator answers or credentials. Audit/logs retain permitted identifiers, nonnegative integer/null usage and explicit outcomes. Known credentials in field names are rejected before provenance writes.
 
+Accepted assessments and pending review packets inherit source sensitivity and admitted redacted citation/provenance views. Reads/exports revalidate original provider dependencies plus current evidence/knowledge policy and support bindings. The bounded workflow preserves these rules; #38 must implement authenticated restoration/inspection/review persistence/export without a scope-only stored-body bypass.
 
-## Azure AKS design boundary — 2026-10-14
+## Hosted and real-data acceptance
 
-[ADR 0015](../adr/0015-azure-aks-cloud-deployment.md) / #55-#60 require independent CI/Terraform, node/image-pull, pod Workload Identity, database/admin and telemetry permissions. Bind app federation to the reviewed namespace/service account; prove wrong/revoked identity rejection and account restrictions before cloud inference. Shared PostgreSQL admission must preserve monetary limits and source/transmission/protected response/review rules across pod replacement/concurrency. Non-root/pod resource/network controls and content-free collection supplement the application's boundaries; they do not turn the existing Python worker into a complete OS sandbox or grant operational-source/remediation access. Cloud identity, authenticated grant derivation and live security acceptance remain future work.
+Before real data or hosted use, record authenticated identity/grant derivation, least-privilege source/database/provider roles, field/transmission policy, processing/retention, deletion including vectors/backups and audit/support ownership. Require adversarial and failure evidence rather than inferring readiness from local tests.
+
+[ADR 0015](../adr/0015-azure-aks-cloud-deployment.md) and #55–#60 separate CI/Terraform, node/image-pull, pod Workload Identity, database/admin and telemetry grants. Verify wrong/revoked pod identity and account restrictions before cloud inference. Shared PostgreSQL admission must preserve budgets, source/transmission and protected report/review rules across concurrent/replaced pods.
+
+## Response authority
+
+Initial investigation remains read-only. Recommendations, assessment support, engineer selection and execution approval are separate. Code/configuration changes follow reviewed delivery. Supported operational actions require the separate deterministic catalog/executor with exact-action approval, state revalidation, limits, reconciliation, verification and recovery. See [response/remediation scope](../planning/production-remediation-scope.md).

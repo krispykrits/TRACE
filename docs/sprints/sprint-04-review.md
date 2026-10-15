@@ -1,5 +1,7 @@
 # Sprint 4 review — knowledge, retrieval and controlled tools
 
+> Historical review snapshot: original statuses, measurements and limitations below are dated evidence. PR #49 was subsequently merged on 2026-10-13; the bounded investigator later merged in PR #62. [Merge record](https://github.com/krispykrits/TRACE/pull/49); [current status](../current-status.md) and [current plan](../planning/capstone-project-plan.md) own present guidance.
+
 Date: 2026-10-13 (America/New_York). Prepared by: Codex. Reviewer: project owner. Scope: [roadmap S4](../planning/capstone-project-plan.md), integration gate [#19](https://github.com/krispykrits/TRACE/issues/19). **Scoped gate accepted through owner merge of [PR #49](https://github.com/krispykrits/TRACE/pull/49) at `a9db329`; live merge/Project Done verified 2026-10-13.** Sprint numbers denote scope increments, not dates or capacity commitments.
 
 ## Completion and acceptance evidence

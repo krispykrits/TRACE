@@ -1,6 +1,6 @@
 # ADR 0016: Bounded investigation and private publication
 
-- **Status:** Proposed for #37 owner review
+- **Status:** Accepted for scoped Local MVP workflow/publication in [merged PR #62](https://github.com/krispykrits/TRACE/pull/62), 2026-10-14; operational inspection and release acceptance remain separate
 - **Date:** 2026-10-14 (America/New_York)
 - **Scope:** Local MVP read-only application use case; operational identity and #38 inspection remain separate
 

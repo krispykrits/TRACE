@@ -4,7 +4,7 @@ Status: owner-selected cloud direction, 2026-10-14; implementation and hosted ac
 
 ## Runtime and delivery boundaries
 
-TRACE remains one modular Python application. Its current product interface is a CLI; #37-#39/S6 still establish the accepted investigator/release. Review bounded CLI execution as an AKS Job before selecting a persistent worker/API. There is no automatic HTTP ingress, microservice split or broker. The initial investigator remains read-only; the final remediation executor retains its separate action/approval boundary.
+TRACE remains one modular Python application. Its current public interface is the configuration/synthetic CLI. The internal bounded investigator is merged; #38/#39 and S6 still establish operator CLI/scoring and Local MVP acceptance. Review bounded CLI execution as an AKS Job before selecting a persistent worker/API. There is no automatic HTTP ingress, microservice split or broker. The initial investigator remains read-only; the final remediation executor retains its separate action/approval boundary.
 
 ```mermaid
 flowchart TD

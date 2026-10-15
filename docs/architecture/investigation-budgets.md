@@ -1,6 +1,6 @@
 # Shared investigation execution limits and usage records
 
-Scoped enabler [#36](https://github.com/krispykrits/TRACE/issues/36), merged in [PR #53](https://github.com/krispykrits/TRACE/pull/53), following merged PR #52 / accepted #35. [ADR 0014](../adr/0014-durable-investigation-budgets.md) records the accepted Local MVP durable admission decision. This supplies bounded model/tool interfaces for #37; an investigator loop, production mutation and operational source authority are outside this change.
+Scoped enabler [#36](https://github.com/krispykrits/TRACE/issues/36), merged in [PR #53](https://github.com/krispykrits/TRACE/pull/53), following merged PR #52 / accepted #35. [ADR 0014](../adr/0014-durable-investigation-budgets.md) records the accepted Local MVP durable admission decision. The bounded investigator now uses these interfaces in merged #37/PR #62. This guide describes the budget boundary; operational source authority and production mutation remain separate.
 
 ## Configuration and composition
 
