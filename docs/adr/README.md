@@ -19,10 +19,11 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0013](0013-assessment-validation-and-support-review.md) | Strict v2 assessments, current citations and independent protected support review | Accepted in #35 / merged PR #52 for Local MVP; frozen v1 scoring remains unchanged |
 | [0014](0014-durable-investigation-budgets.md) | Shared durable model/tool admission, usage reservations and content-free cost estimates | Accepted in #36 / merged PR #53 for the Local MVP enabler; distributed cloud admission remains #57 acceptance |
 | [0015](0015-azure-aks-cloud-deployment.md) | Azure/containers/AKS, shared PostgreSQL/pgvector, Workload Identity and Azure telemetry | Owner-selected direction; #55-#60 design/implementation/acceptance pending |
-| [0016](0016-bounded-investigation-and-private-publication.md) | Fixed evidence-first workflow, complete repeated admission and private atomic publication | Accepted in #37 / merged PR #62; operational inspection remains #38 |
+| [0016](0016-bounded-investigation-and-private-publication.md) | Fixed evidence-first workflow, complete repeated admission and private atomic publication | Accepted in #37 / merged PR #62; local inspection added in #38 / PR #82 |
 | [0017](0017-dotnet-testbed-and-json-first-evidence.md) | Independent .NET Order/Payment testbed, JSON-first then live Azure source ingestion and owner-led investigation | Accepted owner direction; #69-#76 implementation/usefulness pending |
 | [0018](0018-flexible-ml-and-ranked-response-options.md) | Use-case-appropriate evaluated ML and ranked incident-response options with an explicit recommendation | Accepted owner direction, 2026-10-15; ML/response implementation and acceptance pending |
-| [0019](0019-local-cli-and-saved-report-access.md) | Local CLI, durable dependency bindings and current-authority saved disclosure | Proposed in #38 implementation; owner review pending |
+| [0019](0019-local-cli-and-saved-report-access.md) | Local CLI, durable dependency bindings and current-authority saved disclosure | Accepted for #38 through merged PR #82; operational identity remains gated |
+| [0020](0020-investigator-evaluation-and-artifact-isolation.md) | Actual-output scoring, observed-only child and frozen private review artifacts | Proposed in #39; owner review pending |
 
 ## Reading and maintaining ADRs
 

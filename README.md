@@ -158,3 +158,5 @@ uv run --locked python -m scripts.investigator_fixture --directory /tmp/trace-cl
 ~~~
 
 The [bounded investigation use case](docs/architecture/bounded-investigator.md) connects scoped evidence, provider policy, finite execution and protected assessment publication. These offline demonstrations do not establish live diagnostic quality or grant operational execution authority.
+
+Run and deterministically rescore the first investigator's ten-case development/boundary protocol with `python -m evaluation.investigator run --output <fresh-directory>` and `rescore --run-dir <directory>`. The [Sprint 5 evaluation contract](docs/architecture/investigator-evaluation.md) separates actual CLI assembly with a hand-authored provider from real diagnosis, actual human support and Local MVP acceptance.

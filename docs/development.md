@@ -115,6 +115,15 @@ Repeated ingestion of the same submission is idempotent. The file uses a fixed s
 
 ## Evaluation and optional embeddings
 
+Execute and deterministically rescore actual investigator CLI outputs through the [Sprint 5 contract](architecture/investigator-evaluation.md):
+
+~~~sh
+uv run --locked python -m evaluation.investigator run --output /tmp/trace-sprint-05
+uv run --locked python -m evaluation.investigator rescore --run-dir /tmp/trace-sprint-05
+~~~
+
+The explicit offline provider/fictional support ports are separate from real diagnostic and actual human-review evidence. Every planned development/fault case remains in the report. Independent review uses exact sampled bindings and new score artifacts; no paid/live run is authorized by these commands.
+
 ~~~sh
 uv run --locked python -m evaluation.runner run --output /tmp/trace-s3-evaluation
 uv run --locked python -m evaluation.runner rescore --run-dir /tmp/trace-s3-evaluation

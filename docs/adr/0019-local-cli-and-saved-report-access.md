@@ -1,6 +1,6 @@
 # ADR 0019: Local CLI and current-authority saved report access
 
-- Status: Proposed in #38 implementation; owner review pending
+- Status: Accepted for the scoped local implementation by #38 / [PR #82](https://github.com/krispykrits/TRACE/pull/82) merge on 2026-10-15; operational gates remain separate
 - Date: 2026-10-15
 - Scope: Local MVP CLI over existing development/test captures; no operational authentication or new source ingestion
 

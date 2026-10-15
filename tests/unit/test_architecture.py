@@ -76,6 +76,8 @@ class ArchitectureTests(unittest.TestCase):
                 "from trace_app.bootstrap import create_local_investigator",
             ],
             "investigation/workflow.py": [
+                "from evaluation.investigator import run",
+                "from evaluation.investigator_scoring import score_output",
                 "from trace_app.adapters.storage.sqlite.workflow import SQLiteWorkflowStore",
                 "from scripts.demo_investigator import ScriptedModel",
                 "from evaluation.scoring import evaluate",

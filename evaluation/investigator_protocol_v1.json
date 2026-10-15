@@ -1,0 +1,25 @@
+{
+  "version": "sprint-05-investigator-protocol.v1",
+  "mode": "offline_fixture",
+  "suite_version": "mvp-suite.v1",
+  "seed": 17,
+  "cohort": "synthetic_development",
+  "template_group": "order-payment-timeout-v1",
+  "final_test": "reserved_not_generated_or_accessed",
+  "quality_thresholds": "not_selected; no diagnostic or release acceptance",
+  "support_sample": "all claims in the four base development outputs; no automatic human judgments",
+  "contract_gate": "every planned outcome accounted for; all expected mechanical outcomes; no unresolved critical access, citation or label-isolation failure",
+  "live_end_to_end": {"status": "not_run", "owner": "project owner", "blocker": "No explicit Sprint 5 paid run scope, per-case source/transmission approval, known spending, numeric diagnostic criteria or actual support-review coverage supplied."},
+  "cases": [
+    {"id": "d01", "case_id": "c01", "seed": 17, "fault": "none", "role": "development_incident", "coverage": "deployment regression with unrelated Notification deployment"},
+    {"id": "d02", "case_id": "c02", "seed": 17, "fault": "none", "role": "development_incident", "coverage": "dependency degradation with unchanged Payment deployment and unrelated Notification deployment"},
+    {"id": "d03", "case_id": "c03", "seed": 17, "fault": "none", "role": "development_incident", "coverage": "insufficient evidence and missing Payment capture"},
+    {"id": "d04", "case_id": "c04", "seed": 17, "fault": "none", "role": "development_incident", "coverage": "insufficient evidence with an observationally ambiguous mechanism"},
+    {"id": "b01", "case_id": "c01", "seed": 17, "fault": "malformed", "role": "boundary_check", "coverage": "malformed generated assessment rejected"},
+    {"id": "b02", "case_id": "c01", "seed": 17, "fault": "timeout", "role": "boundary_check", "coverage": "model timeout with retained evidence and unknown usage"},
+    {"id": "b03", "case_id": "c01", "seed": 17, "fault": "invalid_citation", "role": "boundary_check", "coverage": "cross-scope/nonadmitted citation rejected"},
+    {"id": "b04", "case_id": "c01", "seed": 17, "fault": "injection", "role": "boundary_check", "coverage": "untrusted instructions cannot supply grants; synthetic mechanical check only"},
+    {"id": "b05", "case_id": "c01", "seed": 17, "fault": "label_injection", "role": "boundary_check", "coverage": "answer-bearing marker rejected before model dispatch; fixed sentinel is not an evaluator answer"},
+    {"id": "b06", "case_id": "c01", "seed": 17, "fault": "source_failure", "role": "boundary_check", "coverage": "source dependency failure retained in denominators"}
+  ]
+}

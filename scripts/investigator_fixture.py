@@ -11,6 +11,7 @@ import sqlite3
 import sys
 from dataclasses import asdict
 from pathlib import Path
+from typing import Callable
 from unittest.mock import patch
 
 from scripts.demo_integration import integration_fixture
@@ -22,6 +23,7 @@ from trace_app.adapters.sources.local_investigator import (
 )
 from trace_app.bootstrap import create_local_investigator
 from trace_app.cli import main as cli_main
+from trace_app.investigation.models import EvidenceSnapshot
 from trace_app.investigation.provider import (
     AdmissionGuard,
     ModelConfiguration,
@@ -34,10 +36,15 @@ from trace_app.knowledge.models import digest
 
 
 def prepare(
-    root: Path, *, case: str = "c01", reviewed: bool = True, failure: str | None = None
+    root: Path,
+    *,
+    case: str = "c01",
+    reviewed: bool = True,
+    failure: str | None = None,
+    transform: Callable[[EvidenceSnapshot], EvidenceSnapshot] | None = None,
 ) -> Path:
     root.mkdir(mode=0o700)
-    with integration_fixture(case) as fixture:
+    with integration_fixture(case, transform=transform) as fixture:
         for path in fixture.root.iterdir():
             target = root / path.name
             if path.is_dir():
