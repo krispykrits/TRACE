@@ -76,7 +76,7 @@ These 18 increments divide scope, not calendar time. Refine and resize work agai
 | Track | Scoped work and order |
 | --- | --- |
 | Sprint 5 handoff | [#34–#37](https://github.com/krispykrits/TRACE/issues/37) establish provider/assessment/budget/workflow contracts; [#38](https://github.com/krispykrits/TRACE/issues/38) exposes protected CLI/report access; [#39](https://github.com/krispykrits/TRACE/issues/39) scores actual output and verifies integration |
-| Sprint 6 acceptance | [#63](https://github.com/krispykrits/TRACE/issues/63) protocol/thresholds before measurement; #64 comparisons → #65 actual human review; #66 recovery and #67 security; #68 clean-environment release after #63–#67 and S5 |
+| Sprint 6 acceptance | [#63](https://github.com/krispykrits/TRACE/issues/63) [protocol/thresholds and dry-run preparation](local-mvp-acceptance.md) before measurement; #64 comparisons → #65 actual human review; #66 recovery and #67 security; #68 clean-environment release after #63–#67 and S5 |
 | Azure Cloud MVP | [#55–#60](azure-cloud-backlog.md): measured design, immutable image, shared state/admission, pod identity/releases, hosted telemetry and cloud acceptance |
 | Monitored .NET services | [#70–#76](dotnet-testbed-backlog.md): local services → telemetry/JSON → controlled recordings → protected import → AKS telemetry → bounded live queries → owner-led replay/shadow comparison |
 | Full capstone | Refine S10–S18 issues when capacity and prerequisites are known; preserve the ML/response and study gates rather than creating placeholder implementation stories |

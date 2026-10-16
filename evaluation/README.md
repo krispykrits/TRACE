@@ -63,6 +63,14 @@ Choose an unused worktree path. Current code manifests include nested applicatio
 
 ## Cohorts and acceptance
 
+Sprint 6 [Local MVP protocol preparation](../docs/planning/local-mvp-acceptance.md) has a versioned cohort/arm/metric policy, pending owner-decision template and a dry-run planner:
+
+~~~sh
+uv run --locked python -m evaluation.local_mvp --output /tmp/trace-local-mvp-plan-v1
+~~~
+
+Use a new directory. Exit 1 saves a valid blocked plan when required owner inputs are missing; it makes no provider call and measures no acceptance result. Cost remains unknown until repeats/budgets are supplied. Approval must bind exact protocol, decision and source hashes; the planner supplies no live authority or release endorsement. #64–#68 retain comparison, review, boundary and release implementation/evidence.
+
 Related seeds, capture gaps, distractors and `payment-dependency.v1` variants form the `order-payment-timeout-v1` development group. Keep related variants together; opaque IDs are not diagnostic features. Existing four-case development data does not establish an independent final-test cohort.
 
 Predeclare group allocations, allowed evidence/arms, thresholds, actual review coverage, budget/run scope and failure/unknown denominators before acceptance measurement. Validation/final-test data and held-out answers remain isolated; freeze the study before final-test access.

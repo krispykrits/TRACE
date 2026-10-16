@@ -9,6 +9,7 @@ Start with the [product overview and target diagram](../README.md). Use the guid
 | What works now, next work and current blockers | [Current status](current-status.md) |
 | Product scope, ownership, settled choices and unresolved inputs | [Charter](charter.md) |
 | Release gates, sprint sequence and evaluation requirements | [Capstone delivery plan](planning/capstone-project-plan.md) |
+| Local MVP acceptance protocol, pending owner decisions and dry run | [Sprint 6 acceptance](planning/local-mvp-acceptance.md) |
 | Current components, interfaces and capability contracts | [Architecture](architecture/README.md) |
 | Setup, supported commands, demos and quality checks | [Development](development.md) |
 | Local operations and future hosted runbook requirements | [Operations](operations/README.md) |
