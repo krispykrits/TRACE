@@ -11,7 +11,7 @@ import sqlite3
 import sys
 from dataclasses import asdict
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 from unittest.mock import patch
 
 from scripts.demo_integration import integration_fixture
@@ -51,7 +51,7 @@ def prepare(
                 shutil.copytree(path, target)
             else:
                 shutil.copy2(path, target)
-        data = {
+        data: dict[str, Any] = {
             "schema_version": "local-investigator.v1",
             "principal_id": "synthetic-cli-operator",
             "evidence_db": str(root / "evidence.sqlite3"),

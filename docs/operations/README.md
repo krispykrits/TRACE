@@ -21,7 +21,7 @@ Use [current status](../current-status.md) for progress and [development](../dev
 - Keep database, private config/key files, output and backup access restricted. Application terminal deletion is not proof that filesystem copies or backups were erased.
 - Report source/provider/storage failures and missing permissions explicitly. Do not replace them with fixtures or unsupported diagnosis.
 
-There is no accepted operational backup/restore, automatic retention, hosted collector recovery or production runbook yet. Those procedures must be introduced with their implementation and measured evidence.
+The [local recovery procedure](local-recovery.md) covers quiescent synthetic backup/restore, interruption, unknown outcomes, journal ownership and retention/deletion boundaries. Its real CLI/SQLite fault checks are development evidence. Operational backup/restore acceptance, automatic retention, provider reconciliation, hosted collector recovery and production runbooks remain separate gates.
 
 ## Hosted runbook requirements
 
