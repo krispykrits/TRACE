@@ -8,44 +8,23 @@ TRACE combines authorized telemetry, operational knowledge, bounded tools and AI
 
 The diagram below describes the planned final architecture. Components are delivered incrementally through the roadmap.
 
+See [ADR 0021](docs/adr/0021-interactive-platform-and-repository-boundaries.md) for selected repository/runtime boundaries. Implementation remains pending.
+
 ```mermaid
 flowchart TD
-    subgraph Sources["Authorized evidence sources"]
-        Services[".NET Order and Payment services"]
-        Logs["Azure Monitor and Log Analytics"]
-        JSON["Exported JSON"]
-        Knowledge["Runbooks and deployment records"]
-
-        Services -->|Telemetry| Logs
-    end
-
-    subgraph App["TRACE Python application on Azure AKS"]
-        Adapters["Read-only evidence and retrieval adapters"]
-        ML["Evaluated ML capability"]
-        Investigation["Bounded investigation workflow"]
-        Results["Cited report and ranked response options"]
-
-        Adapters --> Investigation
-        Adapters --> ML
-        ML --> Investigation
-        Investigation --> Results
-    end
-
-    Logs -->|Scoped queries| Adapters
-    JSON --> Adapters
-    Knowledge --> Adapters
-
-    Investigation <--> Foundry["Azure AI Foundry"]
-    Investigation <--> State["Azure PostgreSQL and pgvector"]
-
-    Engineer["Investigating engineer"] -->|Incident and scope| Investigation
-    Results --> Engineer
-
-    Engineer -->|Approve a supported action| Executor["Separate deterministic response executor"]
-    Executor -->|Bounded action and verification| Target["Authorized target workload"]
+    UI["TRACE web UI"] --> API["Authenticated TRACE API"]
+    API --> State["PostgreSQL: jobs, policies, reports and approvals"]
+    Worker["Bounded investigation worker"] --> State
+    Worker --> Adapters["Source-neutral evidence and knowledge adapters"]
+    Adapters --> Sources["JSON, telemetry, runbooks and change records"]
+    Worker --> Model["Azure AI Foundry"]
+    API --> Reports["Protected reports and ranked responses"]
+    Reports --> UI
+    Executor["Separate deterministic response executor"] --> State
+    Executor --> Target["Approved action and verification"]
 ```
 
-TRACE remains one modular Python application. Independently running .NET Order and Payment services provide the monitored testbed. Evidence integration starts with exported JSON and later adds scoped live Azure queries.
+TRACE retains a modular Python core deployed as an HTTP API and persistent investigation worker. CLI remains for local execution and evaluation. PostgreSQL supplies durable work dispatch and shared admission; a separate broker is not initially required. Planned repositories separate TRACE core/API/worker, web, monitored .NET testbed, platform and later executor. JSON and Azure Monitor are initial implementations behind flexible capability contracts.
 
 ML addresses a justified incident-analysis task, such as anomaly detection or signal prioritization. Candidate approaches include classical ML, deep learning, pretrained models and other suitable ML methods. The use case and method are selected through measured benefit against appropriate baselines, considering quality, reliability, latency, cost and operational complexity.
 
@@ -89,8 +68,8 @@ Individual issues are stories/tasks; milestones are sprints. Project Status is t
 | Release | Provisional sprints | Outcome |
 | --- | --- | --- |
 | **Local MVP** | 1–6 | Synthetic Order → Payment incidents, a small retrieval corpus, bounded read-only tools, cited assessments, abstention, timelines and automated scoring |
-| **Cloud MVP** | 7–9 | Containerized Azure AKS deployment, shared state, workload identity, observability, recovery, cost controls and teardown; independent .NET testbed with JSON-first evidence and later live Azure queries |
-| **Full capstone** | 10–18 | Broader scenarios, evaluated ML suited to the selected use case, five-arm study, ranked response options, approved remediation, production hardening and final defense |
+| **Cloud MVP** | 7–9 | S7 repository/API/worker redesign; S8 PostgreSQL dispatch and AKS implementation; S9 hosted acceptance; independent .NET testbed and extensible JSON-first/live sources |
+| **Full capstone** | 10–18 | Required web investigation workflow before pilot, evaluated ML, five-arm study, ranked response/approval workflow, separate executor, hardening and defense |
 
 - [Complete project plan and release gates](docs/planning/capstone-project-plan.md)
 - [Azure/AKS cloud direction](docs/adr/0015-azure-aks-cloud-deployment.md) and [cloud stories](docs/planning/azure-cloud-backlog.md)
