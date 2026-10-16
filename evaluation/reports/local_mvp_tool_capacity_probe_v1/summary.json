@@ -1,0 +1,88 @@
+{
+  "schema_version": "local-mvp-tool-capacity-probe.v1",
+  "mode": "offline_scripted_capacity_probe",
+  "diagnostic_tool_ceiling": 100,
+  "proposed_tool_ceiling": 40,
+  "proposal_status": "pending_owner_decision",
+  "actual_provider_calls": 0,
+  "actual_human_review_decisions": 0,
+  "attempts": [
+    {
+      "case_id": "c01",
+      "execution_status": "completed",
+      "validation_outcome": "review_required",
+      "tool_calls": 30,
+      "model_calls": 1,
+      "tool_counts": {
+        "logs.query": 1,
+        "metrics.query": 1,
+        "deployments.query": 1,
+        "knowledge.search": 1,
+        "evidence.get": 17,
+        "knowledge.resolve": 9
+      },
+      "elapsed_ms": 16094.346259000304,
+      "actual_provider_calls": 0,
+      "actual_human_review": false
+    },
+    {
+      "case_id": "c02",
+      "execution_status": "completed",
+      "validation_outcome": "review_required",
+      "tool_calls": 30,
+      "model_calls": 1,
+      "tool_counts": {
+        "logs.query": 1,
+        "metrics.query": 1,
+        "deployments.query": 1,
+        "knowledge.search": 1,
+        "evidence.get": 17,
+        "knowledge.resolve": 9
+      },
+      "elapsed_ms": 15891.980098000204,
+      "actual_provider_calls": 0,
+      "actual_human_review": false
+    },
+    {
+      "case_id": "c03",
+      "execution_status": "completed",
+      "validation_outcome": "review_required",
+      "tool_calls": 23,
+      "model_calls": 1,
+      "tool_counts": {
+        "logs.query": 1,
+        "metrics.query": 1,
+        "deployments.query": 1,
+        "knowledge.search": 1,
+        "evidence.get": 10,
+        "knowledge.resolve": 9
+      },
+      "elapsed_ms": 14044.95721100102,
+      "actual_provider_calls": 0,
+      "actual_human_review": false
+    },
+    {
+      "case_id": "c04",
+      "execution_status": "completed",
+      "validation_outcome": "review_required",
+      "tool_calls": 23,
+      "model_calls": 1,
+      "tool_counts": {
+        "logs.query": 1,
+        "metrics.query": 1,
+        "deployments.query": 1,
+        "knowledge.search": 1,
+        "evidence.get": 10,
+        "knowledge.resolve": 9
+      },
+      "elapsed_ms": 14607.32387600001,
+      "actual_provider_calls": 0,
+      "actual_human_review": false
+    }
+  ],
+  "limitations": [
+    "Four one-off development probes, not the declared three-repeat acceptance comparison.",
+    "A diagnostic ceiling of 100 was used only to observe completion cost; no live run or approved numeric setting changed.",
+    "Scripted reports remain review_required; no diagnostic quality or human support is established."
+  ]
+}

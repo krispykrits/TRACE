@@ -158,6 +158,20 @@ class LocalMVPProtocolTests(unittest.TestCase):
         self.assertEqual(result["review_plan"]["actual_review_decisions"], 0)
         self.assertIs(result["review_plan"]["independent_second_reviewer"], False)
 
+    def test_v3_changes_only_the_approved_tool_ceiling_and_provenance(self) -> None:
+        prior = json.loads(
+            DECISIONS.with_name("local_mvp_decisions_v2.json").read_text()
+        )
+        current = json.loads(DECISIONS.read_text())
+        self.assertEqual(prior["limits"]["tool_calls_per_attempt"], 20)
+        self.assertEqual(current["limits"]["tool_calls_per_attempt"], 40)
+        prior["limits"]["tool_calls_per_attempt"] = 40
+        prior["revision"] = current["revision"]
+        prior["planning_decision_reference"] = current["planning_decision_reference"]
+        self.assertEqual(prior, current)
+        self.assertIsNone(current["approval"])
+        self.assertIn(current["planning_decision_reference"], plan()["source_sha256"])
+
     def test_legacy_fixed_quota_schema_is_not_silently_reinterpreted(self) -> None:
         legacy = json.loads(
             DECISIONS.with_name("local_mvp_decisions_v1.json").read_text()

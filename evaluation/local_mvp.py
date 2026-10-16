@@ -15,7 +15,7 @@ from evaluation.runner import _json, _parse, _read, _sha
 
 ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL = ROOT / "evaluation/local_mvp_protocol_v2.json"
-DECISIONS = ROOT / "evaluation/local_mvp_decisions_v2.json"
+DECISIONS = ROOT / "evaluation/local_mvp_decisions_v3.json"
 _APPROVAL_KEYS = {
     "owner",
     "recorded_at",
@@ -219,6 +219,7 @@ def _source_hashes() -> dict[str, str]:
             "docs/architecture/development-evaluation.md",
             "docs/planning/local-mvp-acceptance.md",
             "docs/planning/local-mvp-owner-decisions-2026-10-16.md",
+            "docs/planning/local-mvp-tool-budget-adjustment-2026-10-16.md",
         )
     )
     return {p.relative_to(ROOT).as_posix(): _sha(_read(p)) for p in sorted(paths)}
@@ -322,7 +323,7 @@ def plan(decisions_path: Path = DECISIONS) -> dict[str, Any]:
         "source_sha256": sources,
         "preflight": "blocked" if blockers else "inputs_complete_for_review",
         "blockers": blockers,
-        "execution": "dry_run_only; comparison runner pending #64; no authorization granted",
+        "execution": "dry_run_only; use evaluation.local_mvp_comparison for offline contracts; no live authorization granted",
         "schedule": schedule,
         "schedule_status": "declared"
         if repeats is not None

@@ -1,0 +1,274 @@
+{
+  "schema_version": "1",
+  "suite_version": "mvp-suite.v1",
+  "seeds": [
+    17
+  ],
+  "cases": [
+    {
+      "case_id": "c01",
+      "role": "development",
+      "template_group": "order-payment-timeout-v1",
+      "configuration": {
+        "seed": 17,
+        "environment": "test",
+        "notification_deployment": true,
+        "previous_budget_ms": 50,
+        "deployed_budget_ms": 5,
+        "dependency_work_ms": 10,
+        "payment_capture_available": true,
+        "metric_collection_lag_seconds": 30
+      },
+      "cause_service": "payment",
+      "cause_label": "deployment_regression",
+      "mechanism": "Payment v2 lowers the authorization budget from 50 ms to 5 ms; unchanged 10 ms dependency work exceeds it.",
+      "causal_chain": [
+        "The fixture applies the selected Payment v2 budget configuration.",
+        "Customer lookup succeeds.",
+        "Dependency work exceeds the active authorization budget.",
+        "Payment raises DependencyUnavailable before authorization.",
+        "Order propagates dependency failure; Notification is never called."
+      ],
+      "expected_events": [
+        "metric.sample",
+        "deployment.completed",
+        "order.requested",
+        "customer.found",
+        "metric.sample",
+        "metric.sample",
+        "payment.timeout",
+        "order.dependency_failed",
+        "deployment.completed"
+      ],
+      "supporting_ordinals": [
+        "000",
+        "001",
+        "004",
+        "005",
+        "006",
+        "007"
+      ],
+      "missing_ordinals": [],
+      "distractors": [
+        {
+          "ordinal": "d01",
+          "service": "notification",
+          "event": "deployment.completed",
+          "causal_role": "none",
+          "reason": "Notification adapter is not called on the failed Order path; toggling this record does not alter execution."
+        }
+      ],
+      "expected_assessment": "supported",
+      "abstention_conditions": [
+        "Abstain on a specific cause if budget/work evidence is missing or contradictory; deployment timing alone is insufficient."
+      ],
+      "competing_explanations": [
+        "deployment_regression",
+        "downstream_degradation"
+      ]
+    },
+    {
+      "case_id": "c02",
+      "role": "development",
+      "template_group": "order-payment-timeout-v1",
+      "configuration": {
+        "seed": 17,
+        "environment": "test",
+        "notification_deployment": true,
+        "previous_budget_ms": 50,
+        "deployed_budget_ms": 50,
+        "dependency_work_ms": 100,
+        "payment_capture_available": true,
+        "metric_collection_lag_seconds": 30
+      },
+      "cause_service": "payment",
+      "cause_label": "downstream_degradation",
+      "mechanism": "Payment v2 leaves the 50 ms budget unchanged; dependency work increases to 100 ms and exceeds it.",
+      "causal_chain": [
+        "The fixture applies the selected Payment v2 budget configuration.",
+        "Customer lookup succeeds.",
+        "Dependency work exceeds the active authorization budget.",
+        "Payment raises DependencyUnavailable before authorization.",
+        "Order propagates dependency failure; Notification is never called."
+      ],
+      "expected_events": [
+        "metric.sample",
+        "deployment.completed",
+        "order.requested",
+        "customer.found",
+        "metric.sample",
+        "metric.sample",
+        "payment.timeout",
+        "order.dependency_failed",
+        "deployment.completed"
+      ],
+      "supporting_ordinals": [
+        "000",
+        "001",
+        "004",
+        "005",
+        "006",
+        "007"
+      ],
+      "missing_ordinals": [],
+      "distractors": [
+        {
+          "ordinal": "d01",
+          "service": "notification",
+          "event": "deployment.completed",
+          "causal_role": "none",
+          "reason": "Notification adapter is not called on the failed Order path; toggling this record does not alter execution."
+        },
+        {
+          "ordinal": "001",
+          "service": "payment",
+          "event": "deployment.completed",
+          "causal_role": "noncausal",
+          "reason": "The selected deployed budget is unchanged; slow dependency work alone exceeds it."
+        }
+      ],
+      "expected_assessment": "supported",
+      "abstention_conditions": [
+        "Abstain on a specific cause if budget/work evidence is missing or contradictory; deployment timing alone is insufficient."
+      ],
+      "competing_explanations": [
+        "deployment_regression",
+        "downstream_degradation"
+      ]
+    },
+    {
+      "case_id": "c03",
+      "role": "development",
+      "template_group": "order-payment-timeout-v1",
+      "configuration": {
+        "seed": 17,
+        "environment": "test",
+        "notification_deployment": true,
+        "previous_budget_ms": 50,
+        "deployed_budget_ms": 5,
+        "dependency_work_ms": 10,
+        "payment_capture_available": false,
+        "metric_collection_lag_seconds": 30
+      },
+      "cause_service": "payment",
+      "cause_label": "deployment_regression",
+      "mechanism": "Payment v2 lowers the authorization budget from 50 ms to 5 ms; unchanged 10 ms dependency work exceeds it.",
+      "causal_chain": [
+        "The fixture applies the selected Payment v2 budget configuration.",
+        "Customer lookup succeeds.",
+        "Dependency work exceeds the active authorization budget.",
+        "Payment raises DependencyUnavailable before authorization.",
+        "Order propagates dependency failure; Notification is never called."
+      ],
+      "expected_events": [
+        "order.requested",
+        "customer.found",
+        "order.dependency_failed",
+        "deployment.completed"
+      ],
+      "supporting_ordinals": [
+        "002",
+        "007"
+      ],
+      "missing_ordinals": [
+        "000",
+        "001",
+        "004",
+        "005",
+        "006"
+      ],
+      "distractors": [
+        {
+          "ordinal": "d01",
+          "service": "notification",
+          "event": "deployment.completed",
+          "causal_role": "none",
+          "reason": "Notification adapter is not called on the failed Order path; toggling this record does not alter execution."
+        }
+      ],
+      "expected_assessment": "abstained",
+      "abstention_conditions": [
+        "Payment logs, metrics and deployments are unavailable. The Order symptom cannot distinguish a budget regression from slow dependency work."
+      ],
+      "competing_explanations": [
+        "deployment_regression",
+        "downstream_degradation"
+      ]
+    },
+    {
+      "case_id": "c04",
+      "role": "development",
+      "template_group": "order-payment-timeout-v1",
+      "configuration": {
+        "seed": 17,
+        "environment": "test",
+        "notification_deployment": true,
+        "previous_budget_ms": 50,
+        "deployed_budget_ms": 50,
+        "dependency_work_ms": 100,
+        "payment_capture_available": false,
+        "metric_collection_lag_seconds": 30
+      },
+      "cause_service": "payment",
+      "cause_label": "downstream_degradation",
+      "mechanism": "Payment v2 leaves the 50 ms budget unchanged; dependency work increases to 100 ms and exceeds it.",
+      "causal_chain": [
+        "The fixture applies the selected Payment v2 budget configuration.",
+        "Customer lookup succeeds.",
+        "Dependency work exceeds the active authorization budget.",
+        "Payment raises DependencyUnavailable before authorization.",
+        "Order propagates dependency failure; Notification is never called."
+      ],
+      "expected_events": [
+        "order.requested",
+        "customer.found",
+        "order.dependency_failed",
+        "deployment.completed"
+      ],
+      "supporting_ordinals": [
+        "002",
+        "007"
+      ],
+      "missing_ordinals": [
+        "000",
+        "001",
+        "004",
+        "005",
+        "006"
+      ],
+      "distractors": [
+        {
+          "ordinal": "d01",
+          "service": "notification",
+          "event": "deployment.completed",
+          "causal_role": "none",
+          "reason": "Notification adapter is not called on the failed Order path; toggling this record does not alter execution."
+        }
+      ],
+      "expected_assessment": "abstained",
+      "abstention_conditions": [
+        "Payment logs, metrics and deployments are unavailable. The Order symptom cannot distinguish a budget regression from slow dependency work."
+      ],
+      "competing_explanations": [
+        "deployment_regression",
+        "downstream_degradation"
+      ]
+    }
+  ],
+  "split_policy": {
+    "development_groups": [
+      "order-payment-timeout-v1"
+    ],
+    "validation_groups": [],
+    "final_test_groups": [],
+    "related_versions": [
+      "payment-dependency.v1"
+    ],
+    "held_out_status": "reserved_not_generated",
+    "historical_replay": {
+      "status": "blocked",
+      "reason": "No named data-access owner or independently authorized sanitized export has been supplied.",
+      "cohort": "separate_operational_pilot"
+    }
+  }
+}
