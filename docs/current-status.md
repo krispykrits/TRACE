@@ -18,6 +18,8 @@ Merged [PR #82](https://github.com/krispykrits/TRACE/pull/82) provides captured-
 
 #63 / [PR #85](https://github.com/krispykrits/TRACE/pull/85) records [owner-approved Local MVP settings](planning/local-mvp-owner-decisions-2026-10-16.md): three repeats, 36 attempts, $1 planning allowance, full integrated-output review by the owner alone and resource/retention expectations. Protocol/decisions v2 preserve the original v1 artifacts and label single-owner provenance. Actual provider/spending/source/run metadata, cleanup ownership, final run bindings and #64–#68 implementation/evidence remain gates. No paid run or new human verdict is recorded.
 
+#64's comparison implementation now executes and rescores all 36 offline attempts under exact bound inputs. The [retained comparison](../evaluation/reports/local_mvp_comparison_offline_v1/README.md) records 12/12 completed brief-only references, 12/12 completed deterministic bundles and 0/12 completed integrated attempts: all exhaust the approved 20-call tool ceiling. Saved rescoring is byte-identical with no dispatch. This is a negative contract finding, not Azure diagnosis or release acceptance; paid calls and new human verdicts remain zero.
+
 ## Next work
 
 1. Implement [#64 comparisons](https://github.com/krispykrits/TRACE/issues/64), retaining offline contract results and named live-measurement blockers. Complete the remaining factual/authority/freeze gates before paid acceptance measurement.

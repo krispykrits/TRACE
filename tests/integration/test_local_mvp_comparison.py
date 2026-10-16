@@ -49,6 +49,44 @@ class LocalMVPComparisonTests(unittest.TestCase):
             self.assertEqual(result["arms"]["rag_tools"]["attempted"], 1)
             self.assertEqual(result["arms"]["llm_only"]["attempted"], 1)
             self.assertTrue(result["live_diagnostics"]["blockers"])
+            self.assertEqual(
+                result["arms"]["rag_tools"]["execution_counts"]["failed"], 1
+            )
+            for identity, arm in (
+                ("a001", "llm_only"),
+                ("a002", "evidence_bundle"),
+                ("a003", "rag_tools"),
+            ):
+                execution = _parse(
+                    _read(output / f"artifacts/{identity}/execution.json")
+                )
+                assert isinstance(execution, dict)
+                self.assertEqual(execution["evaluation_modules_loaded"], [])
+                self.assertEqual(
+                    execution["execution_policies"][0]["max_tool_calls"], 20
+                )
+                self.assertEqual(
+                    execution["execution_policies"][0]["max_input_tokens"], 16384
+                )
+                calls = execution["calls"]
+                if arm == "llm_only":
+                    self.assertTrue(calls)
+                    self.assertTrue(all(call["kind"] == "model" for call in calls))
+                elif arm == "evidence_bundle":
+                    self.assertTrue(calls)
+                    self.assertTrue(
+                        all(
+                            call["kind"] == "tool"
+                            and not str(
+                                call.get("metadata", {}).get("tool", "")
+                            ).startswith("knowledge.")
+                            for call in calls
+                        )
+                    )
+                else:
+                    self.assertTrue(
+                        any(call["outcome"] == "budget_exhausted" for call in calls)
+                    )
             with (
                 patch(
                     "subprocess.run",
