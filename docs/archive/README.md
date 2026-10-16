@@ -27,3 +27,12 @@ The October 15 documentation audit consolidated the following active guides. Ori
 Current status and the delivery plan are concise current records. Their pre-cleanup narrative snapshots remain in [Git history](https://github.com/krispykrits/TRACE/blob/698c56be84872337aab31ac158c40403df974e56/docs/current-status.md) and [the previous plan](https://github.com/krispykrits/TRACE/blob/698c56be84872337aab31ac158c40403df974e56/docs/planning/capstone-project-plan.md).
 
 Preserve original corpus/evaluator artifact bytes and hashes. Archival Markdown is not permission to ingest reviewer answers, execute old infrastructure commands or assert a historical result as current validation.
+
+## Retired Local MVP comparison versions
+
+On 2026-10-16 the owner requested keeping only the latest Local MVP comparison in the working tree. [Comparison v3](../../evaluation/reports/local_mvp_comparison_offline_v3/README.md) is the current retained run. Earlier measurements remain unchanged in Git history; restore their artifact directories and use each README’s recorded implementation checkout for historical rescoring. This cleanup does not remove the recorded negative results or change acceptance thresholds.
+
+| Retired directory | Original evidence | Replacement |
+| --- | --- | --- |
+| `evaluation/reports/local_mvp_comparison_offline_v1` | [Original v1](https://github.com/krispykrits/TRACE/tree/ccfc3f49af33ab508b4abe3c5eceaab6a98fa612/evaluation/reports/local_mvp_comparison_offline_v1) | [Latest comparison](../../evaluation/reports/local_mvp_comparison_offline_v3/README.md) |
+| `evaluation/reports/local_mvp_comparison_offline_v2` | [Original v2](https://github.com/krispykrits/TRACE/tree/ccfc3f49af33ab508b4abe3c5eceaab6a98fa612/evaluation/reports/local_mvp_comparison_offline_v2) | [Latest comparison](../../evaluation/reports/local_mvp_comparison_offline_v3/README.md) |
