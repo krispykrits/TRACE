@@ -25,6 +25,8 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | [0019](0019-local-cli-and-saved-report-access.md) | Local CLI, durable dependency bindings and current-authority saved disclosure | Accepted for #38 through merged PR #82; operational identity remains gated |
 | [0020](0020-investigator-evaluation-and-artifact-isolation.md) | Actual-output scoring, observed-only child and frozen private review artifacts | Proposed in #39; owner review pending |
 
+| [0021](0021-interactive-platform-and-repository-boundaries.md) | API/worker, repository ownership, PostgreSQL dispatch and flexible source adapters | Accepted owner direction, 2026-10-15; S7 refinement and implementation pending; supersedes prior single-repository/CLI-first hosted direction |
+
 ## Reading and maintaining ADRs
 
 An ADR records a scoped decision and its rationale. Its original context, alternatives and measurements may describe an earlier implementation. Current capability/status belongs in [architecture](../architecture/README.md) and [current status](../current-status.md).
