@@ -53,6 +53,7 @@ from trace_app.investigation.provider_policy import (
     ProtectedModelResponse,
     ProviderCall,
     ProviderScope,
+    Sensitivity,
     SourceAccessPolicy,
     SourceKind,
 )
@@ -65,7 +66,7 @@ from trace_app.knowledge.models import canonical, digest
 
 WORKFLOW_VERSION = "bounded-investigator.v1"
 WORKFLOW_PROMPT = "investigation-assessment.v1"
-ARTIFACT_VERSION = "investigation-result.v1"
+ARTIFACT_VERSION = "investigation-result.v2"
 WORKFLOW_TRANSITIONS = {
     "started": {"gathering"},
     "gathering": {"model", "evidence_only"},
@@ -503,9 +504,16 @@ class BoundedInvestigation:
                     if validation.outcome == "accepted"
                     else packet
                 )
+                if package.data is None:
+                    raise AssessmentBoundaryError("execution_failure")
+                body["captured_timeline"] = package.data["timeline"]
+                body["model_context_omissions"] = package.data.get(
+                    "model_context_omissions", {}
+                )
                 self._phase("publishing")
                 self.check_source_access(package)
                 report = AssessmentReport.from_dict(body["report"])
+                evidence_binding = self._binding(package)
                 metadata = {
                     **validation.metadata(),
                     **response.metadata(),
@@ -515,7 +523,7 @@ class BoundedInvestigation:
                     "artifact_id": uuid.uuid4().hex,
                     "citation_ids": list(report.references()),
                     "response_access": response.storage_binding(self.scope),
-                    "evidence_access": self._binding(package),
+                    "evidence_access": evidence_binding,
                     "review_tasks": [
                         {"binding_id": t["binding_id"], "claim_id": t["claim_id"]}
                         for t in tasks
@@ -530,7 +538,10 @@ class BoundedInvestigation:
                     report.candidate.assessment_status
                     if validation.outcome == "accepted"
                     else "pending",
-                    response.sensitivity.name.lower(),
+                    max(
+                        response.sensitivity,
+                        Sensitivity[str(evidence_binding["sensitivity"]).upper()],
+                    ).name.lower(),
                     canonical(body),
                     canonical(metadata),
                 )
