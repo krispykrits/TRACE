@@ -322,7 +322,7 @@ def plan(decisions_path: Path = DECISIONS) -> dict[str, Any]:
         "source_sha256": sources,
         "preflight": "blocked" if blockers else "inputs_complete_for_review",
         "blockers": blockers,
-        "execution": "dry_run_only; comparison runner pending #64; no authorization granted",
+        "execution": "dry_run_only; use evaluation.local_mvp_comparison for offline contracts; no live authorization granted",
         "schedule": schedule,
         "schedule_status": "declared"
         if repeats is not None
