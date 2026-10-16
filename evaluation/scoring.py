@@ -186,7 +186,11 @@ class CandidateScore:
 
 
 def score_candidate(
-    attempt: EvaluationAttempt, evidence: EvidenceSnapshot, expected: ExpectedOutcome
+    attempt: EvaluationAttempt,
+    evidence: EvidenceSnapshot,
+    expected: ExpectedOutcome,
+    *,
+    valid_citation_ids: frozenset[str] | None = None,
 ) -> CandidateScore:
     if attempt.case_id != expected.case_id:
         raise ValueError("Attempt and expected case do not match.")
@@ -208,12 +212,16 @@ def score_candidate(
     ):
         raise ValueError("Support review refers to an absent claim.")
     references = [reference for claim in claims for reference in claim.citations]
-    invalid_refs = tuple(sorted(set(references) - known_ids))
+    valid_references = (
+        known_ids if valid_citation_ids is None else set(valid_citation_ids)
+    )
+    invalid_refs = tuple(sorted(set(references) - valid_references))
     uncited = tuple(claim.claim_id for claim in claims if not claim.citations)
     structural = tuple(
         claim.claim_id
         for claim in claims
-        if not claim.citations or any(ref not in known_ids for ref in claim.citations)
+        if not claim.citations
+        or any(ref not in valid_references for ref in claim.citations)
     )
     human_unsupported, indeterminate, fixture_unsupported, disputed, unreviewed = (
         [],
@@ -288,7 +296,7 @@ def score_candidate(
         assessment_correct=report is not None
         and report.assessment_status == expected.assessment,
         abstention_correct=abstention if not answerable else None,
-        valid_citation_count=sum(ref in known_ids for ref in references),
+        valid_citation_count=sum(ref in valid_references for ref in references),
         citation_count=len(references),
         invalid_citations=invalid_refs,
         invalid_timeline_citations=tuple(sorted(set(timeline_ids) - known_ids)),

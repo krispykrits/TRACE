@@ -49,7 +49,7 @@ Corpus publication, withdrawal and retention purge are trusted administration, n
 | Knowledge | [Corpus](knowledge-corpus.md), [retrieval](knowledge-retrieval.md), [passage evaluation/context](retrieval-evaluation-context.md) |
 | Tools and integration | [Read-only catalog](investigation-tools.md), [scripted cited package](scripted-evidence-package.md) |
 | AI investigation | [Provider/data policy](model-provider.md), [validated assessments](validated-assessments.md), [shared execution budgets](investigation-budgets.md), [bounded investigator](bounded-investigator.md) |
-| Evaluation | [Development contracts](development-evaluation.md), [artifact/reproduction guide](../../evaluation/README.md) |
+| Evaluation | [Actual investigator outputs](investigator-evaluation.md), [Development contracts](development-evaluation.md), [artifact/reproduction guide](../../evaluation/README.md) |
 | Hosting and operation | [Azure cloud design](azure-cloud.md), [deployment](../../deploy/README.md), [operations](../operations/README.md), [security](../security/README.md) |
 
 ## Planned boundaries

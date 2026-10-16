@@ -9,7 +9,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Iterator
+from typing import Callable, Iterator
 
 from trace_app.adapters.retrieval.local_index import build_index
 from trace_app.adapters.sources.curated_files import CuratedFileSource
@@ -19,7 +19,7 @@ from trace_app.bootstrap import create_tool_session
 from trace_app.demo.scenarios import ScenarioConfig, ScenarioSession
 from trace_app.evidence.queries import EvidenceQuery, TrustedQueryContext
 from trace_app.investigation.bundle import build_evidence_package
-from trace_app.investigation.models import InvestigationRequest
+from trace_app.investigation.models import EvidenceSnapshot, InvestigationRequest
 from trace_app.investigation.tools import ToolPolicy, ToolScope, ToolSession
 from trace_app.knowledge.models import CorpusReadContext
 from trace_app.runtime.logging import configure_logging
@@ -53,13 +53,16 @@ class IntegrationFixture:
 
 @contextmanager
 def integration_fixture(
-    case_id: str = "c01", *, limit: int = 100
+    case_id: str = "c01",
+    *,
+    limit: int = 100,
+    transform: Callable[[EvidenceSnapshot], EvidenceSnapshot] | None = None,
 ) -> Iterator[IntegrationFixture]:
     """Explicit synthetic setup; neither evaluator labels nor expected calls loaded."""
     with tempfile.TemporaryDirectory(prefix="trace-s4-integration-") as directory:
         root = Path(directory)
         replay = ScenarioSession(ScenarioConfig(case_id, 17)).replay(collected_at=AT)
-        snapshot = replay.snapshot
+        snapshot = transform(replay.snapshot) if transform else replay.snapshot
         with SQLiteInvestigationStore(root / "evidence.sqlite3") as store:
             investigation = store.submit(
                 InvestigationRequest(

@@ -19,7 +19,7 @@ Start with the [product overview and target diagram](../README.md). Use the guid
 | Recommended responses and approved operational execution | [Response/remediation scope](planning/production-remediation-scope.md), [ADR 0018](adr/0018-flexible-ml-and-ranked-response-options.md) |
 | Reproduce or interpret evaluation artifacts | [Evaluation guide](../evaluation/README.md) |
 | Curated development knowledge inputs | [Corpus guide](../corpus/README.md) |
-| Historical reviews and superseded material | [Archive](archive/README.md), [Sprint 1 snapshot](sprints/sprint-01-review.md), [Sprint 4 snapshot](sprints/sprint-04-review.md) |
+| Historical reviews and superseded material | [Archive](archive/README.md), [Sprint 1 snapshot](sprints/sprint-01-review.md), [Sprint 4 snapshot](sprints/sprint-04-review.md), [Sprint 5 review](sprints/sprint-05-review.md) |
 | Prepare a sprint review or work with an agent | [Review template](sprints/sprint-review-template.md), [contributor/agent rules](../AGENTS.md) |
 
 GitHub [Project Status](https://github.com/users/krispykrits/projects/2) is authoritative for work status. [Issues](https://github.com/krispykrits/TRACE/issues) own story acceptance criteria; [milestones](https://github.com/krispykrits/TRACE/milestones) group provisional sprints.

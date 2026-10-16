@@ -36,6 +36,7 @@ class AssessmentBoundaryError(ValueError):
                 "citation_not_admitted",
                 "invalid_review",
                 "invalid_response",
+                "malformed_assessment",
                 "scope_mismatch",
                 "review_denied",
             }

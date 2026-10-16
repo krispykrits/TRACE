@@ -282,6 +282,8 @@ class WorkflowContracts(unittest.TestCase):
         model.transform = lambda value, request: value.update(extra="unapproved")
         result = workflow.run()
         self.assertEqual(result.validation_outcome, "rejected")
+        self.assertEqual(result.failure_code, "malformed_assessment")
+        self.assertEqual(store.job.failure_code, "malformed_assessment")
         self.assertEqual(store.job.assessment_status, "pending")
         self.assertEqual(store.publications, [])
         workflow, model, _, _, _, _, _, _, _ = fixture(

@@ -2,6 +2,8 @@
 
 Status: issue [#14](https://github.com/krispykrits/TRACE/issues/14) merged via [PR #42](https://github.com/krispykrits/TRACE/pull/42), 2026-10-12. This offline runner checks hand-authored candidate fixtures against the four seed-17 development cases. It provides scoring plumbing before investigator/model integration. Its deliberately mixed correct, incorrect, abstaining, missing, malformed and failed outputs are a scorer demonstration; their rates do not measure a model or establish Local MVP, Cloud MVP, Full Capstone or Operational Pilot acceptance.
 
+The [actual-output evaluator](investigator-evaluation.md) adds #39 assembly/scoring and bound support samples for #37/#38 outputs. The original v1 fixture runner/metrics below remain available; their rates are not relabeled as actual-provider results.
+
 ## Run and reproduce
 
 From the repository root, use a new output path:

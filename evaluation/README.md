@@ -13,9 +13,24 @@
 | Frozen v4 passage reports | Exploratory baseline/candidate reports are not acceptance; the separate lexical acceptance report passed its recorded protocol |
 | `fixtures/tool_choices_v1.json` | Agent-authored tool-choice/argument expectations: 18 cases/21 examples; legal API execution is separate from model-selected choice quality |
 | `reports/sprint_04_evidence_package_v1.json` | Observed cited package without evaluator labels; scripted integration evidence |
+| Actual-output Sprint 5 runner | [Protocol](investigator_protocol_v1.json), actual CLI/private artifacts, deterministic v2-to-v1 scoring, explicit failures and an unreviewed support sample; offline mechanical evidence only |
+| [Sprint 5 human review addendum](reports/investigator_offline_v1_human_review_v1/README.md) | One guided owner review: 10/10 sampled claims indeterminate because the wording was too vague; zero determinate support evidence; original run unchanged |
 | Offline investigator demo | Actual local application/storage/tool boundaries with hand-authored model/review records; zero actual provider calls or human review |
 
 The v4 owner endorsement is shared blanket provenance, not fabricated per-target notes or independent end-to-end reviewer evidence. [Judgment revisions](retrieval/judgment-revisions.md) and [the passage contract](../docs/architecture/retrieval-evaluation-context.md) preserve the chronology and exact metrics. All 16 no-relevant v4 queries returning candidates remains a documented limitation.
+
+## First investigator and Sprint 5
+
+~~~sh
+uv run --locked python -m evaluation.investigator run --output /tmp/trace-sprint-05
+uv run --locked python -m evaluation.investigator rescore --run-dir /tmp/trace-sprint-05
+~~~
+
+Use a fresh directory. Ten planned development/boundary attempts run through the public CLI with an explicit hand-authored provider and fictional runtime review ports. All attempted cases and unknown usage remain visible. Actual human judgments initially number zero; sampled claim/citation bindings are ready for independent review. Live diagnosis is explicitly not run and blocked on owner run/budget/data/criteria/review inputs. This does not reaccept Local MVP, actual model quality or operational usefulness. See the [actual-output contract](../docs/architecture/investigator-evaluation.md) and [Sprint 5 review](../docs/sprints/sprint-05-review.md).
+
+The later [human review addendum](reports/investigator_offline_v1_human_review_v1/README.md) preserves the owner's ten guided indeterminate decisions, completed packet and regenerated scores separately from the frozen run. All sampled claims were judged too vague to assess; the support rate remains unavailable with a zero determinate denominator. Its reproduction command makes no provider call and does not alter original artifacts.
+
+The old `evaluation.runner` below remains the frozen v1 candidate-fixture path. Existing historical bytes/schemas are preserved.
 
 ## Current-source exploration
 
