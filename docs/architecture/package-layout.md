@@ -2,6 +2,10 @@
 
 Accepted direction for [#46](https://github.com/krispykrits/TRACE/issues/46), merged in [PR #47](https://github.com/krispykrits/TRACE/pull/47). [ADR 0010](../adr/0010-capability-packages-and-adapter-boundaries.md) records this change. TRACE remains one installable `trace_app` application. Its public `trace-app` and `python -m trace_app.cli` entry points, serialized schemas and retrieval defaults are preserved.
 
+## Planned deployment evolution
+
+[ADR 0021](../adr/0021-interactive-platform-and-repository-boundaries.md) selects API and persistent worker entry points around the core, with CLI retained. S7 refines package/import contracts; scoped S8 implementation updates checker and packaging evidence. The table below describes current implementation, not an existing HTTP runtime. Flexible source capabilities remain provider-neutral. Web, testbed, platform and later executor have separate planned repositories.
+
 ## Runtime placement
 
 | Package | Responsibility and placement rule |
