@@ -1,6 +1,6 @@
 # .NET monitored testbed and source-integration backlog
 
-Owner direction approved on 2026-10-14: lightweight .NET Order and Payment services; exported JSON first, then live Azure queries; project owner (`krispykrits`) is service owner and initial investigating engineer. [Planning #69](https://github.com/krispykrits/TRACE/issues/69) and [ADR 0017](../adr/0017-dotnet-testbed-and-json-first-evidence.md) record the decision. TRACE remains one Python application; these are the workloads it monitors.
+Owner direction approved on 2026-10-14: lightweight .NET Order and Payment services; exported JSON first, then live Azure queries; project owner (`krispykrits`) is service owner and initial investigating engineer. [Planning #69](https://github.com/krispykrits/TRACE/issues/69) and [ADR 0017](../adr/0017-dotnet-testbed-and-json-first-evidence.md) record the decision. TRACE API/worker share a modular Python codebase; these are independently monitored workloads. ADR 0021 selects separate repositories.
 
 | Issue | Existing milestone | Deliverable |
 | --- | --- | --- |
@@ -25,13 +25,23 @@ Existing #55-#60 still own TRACE's cloud design, shared state/admission, runtime
 
 ## Placement and behavior
 
-- Place future .NET source/tests/build settings under `testbed/dotnet/`; pin a supported SDK/dependencies and use a separate .NET CI lane. Keep it outside the Python wheel; add no empty scaffold in this planning PR.
+- Place future .NET source/tests/build settings in planned trace-testbed after S7 repository refinement; pin supported SDK/dependencies and use independent .NET CI. Keep it outside the Python wheel; add no empty scaffold in this planning PR.
 - Begin with two services and fictional payment authorization. Use bounded HTTP timeouts/cancellation/workloads and fault controls disabled by default in explicit test environments. No real money/customer data or additional business platform is required.
 - Export genuine observations, measurements, deployment revisions and missing-data status. Preserve original record/revision, event/collection time, environment/correlation and declared units/window. Preserve actual variation across executions; saved artifacts remain immutable/rescorable.
 - Keep injected cause/schedule/expected answers and evaluator judgments separate from service/export manifests, runtime images, corpus, tool results and model prompts. Use a new controlled cohort and preserve frozen Local MVP reports.
 - Authorize file/source reads independently, then retain current source/transmission/revocation/redaction/citation/review/output protection across both JSON and Azure adapters. Imports/query filters never grant authority and failures never silently use fixtures.
 - Keep collection/write, deployment, scoped investigation-read, fault control and final remediation permissions separate. Fixed bounded Azure queries expose no arbitrary KQL/workspace selection or administration to the model.
 - Preserve the $20/month model cap and shared admission across hosted jobs. Infrastructure and telemetry/query spending, retention, subscription/region/resource shape and live access remain separately recorded gates.
+
+## End-state delivery update — 2026-10-15
+
+[ADR 0021](../adr/0021-interactive-platform-and-repository-boundaries.md) selects an authenticated API and persistent investigation worker around the modular Python core. Retain CLI reproduction and keep evaluation in TRACE, excluded from runtime packages/images. Planned repositories: TRACE core/API/worker, trace-web, trace-testbed, trace-platform and trace-executor introduced with S14 remediation. Component CI/Dockerfiles stay with source; platform deployments pin compatible image digests. Repository extraction preserves historical reports/hashes and versioned contracts.
+
+PostgreSQL-backed durable work dispatch is the initial choice: transactional submission, atomic claims, leases, cancellation, retries and shared attempt/spending admission. Reconcile uncertain external outcomes before retrying. No separate broker is required; add one only for demonstrated throughput/latency/contention/consumer needs. Use batch Jobs for evaluation, corpus rebuilds, migrations and scenarios.
+
+Flexible capability contracts cover telemetry, knowledge, change/deployment records and workload state. JSON then Azure Monitor are first implementations. Preserve original identity/revision, timestamps, correlation, units, provenance and explicit completeness; enforce source/transmission/report rights independently, with scope/result/deadline/pagination limits. On-demand reads and batch import are initial modes; scheduled/event-driven ingestion and dedicated ingestion workers require a concrete lifecycle/volume/isolation need.
+
+**Required web delivery:** after S8 API stabilization and before S15 pilot, provide submission, progress/cancellation, evidence/timeline and protected cited reports. S14 adds ranked-response comparison, selection and concrete approval UI/API, plus separate deterministic execution with distinct credentials. This is required scope. S7 must size stories and place them within S8-S14 capacity or add an undated increment before S15; do not assume it fits the existing 18 increments unchanged.
 
 ## Ownership and claim limits
 
