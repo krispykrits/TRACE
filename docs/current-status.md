@@ -1,6 +1,6 @@
 # TRACE current status
 
-Updated: 2026-10-16 against main `e45186d` and live Project Status: #63 / PR #85 is merged and Done; #64 comparisons are In review. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
+Updated: 2026-10-16 against main `ccfc3f4` and live Project Status: #64 / PR #86 is merged; #88 / PR #90 full authorized timelines is In review. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
 
 ## Implemented
 
@@ -18,21 +18,21 @@ Merged [PR #82](https://github.com/krispykrits/TRACE/pull/82) provides captured-
 
 #63 / [PR #85](https://github.com/krispykrits/TRACE/pull/85) records [owner-approved Local MVP settings](planning/local-mvp-owner-decisions-2026-10-16.md): three repeats, 36 attempts, $1 planning allowance, full integrated-output review by the owner alone and resource/retention expectations. Protocol/decisions v2 preserve the original v1 artifacts and label single-owner provenance. Actual provider/spending/source/run metadata, cleanup ownership, final run bindings and #64–#68 implementation/evidence remain gates. No paid run or new human verdict is recorded.
 
-#64 / [PR #86](https://github.com/krispykrits/TRACE/pull/86) executes and rescores all 36 offline attempts. After the owner [approved 40 tool calls](planning/local-mvp-tool-budget-adjustment-2026-10-16.md), the [fresh v2 comparison](../evaluation/reports/local_mvp_comparison_offline_v2/README.md) completed all 12 integrated attempts as review-required, using 23–30 calls; both reference arms also completed 12/12. Saved rescoring is byte-identical without dispatch. The [original 20-call failures](../evaluation/reports/local_mvp_comparison_offline_v1/README.md) remain unchanged.
+#64 / [PR #86](https://github.com/krispykrits/TRACE/pull/86) executes and rescores all 36 offline attempts. After the owner [approved 40 tool calls](planning/local-mvp-tool-budget-adjustment-2026-10-16.md), the [fresh v2 comparison](https://github.com/krispykrits/TRACE/blob/ccfc3f49af33ab508b4abe3c5eceaab6a98fa612/evaluation/reports/local_mvp_comparison_offline_v2/README.md) completed all 12 integrated attempts as review-required, using 23–30 calls; both reference arms also completed 12/12. Saved rescoring is byte-identical without dispatch. The [original 20-call failures](https://github.com/krispykrits/TRACE/blob/ccfc3f49af33ab508b4abe3c5eceaab6a98fa612/evaluation/reports/local_mvp_comparison_offline_v1/README.md) remain unchanged.
 
-The tool-budget blocker is removed for this schedule. Cause accuracy remains 0/6 for the scripted placeholder mechanism; full timeline completeness remains 0/12 because assessment timelines omit captured events outside selected model context. Actual provider calls and human judgments remain zero; support is unmeasured. Actual-provider and quality-review gates remain pending for S7; S6 readiness still requires timeline completeness and the local recovery/security/handoff evidence.
+The [#88 implementation and fresh v3 comparison](../evaluation/reports/local_mvp_comparison_offline_v3/README.md) deliver the full captured timeline independently of admitted model context: 12/12 integrated attempts complete under 40 calls, with 12/12 timeline completeness and zero observed critical boundary failures. Candidate full-snapshot completeness remains 0/12 because model selection is still bounded. Saved rescoring is byte-identical without dispatch. The original reports retain their failures in pinned Git history; only the latest comparison is kept in the working tree at the owner’s request. Cause accuracy remains 0/6 for the scripted placeholder mechanism; actual provider calls/human judgments remain zero and support is unmeasured. The owner reported reviewing the report on 2026-10-16; no bound per-claim support judgments were supplied. PR #90 remains open; local recovery/security/handoff and S7 actual diagnostic acceptance remain gates.
 
 ## Next work
 
 The owner [selected the S6/S7 gate split](adr/0022-sprint-06-readiness-and-sprint-07-diagnostics.md): S6 local readiness/handoff, S7 actual-provider diagnostic acceptance, S8 hosted delivery and S9 Cloud MVP acceptance. This is sequencing, not a release approval or a passing fake-provider quality result.
 
-1. Review #64 / PR #86, implement [#88 full authorized timelines](https://github.com/krispykrits/TRACE/issues/88), then complete #66/#67 local recovery/security and #68 clean-environment readiness/owner handoff. Protected review-packet plumbing and an owner walkthrough stay S6 requirements.
+1. Review [#88 / PR #90 full authorized timelines](https://github.com/krispykrits/TRACE/pull/90), then complete #66/#67 local recovery/security and #68 clean-environment readiness/owner handoff. Protected review-packet plumbing and an owner walkthrough stay S6 requirements.
 2. In S7, [#87 actual Azure comparisons](https://github.com/krispykrits/TRACE/issues/87) provide the artifacts for #65 actual owner quality review and the Local MVP diagnostic decision. Verify actual provider/spending/source/transmission/run facts before separately authorized dispatch. #55 architecture/design can proceed in parallel; resize the added S7 scope rather than inventing capacity.
 3. S8–S9 [#55–#60 cloud delivery](planning/azure-cloud-backlog.md) and [#70–#76 monitored services](planning/dotnet-testbed-backlog.md) retain their contracts, hosted-acceptance and independent-usefulness gates.
 
 ## Acceptance still pending
 
-- **S6 local readiness:** full authorized timelines, completed local recovery/security, review workflow/setup/runbook evidence and explicit owner handoff.
+- **S6 local readiness:** review of the full authorized timeline implementation, completed local recovery/security, review workflow/setup/runbook evidence and explicit owner handoff.
 - **Local MVP diagnostic acceptance (S7):** live comparison composition, actual authorized model measurements, actual owner support review and applicable quality/latency/cost decision.
 - **Cloud MVP:** Azure/AKS resources, shared PostgreSQL/admission, pod identity, hosted telemetry, restore and teardown.
 - **Operational Pilot:** permitted representative sources, historical replay/read-only shadow use and measured operator benefit.

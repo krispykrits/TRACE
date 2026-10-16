@@ -28,7 +28,7 @@ from evaluation.scoring import EvaluationAttempt, aggregate_scores, score_candid
 from trace_app.investigation.assessment_schema import AssessmentReport
 from trace_app.investigation.execution import ExecutionPolicy
 
-VERSION = "local-mvp-comparison.v1"
+VERSION = "local-mvp-comparison.v2"
 
 
 def capture(case: str) -> dict[str, Any]:
@@ -291,7 +291,7 @@ def score(files: dict[str, Any]) -> dict[str, Any]:
     integrated = summarize(arms["rag_tools"])
     measured = {arm: measurements(values) for arm, values in arms.items()}
     return {
-        "schema_version": "local-mvp-comparison-scores.v1",
+        "schema_version": "local-mvp-comparison-scores.v2",
         "mode": "offline_fixture",
         "scheduled": len(rows),
         "actual_provider_calls": 0,

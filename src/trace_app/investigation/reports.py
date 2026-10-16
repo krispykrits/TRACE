@@ -18,7 +18,7 @@ from trace_app.investigation.provider_policy import (
     SourceAccessPolicy,
 )
 
-REPORT_VERSION = "investigation-cli.v1"
+REPORT_VERSION = "investigation-cli.v2"
 
 
 @dataclass(frozen=True, slots=True)
@@ -98,18 +98,13 @@ class ReportAccess:
         # A review read may change source permissions.
         check()
         evidence = body["data"] if body and not assessment else None
+        captured = (assessment.get("captured_timeline") if assessment else None) or (
+            evidence.get("timeline") if evidence else None
+        )
         timeline = assessment.get("timeline", []) if assessment else []
-        if assessment and not timeline:
-            timeline = [
-                {
-                    "citation_id": key,
-                    **value["source_mapping"],
-                    "causal_status": "observed",
-                }
-                for key, value in assessment["citations"].items()
-                if value["source_mapping"]["kind"] == "evidence"
-            ]
-        if evidence:
+        # Older saved reports remain explicitly incomplete: citations cannot
+        # establish which additional events were captured by that attempt.
+        if captured is not None:
             timeline = [
                 {
                     "citation_id": e["evidence_id"],
@@ -117,8 +112,10 @@ class ReportAccess:
                     "observed_at": e["record"]["observed_at"],
                     "collected_at": e["record"]["collected_at"],
                     "causal_status": "observed",
+                    "kind": e["kind"],
+                    "record": e["record"],
                 }
-                for e in evidence["timeline"]["events"]
+                for e in captured["events"]
             ]
         timeline.sort(key=lambda e: (e["observed_at"], e["citation_id"]))
         metadata = selected["metadata"] if selected else {}
@@ -147,14 +144,29 @@ class ReportAccess:
             "actual_human_review": False
             if configuration and configuration.get("mode") == "offline_test"
             else selected is not None and selected["role"] == "accepted",
-            "sensitivity": (
-                metadata.get("response_access") or metadata.get("evidence_access") or {}
-            ).get("sensitivity", "unknown"),
+            "sensitivity": max(
+                (
+                    Sensitivity[
+                        (metadata.get(name) or {}).get("sensitivity", "unknown").upper()
+                    ]
+                    for name in ("response_access", "evidence_access")
+                    if metadata.get(name)
+                ),
+                default=Sensitivity.UNKNOWN,
+            ).name.lower(),
             "usage": metadata.get("usage"),
             "usage_available": (metadata.get("usage") or {}).get("availability")
             == "available",
             "usage_basis": "final_response_only; aggregate call records remain private",
             "timeline": timeline,
+            "timeline_capture": {
+                key: value for key, value in captured.items() if key != "events"
+            }
+            if captured is not None
+            else {"status": "unavailable"},
+            "model_context_omissions": assessment.get("model_context_omissions", {})
+            if assessment
+            else {},
             "report": assessment["report"] if assessment else None,
             "citations": assessment["citations"] if assessment else {},
             "artifacts": [

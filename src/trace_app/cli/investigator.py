@@ -96,6 +96,9 @@ def render(data: dict[str, Any]) -> str:
         "Usage: " + json.dumps(data["usage"])
         if data["usage_available"]
         else "Usage: unknown / unavailable",
+        "Timeline capture: " + json.dumps(data.get("timeline_capture"), sort_keys=True),
+        "Model context omissions: "
+        + json.dumps(data.get("model_context_omissions"), sort_keys=True),
         "Timeline (observed; time correlation does not prove cause):",
     ]
     lines.extend("  " + json.dumps(event, sort_keys=True) for event in data["timeline"])

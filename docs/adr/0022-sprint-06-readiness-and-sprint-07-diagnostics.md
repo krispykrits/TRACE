@@ -8,7 +8,7 @@
 
 The S6 backlog required actual Azure diagnosis and human quality acceptance before S7, while the owner intends live diagnostic integration in S7. A connector already exists under ADR 0012; it is not an executable live comparison, AKS hosting or proof of diagnostic usefulness. S7 currently designs the Azure platform; hosted implementation remains S8 and Cloud MVP acceptance S9. Conflating these scopes creates an artificial S6 blocker and risks counting scripted outputs as model-quality evidence.
 
-The [40-call comparison](../../evaluation/reports/local_mvp_comparison_offline_v2/README.md) completes 12/12 integrated proposals but retains 0/6 scripted cause accuracy, 0/12 full timeline completeness and no actual human support. Full timeline completeness is a local implementation defect; placeholder-model quality is unmeasured for a real model. Recovery/security and actual review tooling also need their own evidence. A sprint goal alone cannot settle these dependencies.
+The [40-call comparison](https://github.com/krispykrits/TRACE/blob/ccfc3f49af33ab508b4abe3c5eceaab6a98fa612/evaluation/reports/local_mvp_comparison_offline_v2/README.md) completes 12/12 integrated proposals but retains 0/6 scripted cause accuracy, 0/12 full timeline completeness and no actual human support. Full timeline completeness is a local implementation defect; placeholder-model quality is unmeasured for a real model. Recovery/security and actual review tooling also need their own evidence. A sprint goal alone cannot settle these dependencies.
 
 ## Decision
 

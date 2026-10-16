@@ -61,6 +61,37 @@ class InvestigatorScoringTests(unittest.TestCase):
             },
         )
 
+    def test_full_delivered_timeline_is_independent_of_admitted_model_subset(
+        self,
+    ) -> None:
+        self.result["schema_version"] = "investigation-cli.v2"
+        records = {
+            entry["record"]["evidence_id"]: entry["record"]
+            for entry in self.observed["entries"]
+        }
+        for event in self.result["timeline"]:
+            event["record"] = records[event["citation_id"]]
+        self.result["timeline_capture"] = {
+            "sources": self.observed["sources"],
+            "matching_count": len(records),
+            "truncated": False,
+        }
+        omitted = self.result["report"]["timeline_evidence_ids"].pop(1)
+        del self.result["citations"][omitted]
+        score = self.score()
+        self.assertTrue(score["deterministic_timeline_valid"])
+        self.assertTrue(score["delivered_timeline_complete_correct"])
+        self.assertFalse(score["timeline_complete_correct"])
+        summary = summarize([score])
+        self.assertEqual(summary["timeline_complete_accuracy"]["value"], 1.0)
+        self.assertEqual(summary["candidate_timeline_complete_accuracy"]["value"], 0.0)
+        self.result["timeline"] = [
+            event
+            for event in self.result["timeline"]
+            if event["citation_id"] != omitted
+        ]
+        self.assertFalse(self.score()["delivered_timeline_complete_correct"])
+
     def test_knowledge_citations_are_validated_independently_of_event_ids(self) -> None:
         generation, chunk = "gen-" + "a" * 64, "chunk-" + "b" * 64
         identity = "knowledge-" + digest(

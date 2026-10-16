@@ -106,7 +106,7 @@ class InvestigatorCliTests(unittest.TestCase):
     ) -> None:
         for case in ("answered", "abstained"):
             result = self.results[case]
-            self.assertEqual(result["schema_version"], "investigation-cli.v1")
+            self.assertEqual(result["schema_version"], "investigation-cli.v2")
             self.assertEqual(result["configuration"]["mode"], "offline_test")
             self.assertEqual(result["execution_status"], "completed")
             self.assertEqual(
@@ -138,6 +138,46 @@ class InvestigatorCliTests(unittest.TestCase):
         self.assertEqual(
             self.results["pending"]["validation_outcome"], "review_required"
         )
+
+    def test_full_timeline_survives_restart_without_granting_model_citations(
+        self,
+    ) -> None:
+        result = self.results["answered"]
+        ids = {event["citation_id"] for event in result["timeline"]}
+        admitted = set(result["report"]["timeline_evidence_ids"])
+        omitted = set(result["model_context_omissions"]["evidence"])
+        self.assertTrue(omitted)
+        self.assertTrue(
+            any(
+                source["status"] != "available"
+                for source in result["timeline_capture"]["sources"]
+            )
+        )
+        self.assertEqual(result["timeline_capture"]["status"], "incomplete")
+        self.assertEqual(ids, admitted | omitted)
+        self.assertFalse(omitted & result["citations"].keys())
+        self.assertEqual(result["timeline_capture"]["matching_count"], len(ids))
+        self.assertTrue(
+            all(
+                event["record"]["evidence_id"] == event["citation_id"]
+                for event in result["timeline"]
+            )
+        )
+        restored = self.report("--format", "json")
+        self.assertEqual(restored.returncode, 0, restored.stderr)
+        self.assertEqual(json.loads(restored.stdout)["timeline"], result["timeline"])
+        identity = next(iter(omitted))
+        self.assert_denied(self.report("--citation-id", identity, "--format", "json"))
+        self.change_profile(
+            lambda d: d["grants"][identity].__setitem__("access_allowed", False)
+        )
+        self.assert_denied(self.report())
+        self.assert_denied(self.report("--format", "json"))
+        self.profile_path.write_text(self.original_profile)
+        self.change_profile(
+            lambda d: d["grants"][identity].__setitem__("revision", "changed")
+        )
+        self.assert_denied(self.report())
 
     def test_restart_inspect_citation_export_and_no_overwrite(self) -> None:
         self.assertEqual(self.report().returncode, 0)

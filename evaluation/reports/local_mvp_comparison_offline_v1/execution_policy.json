@@ -1,1 +1,0 @@
-{"configuration_id":"local-mvp-approved.v1","deadline_ms":120000,"max_corrections":0,"max_input_tokens":16384,"max_model_calls":3,"max_model_response_bytes":65536,"max_output_tokens":2048,"max_retries":0,"max_tool_calls":20,"max_tool_result_bytes":65536,"max_total_tokens":55296,"model_timeout_ms":30000,"tool_timeout_ms":5000}

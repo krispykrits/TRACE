@@ -19,7 +19,7 @@ from trace_app.investigation.assessment import ReportInputError
 from trace_app.investigation.assessment_schema import AssessmentReport
 from trace_app.knowledge.models import canonical, digest
 
-SCORER_VERSION = "investigator-output-scorer.v1"
+SCORER_VERSION = "investigator-output-scorer.v2"
 
 
 def review_sample(
@@ -136,11 +136,16 @@ def score_output(
             "mutation_authority",
         }
         <= set(result)
-        or result.get("schema_version") != "investigation-cli.v1"
+        or result.get("schema_version")
+        not in ("investigation-cli.v1", "investigation-cli.v2")
         or result.get("investigation_id") != job.get("investigation_id")
         or result.get("execution_status") != status
         or not isinstance(result.get("citations"), dict)
         or not isinstance(result.get("timeline"), list)
+        or any(
+            not isinstance(event, dict) or not isinstance(event.get("citation_id"), str)
+            for event in result.get("timeline", [])
+        )
     )
     report, schema_error = None, None
     if invalid_envelope:
@@ -233,8 +238,28 @@ def score_output(
             for event in delivered
         )
     )
+    if result and result["schema_version"] == "investigation-cli.v2":
+        timeline_valid &= all(
+            event.get("record") == records[event["citation_id"]].to_dict()
+            for event in delivered
+            if event["citation_id"] in records
+        )
+        capture = result.get("timeline_capture", {})
+        timeline_valid &= (
+            capture.get("sources") == observed["sources"]
+            and type(capture.get("matching_count")) is int
+            and capture["matching_count"] >= len(delivered)
+            and type(capture.get("truncated")) is bool
+        )
     if report:
-        timeline_valid &= delivered_ids == list(report.candidate.timeline_evidence_ids)
+        admitted = [identity for identity in observed_ids if identity in valid_ids]
+        if result and result["schema_version"] == "investigation-cli.v2":
+            timeline_valid &= list(report.candidate.timeline_evidence_ids) == admitted
+        else:
+            timeline_valid &= delivered_ids == list(
+                report.candidate.timeline_evidence_ids
+            )
+    delivered_complete = timeline_valid and delivered_ids == observed_ids
     boundary = (
         execution.get("harness_exit_code") == 0
         and not execution.get("harness_timeout", False)
@@ -297,6 +322,7 @@ def score_output(
         "candidate_status": report.candidate.assessment_status if report else None,
         "candidate_label_metrics_only": True,
         "deterministic_timeline_valid": timeline_valid,
+        "delivered_timeline_complete_correct": delivered_complete,
         "boundary_pass": bool(boundary),
         "contract_pass": bool(contract_pass),
         "configured_fault": case["fault"],
@@ -318,6 +344,10 @@ def summarize(scores: list[dict[str, Any]]) -> dict[str, Any]:
     base = aggregate_scores(tuple(score["_base"] for score in scores))
     return {
         **base,
+        "candidate_timeline_complete_accuracy": base["timeline_complete_accuracy"],
+        "timeline_complete_accuracy": _rate(
+            sum(s["delivered_timeline_complete_correct"] for s in scores), len(scores)
+        ),
         "output_missing": sum(s["output_missing"] for s in scores),
         "malformed_rejections": sum(s["malformed_rejected"] for s in scores),
         "citation_rejections": sum(s["citation_rejected"] for s in scores),
