@@ -13,7 +13,7 @@ Owner cloud direction and document/story update authorized on 2026-10-14; planni
 
 ## Dependency and acceptance order
 
-S6 accepts the local investigator before cloud implementation acceptance. #55 reviews Azure design and unresolved account/budget/region/retention inputs. #56 packages API/worker/CLI entry points; #57 supplies shared PostgreSQL dispatch, leases and admission. #58 depends on both and implements/deploys the authenticated API and persistent runner, including protected status/report/cancellation contracts. #59 records collection design alongside S7 and requires #58 for hosted evidence. #60 accepts the complete S8 release after fault/access/cost/restore/teardown demonstrations.
+Under [ADR 0022](../adr/0022-sprint-06-readiness-and-sprint-07-diagnostics.md), S6 supplies local readiness and the owner handoff. S7 #87 supplies actual Azure diagnostic comparisons locally, then #65 supplies actual owner quality review and the Local MVP diagnostic decision. These do not require AKS; S8 hosted implementation acceptance requires that diagnostic decision as well as reviewed S7 design. #55 reviews Azure design and unresolved account/budget/region/retention inputs. #56 packages API/worker/CLI entry points; #57 supplies shared PostgreSQL dispatch, leases and admission. #58 depends on both and implements/deploys the authenticated API and persistent runner, including protected status/report/cancellation contracts. #59 records collection design alongside S7 and requires #58 for hosted evidence. #60 accepts the complete S8 release after fault/access/cost/restore/teardown demonstrations.
 
 Linked issues own concrete acceptance/verification; avoid duplicate placeholder stories. Refine/split scope against capacity and update dependencies/gates together. Native milestones 7/8/9 retain their identities and undated scheduling. [Project Status and Release](https://github.com/users/krispykrits/projects/2/views/4) are authoritative and must be checked live. Planning #54 was accepted through [merged PR #61](https://github.com/krispykrits/TRACE/pull/61); cloud implementation and hosted acceptance remain separate.
 
@@ -29,7 +29,7 @@ Flexible capability contracts cover telemetry, knowledge, change/deployment reco
 
 ## Native sprint titles and goals
 
-Native milestone titles and descriptions were updated and verified on 2026-10-15 to match ADR 0021. Numeric identities, open state, issue assignments and undated scheduling are retained. Descriptions include goals, deliverables, exit gates, dependencies and capacity constraints.
+The following milestone titles and descriptions were updated and verified on 2026-10-15; this is the historical pre-ADR-0022 snapshot. The 2026-10-16 current sequencing below supersedes its S6 acceptance dependency. They matched ADR 0021. Numeric identities, open state, issue assignments and undated scheduling are retained. Descriptions include goals, deliverables, exit gates, dependencies and capacity constraints.
 
 | Milestone | Verified title | Goal and deliverables | Exit gate and dependencies |
 | --- | --- | --- | --- |
@@ -54,3 +54,17 @@ Historical #1/#3/#6/#10/#16/#29 retain their earlier local/decision acceptance a
 ## .NET monitored workload addition — 2026-10-14
 
 The owner approved lightweight .NET Order/Payment services, exported JSON first then live Azure queries, and the owner as service owner/initial investigating engineer. [ADR 0017](../adr/0017-dotnet-testbed-and-json-first-evidence.md) and [the testbed backlog](dotnet-testbed-backlog.md) refine S7 #69-#72, S8 #73-#75 and S9 #76 alongside the existing cloud work. Deploy API and persistent worker from one modular Python codebase and preserve frozen Local MVP evidence. The new track owns monitored workload telemetry and protected source ingestion; #59 remains TRACE's own observability acceptance. Native milestones stay undated; resize capacity and keep exact field/retention/access, infrastructure spending and usefulness/review thresholds explicit. Generated-fault replay/shadow findings remain controlled-testbed evidence, with independent Operational Pilot and production-remediation gates retained.
+
+
+## Current S6/S7 sequencing — 2026-10-16
+
+The owner explicitly deferred live diagnostic comparisons to S7, with S6 ending in local readiness rather than model-quality acceptance. [ADR 0022](../adr/0022-sprint-06-readiness-and-sprint-07-diagnostics.md) and the [canonical gate matrix](capstone-project-plan.md#s6-readiness-and-s7-diagnostic-handoff) own this change. Preserve the dated milestone snapshot above as historical context.
+
+| Sprint | Current responsibility | Dependency / exit distinction |
+| --- | --- | --- |
+| S6 | #64 offline comparison/review mechanics, #88 full timelines, #66/#67 local recovery/security, #68 clean setup/runbook and owner readiness handoff | No actual-provider quality acceptance; critical local/completeness defects still block readiness |
+| S7 | #87 actual Azure comparison composition and separately approved measurement; #65 owner quality review and diagnostic decision; #55 architecture/design and #70–#72 workload preparation | Live execution can run locally after S6 readiness and verified permissions/spending/run bindings. Design may proceed independently. Resize/split added scope; no apply or paid permission inferred |
+| S8 | #56–#59 API/worker/shared state/identities/telemetry and #73–#75 protected testbed sources | Hosted implementation acceptance requires reviewed S7 contracts/design plus Local MVP diagnostic acceptance |
+| S9 | #60 Cloud MVP recovery/security/cost/teardown; #76 separate replay/shadow comparison | Actual hosted evidence; no substitution for Operational Pilot or production remediation |
+
+Existing Azure connector acceptance remains under ADR 0012. It is neither missing work to redo in S7 nor evidence that actual diagnosis, AKS hosting or keyless pod identity already works. S7 milestone/native issue assignments are updated for diagnostics plus design; all increments remain undated, and required web/repository/testbed work must still be sized explicitly.

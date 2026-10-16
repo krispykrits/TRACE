@@ -24,12 +24,13 @@ Generated testbed incidents provide controlled evidence. Representative operatio
 
 | Gate | Required outcome |
 | --- | --- |
-| Local MVP, S1–S6 | Evaluated local read-only investigator with reproducible evidence, bounded tools, cited assessment/timeline, uncertainty/abstention and documented setup |
+| Local readiness, S1–S6 | Reproducible read-only CLI/evidence, full authorized timeline, bounded tools, protected assessment/review mechanics, local recovery/security and an owner readiness/handoff decision; no real-model quality claim |
+| Local MVP diagnostic acceptance, S7 | Actual authorized Azure comparisons and sole-owner quality review against applicable predeclared thresholds; explicit diagnostic decision before hosted implementation acceptance |
 | Cloud MVP, S7–S9 | Repeatable Azure/AKS delivery with shared state/admission, workload identity, observability, recovery and teardown |
 | Full capstone, S10–S18 | Full capability checklist, justified evaluated ML, five-arm study, ranked responses, hardening, defense and verified authorized production remediation |
 | Independent Operational Pilot | Authorized replay and read-only shadow use, comparison to the operator's workflow and a deterministic evidence bundle, predeclared utility/quality/reliability/latency/cost criteria, support ownership and feedback |
 
-The [delivery plan](planning/capstone-project-plan.md#releases-and-acceptance) defines these gates. Synthetic scores, cloud deployment and academic completion do not independently establish operational usefulness.
+The [delivery plan](planning/capstone-project-plan.md#releases-and-acceptance) and [ADR 0022](adr/0022-sprint-06-readiness-and-sprint-07-diagnostics.md) define the owner-selected S6/S7 gate split. Synthetic scores, cloud deployment and academic completion do not independently establish operational usefulness.
 
 Final production remediation requires an authorized workload serving a real operational purpose, staging validation and a concrete approved action with verified resource/health outcomes. A missing target/access is a recorded blocker. See [response/remediation scope](planning/production-remediation-scope.md).
 

@@ -20,17 +20,20 @@ Merged [PR #82](https://github.com/krispykrits/TRACE/pull/82) provides captured-
 
 #64 / [PR #86](https://github.com/krispykrits/TRACE/pull/86) executes and rescores all 36 offline attempts. After the owner [approved 40 tool calls](planning/local-mvp-tool-budget-adjustment-2026-10-16.md), the [fresh v2 comparison](../evaluation/reports/local_mvp_comparison_offline_v2/README.md) completed all 12 integrated attempts as review-required, using 23–30 calls; both reference arms also completed 12/12. Saved rescoring is byte-identical without dispatch. The [original 20-call failures](../evaluation/reports/local_mvp_comparison_offline_v1/README.md) remain unchanged.
 
-The tool-budget blocker is removed for this schedule. Cause accuracy remains 0/6 for the scripted placeholder mechanism; full timeline completeness remains 0/12 because assessment timelines omit captured events outside selected model context. Actual provider calls and human judgments remain zero; support is unmeasured. Live composition/provider/spending/source/run gates and #65–#68 evidence still block acceptance.
+The tool-budget blocker is removed for this schedule. Cause accuracy remains 0/6 for the scripted placeholder mechanism; full timeline completeness remains 0/12 because assessment timelines omit captured events outside selected model context. Actual provider calls and human judgments remain zero; support is unmeasured. Actual-provider and quality-review gates remain pending for S7; S6 readiness still requires timeline completeness and the local recovery/security/handoff evidence.
 
 ## Next work
 
-1. Review [#64 comparisons](https://github.com/krispykrits/TRACE/issues/64), retaining offline contract results and named live-measurement blockers. Complete the remaining factual/authority/freeze gates before paid acceptance measurement.
-2. Continue Sprint 6 [#64–#68](planning/capstone-project-plan.md#backlogs-and-dependencies): comparisons, actual owner review, recovery/security evidence and release decision.
-3. Follow [#55–#60](planning/azure-cloud-backlog.md) and [#70–#76](planning/dotnet-testbed-backlog.md) for cloud delivery and monitored services, in their recorded dependency order.
+The owner [selected the S6/S7 gate split](adr/0022-sprint-06-readiness-and-sprint-07-diagnostics.md): S6 local readiness/handoff, S7 actual-provider diagnostic acceptance, S8 hosted delivery and S9 Cloud MVP acceptance. This is sequencing, not a release approval or a passing fake-provider quality result.
+
+1. Review #64 / PR #86, implement [#88 full authorized timelines](https://github.com/krispykrits/TRACE/issues/88), then complete #66/#67 local recovery/security and #68 clean-environment readiness/owner handoff. Protected review-packet plumbing and an owner walkthrough stay S6 requirements.
+2. In S7, [#87 actual Azure comparisons](https://github.com/krispykrits/TRACE/issues/87) provide the artifacts for #65 actual owner quality review and the Local MVP diagnostic decision. Verify actual provider/spending/source/transmission/run facts before separately authorized dispatch. #55 architecture/design can proceed in parallel; resize the added S7 scope rather than inventing capacity.
+3. S8–S9 [#55–#60 cloud delivery](planning/azure-cloud-backlog.md) and [#70–#76 monitored services](planning/dotnet-testbed-backlog.md) retain their contracts, hosted-acceptance and independent-usefulness gates.
 
 ## Acceptance still pending
 
-- **Local MVP:** approved S6 protocol/owner inputs, comparisons, human support review, reliability/security checks and release decision.
+- **S6 local readiness:** full authorized timelines, completed local recovery/security, review workflow/setup/runbook evidence and explicit owner handoff.
+- **Local MVP diagnostic acceptance (S7):** live comparison composition, actual authorized model measurements, actual owner support review and applicable quality/latency/cost decision.
 - **Cloud MVP:** Azure/AKS resources, shared PostgreSQL/admission, pod identity, hosted telemetry, restore and teardown.
 - **Operational Pilot:** permitted representative sources, historical replay/read-only shadow use and measured operator benefit.
 - **Full capstone:** justified evaluated ML, five-arm study, ranked response contract, hardened operations and defense.

@@ -1,5 +1,7 @@
 # ADR 0020: Actual investigator evaluation and isolated saved artifacts
 
+**Delivery-sequencing update — 2026-10-16:** [ADR 0022](0022-sprint-06-readiness-and-sprint-07-diagnostics.md) replaces only the original S6/S7 acceptance timing: S6 local readiness/handoff, S7 actual Azure diagnostics and owner quality decision. The original decision text and evidence below remain historical; provider/architecture/security boundaries are unchanged.
+
 - Status: Proposed in #39; owner review pending
 - Date: 2026-10-15
 - Scope: Sprint 5 offline integration/scoring, not a quality/release or live-run approval

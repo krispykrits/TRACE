@@ -1,5 +1,7 @@
 # ADR 0021: Interactive platform and repository boundaries
 
+**Delivery-sequencing update — 2026-10-16:** [ADR 0022](0022-sprint-06-readiness-and-sprint-07-diagnostics.md) replaces only the original S6/S7 acceptance timing: S6 local readiness/handoff, S7 actual Azure diagnostics and owner quality decision. The original decision text and evidence below remain historical; provider/architecture/security boundaries are unchanged.
+
 Status: Accepted owner direction, 2026-10-15; S7 design refinement and implementation pending.
 Owner: krispykrits.
 Supersedes the single-repository/CLI-default hosted direction in ADRs 0001, 0015 and 0017 only. Local CLI behavior, core import rules, Azure selection and JSON-first delivery remain valid.
