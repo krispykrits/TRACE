@@ -57,7 +57,7 @@ def capture(case: str) -> dict[str, Any]:
 def execution_policy(decisions: dict[str, Any]) -> ExecutionPolicy:
     limits = decisions["limits"]
     return ExecutionPolicy(
-        configuration_id="local-mvp-approved.v1",
+        configuration_id="local-mvp-approved.v2",
         deadline_ms=limits["attempt_deadline_ms"],
         max_model_calls=limits["model_calls_per_attempt"],
         max_tool_calls=limits["tool_calls_per_attempt"],

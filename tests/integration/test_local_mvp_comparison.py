@@ -49,8 +49,13 @@ class LocalMVPComparisonTests(unittest.TestCase):
             self.assertEqual(result["arms"]["rag_tools"]["attempted"], 1)
             self.assertEqual(result["arms"]["llm_only"]["attempted"], 1)
             self.assertTrue(result["live_diagnostics"]["blockers"])
+            delivered = _parse(_read(output / "artifacts/a003/result.json"))
+            assert isinstance(delivered, dict)
+            self.assertEqual(delivered["validation_outcome"], "review_required")
+            self.assertFalse(delivered["actual_human_review"])
+            self.assertEqual(delivered["report"]["schema_version"], "assessment.v2")
             self.assertEqual(
-                result["arms"]["rag_tools"]["execution_counts"]["failed"], 1
+                result["arms"]["rag_tools"]["execution_counts"]["completed"], 1
             )
             for identity, arm in (
                 ("a001", "llm_only"),
@@ -63,7 +68,7 @@ class LocalMVPComparisonTests(unittest.TestCase):
                 assert isinstance(execution, dict)
                 self.assertEqual(execution["evaluation_modules_loaded"], [])
                 self.assertEqual(
-                    execution["execution_policies"][0]["max_tool_calls"], 20
+                    execution["execution_policies"][0]["max_tool_calls"], 40
                 )
                 self.assertEqual(
                     execution["execution_policies"][0]["max_input_tokens"], 16384
@@ -77,15 +82,13 @@ class LocalMVPComparisonTests(unittest.TestCase):
                     self.assertTrue(
                         all(
                             call["kind"] == "tool"
-                            and not str(
-                                call.get("metadata", {}).get("tool", "")
-                            ).startswith("knowledge.")
+                            and not str(call.get("tool", "")).startswith("knowledge.")
                             for call in calls
                         )
                     )
                 else:
                     self.assertTrue(
-                        any(call["outcome"] == "budget_exhausted" for call in calls)
+                        not any(call["outcome"] == "budget_exhausted" for call in calls)
                     )
             with (
                 patch(

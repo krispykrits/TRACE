@@ -20,7 +20,7 @@ Merged [PR #82](https://github.com/krispykrits/TRACE/pull/82) provides captured-
 
 #64's comparison implementation now executes and rescores all 36 offline attempts under exact bound inputs. The [retained comparison](../evaluation/reports/local_mvp_comparison_offline_v1/README.md) records 12/12 completed brief-only references, 12/12 completed deterministic bundles and 0/12 completed integrated attempts: all exhaust the approved 20-call tool ceiling. Saved rescoring is byte-identical with no dispatch. This is a negative contract finding, not Azure diagnosis or release acceptance; paid calls and new human verdicts remain zero.
 
-The [tool-budget adjustment proposal](planning/local-mvp-tool-budget-adjustment-2026-10-16.md) records four additional diagnostic probes: 23–30 calls reach review-required output. A 40-call ceiling is recommended pending the owner's explicit numeric choice; active v2 remains at 20, and the failed frozen comparison is unchanged.
+The owner [approved 40 tool calls](planning/local-mvp-tool-budget-adjustment-2026-10-16.md) after capacity probes measured 23–30 calls. Decision revision v3 preserves all other limits and gates; a fresh 36-attempt offline comparison is being prepared. Original v2 inputs and the failed frozen comparison remain unchanged.
 
 ## Next work
 
