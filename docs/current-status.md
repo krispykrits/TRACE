@@ -1,6 +1,6 @@
 # TRACE current status
 
-Updated: 2026-10-16 against main `2679d52` and live Project Status: #39 / PR #83 is merged and Done; #63 protocol preparation is proposed for owner review. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
+Updated: 2026-10-16 against main `2679d52` and live Project Status: #39 / PR #83 is merged and Done; #63 / PR #85 is In review with owner planning settings and sole-reviewer choice recorded. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
 
 ## Implemented
 
@@ -16,12 +16,12 @@ Updated: 2026-10-16 against main `2679d52` and live Project Status: #39 / PR #83
 
 Merged [PR #82](https://github.com/krispykrits/TRACE/pull/82) provides captured-window CLI investigation, protected saved display/citation/export and cancellation with original dependency/clearance/retention and current support checks. Merged [PR #83](https://github.com/krispykrits/TRACE/pull/83) adds actual-output scoring, saved-artifact rescoring and bound review samples. Its [retained run](../evaluation/reports/investigator_offline_v1/manifest.json) passed 10/10 expected offline checks with zero critical boundary failures. The [Sprint 5 review](sprints/sprint-05-review.md) preserves the wrong fixture cause scores and a separate [guided owner review](../evaluation/reports/investigator_offline_v1_human_review_v1/README.md): all ten sampled claims indeterminate because their wording was too vague to assess; no determinate support rate. Paid end-to-end diagnosis and positive human support remain unmeasured.
 
-#63 prepares the [Local MVP acceptance protocol](planning/local-mvp-acceptance.md), explicit pending owner decisions and a private hash-bound cost/schedule dry run. No provider calls or acceptance measurements are made. Numeric release thresholds, repeats/review coverage, resources/retention, current provider/spending and separately approved live-run scope remain blockers before acceptance execution.
+#63 / [PR #85](https://github.com/krispykrits/TRACE/pull/85) records [owner-approved Local MVP settings](planning/local-mvp-owner-decisions-2026-10-16.md): three repeats, 36 attempts, $1 planning allowance, full integrated-output review by the owner alone and resource/retention expectations. Protocol/decisions v2 preserve the original v1 artifacts and label single-owner provenance. Actual provider/spending/source/run metadata, cleanup ownership, final run bindings and #64–#68 implementation/evidence remain gates. No paid run or new human verdict is recorded.
 
 ## Next work
 
-1. Review [#63 protocol preparation](https://github.com/krispykrits/TRACE/issues/63) and obtain the missing owner decisions before acceptance measurement.
-2. Continue Sprint 6 [#64–#68](planning/capstone-project-plan.md#backlogs-and-dependencies): comparisons, actual independent review, recovery/security evidence and release decision.
+1. Review [#63 protocol preparation](https://github.com/krispykrits/TRACE/issues/63) and complete the remaining factual/authority/freeze gates before acceptance measurement.
+2. Continue Sprint 6 [#64–#68](planning/capstone-project-plan.md#backlogs-and-dependencies): comparisons, actual owner review, recovery/security evidence and release decision.
 3. Follow [#55–#60](planning/azure-cloud-backlog.md) and [#70–#76](planning/dotnet-testbed-backlog.md) for cloud delivery and monitored services, in their recorded dependency order.
 
 ## Acceptance still pending

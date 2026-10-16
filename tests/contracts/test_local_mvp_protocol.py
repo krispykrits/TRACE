@@ -40,9 +40,6 @@ def fixture_decisions() -> dict:
         output_tokens_per_call=1024,
         attempt_deadline_ms=120000,
     )
-    value["review"].update(
-        claims_per_model_arm=10, minimum_determinate_claims_per_arm=5
-    )
     value["provider"]["model_id"] = "gpt-6-luna"
     value["spending"].update(
         month="2026-10",
@@ -98,7 +95,10 @@ class LocalMVPProtocolTests(unittest.TestCase):
             ("spending", "prior_spend_nusd", -1),
             ("limits", "model_calls_per_attempt", 101),
             ("limits", "output_tokens_per_call", 15),
-            ("review", "reviewers_per_claim", 1),
+            ("review", "reviewers_per_claim", 0),
+            ("review", "reviewers_per_claim", 2),
+            ("limits", "automatic_paid_retries", 1),
+            ("limits", "max_parallel_attempts", 2),
             ("provider", "provider", "unapproved-provider"),
             ("spending", "month", "2026-13"),
             ("spending", "accounting_observed_at", "2026-10-16T12:00:00"),
@@ -116,9 +116,18 @@ class LocalMVPProtocolTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_decisions(value, self.protocol)
 
-    def test_review_coverage_cannot_exceed_population(self) -> None:
+    def test_review_policy_cannot_shrink_coverage_or_claim_independence(self) -> None:
+        for field, invalid in (
+            ("coverage", "sample_first_n"),
+            ("provenance", "two_independent_reviewers"),
+            ("reference_arm_review", "required_positive_support"),
+        ):
+            value = fixture_decisions()
+            value["review"][field] = invalid
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                validate_decisions(value, self.protocol)
         value = fixture_decisions()
-        value["review"]["minimum_determinate_claims_per_arm"] = 11
+        value["review"]["claims_per_model_arm"] = 20
         with self.assertRaises(ValueError):
             validate_decisions(value, self.protocol)
 
@@ -130,17 +139,31 @@ class LocalMVPProtocolTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_decisions(value, self.protocol)
 
-    def test_missing_owner_decisions_do_not_become_defaults_or_zero_spend(self) -> None:
+    def test_approved_planning_values_do_not_invent_spend_or_run_approval(self) -> None:
         result = plan()
         self.assertEqual(result["preflight"], "blocked")
-        self.assertIn("missing:thresholds.cause_accuracy", result["blockers"])
+        self.assertNotIn("missing:thresholds.cause_accuracy", result["blockers"])
         self.assertIn("missing:spending.prior_spend_nusd", result["blockers"])
+        self.assertIn(
+            "missing:authorization.live_run_scope_reference", result["blockers"]
+        )
         self.assertIn("missing:approval", result["blockers"])
-        self.assertIsNone(result["projected_cost_ceiling_nusd"])
+        self.assertEqual(result["projected_cost_ceiling_nusd"], 405504000)
         self.assertIsNone(result["monthly_available_nusd"])
-        self.assertEqual(result["schedule"], [])
-        self.assertEqual(len(result["schedule_template"]), 12)
+        self.assertEqual(len(result["schedule"]), 36)
         self.assertEqual(result["actual_provider_calls"], 0)
+        self.assertEqual(result["review_plan"]["planned_integrated_reports"], 12)
+        self.assertEqual(result["review_plan"]["reviewer_id"], "krispykrits")
+        self.assertEqual(result["review_plan"]["reviewers_per_claim"], 1)
+        self.assertEqual(result["review_plan"]["actual_review_decisions"], 0)
+        self.assertIs(result["review_plan"]["independent_second_reviewer"], False)
+
+    def test_legacy_fixed_quota_schema_is_not_silently_reinterpreted(self) -> None:
+        legacy = json.loads(
+            DECISIONS.with_name("local_mvp_decisions_v1.json").read_text()
+        )
+        with self.assertRaises(ValueError):
+            validate_decisions(legacy, self.protocol)
 
     def test_schedule_cost_and_approval_bind_the_exact_inputs(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

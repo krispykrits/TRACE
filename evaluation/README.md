@@ -63,13 +63,13 @@ Choose an unused worktree path. Current code manifests include nested applicatio
 
 ## Cohorts and acceptance
 
-Sprint 6 [Local MVP protocol preparation](../docs/planning/local-mvp-acceptance.md) has a versioned cohort/arm/metric policy, pending owner-decision template and a dry-run planner:
+Sprint 6 [Local MVP protocol preparation](../docs/planning/local-mvp-acceptance.md) uses protocol/decisions v2 with [owner-approved numeric planning settings and sole owner review](../docs/planning/local-mvp-owner-decisions-2026-10-16.md), plus a dry-run planner:
 
 ~~~sh
-uv run --locked python -m evaluation.local_mvp --output /tmp/trace-local-mvp-plan-v1
+uv run --locked python -m evaluation.local_mvp --output /tmp/trace-local-mvp-plan-v2
 ~~~
 
-Use a new directory. Exit 1 saves a valid blocked plan when required owner inputs are missing; it makes no provider call and measures no acceptance result. Cost remains unknown until repeats/budgets are supplied. Approval must bind exact protocol, decision and source hashes; the planner supplies no live authority or release endorsement. #64–#68 retain comparison, review, boundary and release implementation/evidence.
+Use a new directory. Exit 1 saves a valid blocked plan when required owner inputs are missing; it makes no provider call and measures no acceptance result. The current settings declare 36 attempts and a $0.405504 model reservation ceiling under frozen rates; actual usage, current spending and applicable live authority remain unverified. Review covers all integrated reports/claims and explicitly has one owner reviewer, with no new judgments. The original v1 draft/input/report bytes remain unchanged at their recorded checkout. Approval must bind exact protocol, decision and source hashes; the planner supplies no live authority or release endorsement. #64–#68 retain comparison, review, boundary and release implementation/evidence.
 
 Related seeds, capture gaps, distractors and `payment-dependency.v1` variants form the `order-payment-timeout-v1` development group. Keep related variants together; opaque IDs are not diagnostic features. Existing four-case development data does not establish an independent final-test cohort.
 

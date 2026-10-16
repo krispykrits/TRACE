@@ -14,8 +14,8 @@ from typing import Any
 from evaluation.runner import _json, _parse, _read, _sha
 
 ROOT = Path(__file__).resolve().parents[1]
-PROTOCOL = ROOT / "evaluation/local_mvp_protocol_v1.json"
-DECISIONS = ROOT / "evaluation/local_mvp_decisions_v1.json"
+PROTOCOL = ROOT / "evaluation/local_mvp_protocol_v2.json"
+DECISIONS = ROOT / "evaluation/local_mvp_decisions_v2.json"
 _APPROVAL_KEYS = {
     "owner",
     "recorded_at",
@@ -26,14 +26,14 @@ _APPROVAL_KEYS = {
 }
 _INTEGER_BOUNDS = {
     "repeats": (1, 100),
-    "review.claims_per_model_arm": (1, 1000),
-    "review.reviewers_per_claim": (2, 100),
-    "review.minimum_determinate_claims_per_arm": (1, 1000),
+    "review.reviewers_per_claim": (1, 1),
     "limits.model_calls_per_attempt": (1, 100),
     "limits.input_tokens_per_call": (1, 263168),
     "limits.output_tokens_per_call": (16, 100000),
     "limits.tool_calls_per_attempt": (1, 100),
     "limits.attempt_deadline_ms": (1, 600000),
+    "limits.automatic_paid_retries": (0, 0),
+    "limits.max_parallel_attempts": (1, 1),
     "resources.memory_limit_mb": (1, 1000000),
     "resources.disk_limit_mb": (1, 1000000),
     "resources.retention_days": (1, 36500),
@@ -72,6 +72,7 @@ def validate_decisions(value: Any, protocol: dict[str, Any]) -> dict[str, Any]:
         {
             "schema_version",
             "revision",
+            "planning_decision_reference",
             "thresholds",
             "repeats",
             "review",
@@ -85,9 +86,10 @@ def validate_decisions(value: Any, protocol: dict[str, Any]) -> dict[str, Any]:
         "decision template",
     )
     result = _object(value, set(template), "decisions")
-    if result["schema_version"] != "local-mvp-decisions.v1":
+    if result["schema_version"] != "local-mvp-decisions.v2":
         raise ValueError("Unsupported decision schema")
     _text(result["revision"], "revision")
+    _text(result["planning_decision_reference"], "planning_decision_reference")
     for section, fields in template.items():
         if isinstance(fields, dict):
             keys = (
@@ -146,14 +148,13 @@ def validate_decisions(value: Any, protocol: dict[str, Any]) -> dict[str, Any]:
             != spending["month"]
         ):
             raise ValueError("Spending snapshot must identify the declared month")
-    review = result["review"]
-    if (
-        review["claims_per_model_arm"] is not None
-        and review["minimum_determinate_claims_per_arm"] is not None
-        and review["minimum_determinate_claims_per_arm"]
-        > review["claims_per_model_arm"]
-    ):
-        raise ValueError("Determinate coverage exceeds the selected sample")
+    for field, expected in {
+        "coverage": "all_integrated_reports_and_claims",
+        "provenance": "single_owner_review",
+        "reference_arm_review": "descriptive",
+    }.items():
+        if result["review"][field] != expected:
+            raise ValueError(f"review.{field}: incompatible Local MVP review policy")
     approval = result["approval"]
     if approval is not None:
         _object(approval, _APPROVAL_KEYS, "approval")
@@ -217,6 +218,7 @@ def _source_hashes() -> dict[str, str]:
             "evaluation/investigator_protocol_v1.json",
             "docs/architecture/development-evaluation.md",
             "docs/planning/local-mvp-acceptance.md",
+            "docs/planning/local-mvp-owner-decisions-2026-10-16.md",
         )
     )
     return {p.relative_to(ROOT).as_posix(): _sha(_read(p)) for p in sorted(paths)}
@@ -227,7 +229,7 @@ def plan(decisions_path: Path = DECISIONS) -> dict[str, Any]:
     protocol = _parse(protocol_bytes)
     if (
         not isinstance(protocol, dict)
-        or protocol.get("schema_version") != "local-mvp-protocol.v1"
+        or protocol.get("schema_version") != "local-mvp-protocol.v2"
     ):
         raise ValueError("Unsupported local protocol schema")
     decisions_bytes = _read(decisions_path)
@@ -310,7 +312,7 @@ def plan(decisions_path: Path = DECISIONS) -> dict[str, Any]:
         ):
             blockers.append("budget:scope_allowance_exceeds_monthly_headroom")
     return {
-        "schema_version": "local-mvp-dry-run.v1",
+        "schema_version": "local-mvp-dry-run.v2",
         "protocol_revision": protocol["revision"],
         "decisions_revision": decisions["revision"],
         "binding": binding,
@@ -336,6 +338,16 @@ def plan(decisions_path: Path = DECISIONS) -> dict[str, Any]:
         "projected_cost_ceiling_nusd": projected,
         "monthly_available_nusd": available,
         "pricing": protocol["pricing"],
+        "review_plan": {
+            **decisions["review"],
+            "planned_integrated_reports": sum(
+                row["arm"] == "rag_tools" for row in schedule
+            )
+            if repeats is not None
+            else None,
+            "actual_review_decisions": 0,
+            "independent_second_reviewer": False,
+        },
         "actual_provider_calls": 0,
         "measured_usage": None,
         "local_mvp_release": "not_assessed",

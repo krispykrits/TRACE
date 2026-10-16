@@ -1,0 +1,70 @@
+{
+  "schema_version": "local-mvp-decisions.v2",
+  "revision": "owner-planning-settings-2026-10-16.v2",
+  "thresholds": {
+    "schema_validity": 1.0,
+    "cause_accuracy": 0.8,
+    "service_accuracy": 0.8,
+    "assessment_accuracy": 0.9,
+    "abstention_contract_accuracy": 1.0,
+    "citation_validity": 1.0,
+    "timeline_complete_accuracy": 1.0,
+    "deterministic_timeline_validity": 1.0,
+    "human_unsupported_claim_rate": 0.0,
+    "completion_rate": 1.0,
+    "elapsed_p95_ms": 60000,
+    "estimated_cost_per_attempt_nusd": 20000000
+  },
+  "repeats": 3,
+  "review": {
+    "coverage": "all_integrated_reports_and_claims",
+    "reviewers_per_claim": 1,
+    "reviewer_id": "krispykrits",
+    "provenance": "single_owner_review",
+    "reference_arm_review": "descriptive"
+  },
+  "limits": {
+    "model_calls_per_attempt": 3,
+    "input_tokens_per_call": 16384,
+    "output_tokens_per_call": 2048,
+    "tool_calls_per_attempt": 20,
+    "attempt_deadline_ms": 120000,
+    "automatic_paid_retries": 0,
+    "max_parallel_attempts": 1
+  },
+  "resources": {
+    "memory_limit_mb": 4096,
+    "disk_limit_mb": 2048,
+    "retention_days": 30,
+    "cleanup_owner": null
+  },
+  "provider": {
+    "provider": "azure",
+    "deployment": null,
+    "model_id": null,
+    "model_version": null,
+    "api_revision": null,
+    "configuration_id": null,
+    "llm_only_prompt_revision": null,
+    "integrated_prompt_revision": null,
+    "tool_revision": null,
+    "policy_revision": null
+  },
+  "spending": {
+    "month": null,
+    "monthly_cap_nusd": 20000000000,
+    "prior_spend_nusd": null,
+    "outstanding_reservations_nusd": null,
+    "scope_allowance_nusd": 1000000000,
+    "journal_reference": null,
+    "accounting_observed_at": null
+  },
+  "authorization": {
+    "live_run_scope_reference": null,
+    "source_transmission_reference": null,
+    "retention_reference": "docs/planning/local-mvp-owner-decisions-2026-10-16.md#retention-and-resources",
+    "stop_contact": null
+  },
+  "approval": null,
+  "planning_decision_reference": "docs/planning/local-mvp-owner-decisions-2026-10-16.md"
+}
