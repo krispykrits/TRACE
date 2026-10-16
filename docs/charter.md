@@ -1,6 +1,6 @@
 # TRACE charter
 
-Current scope: owner decisions through 2026-10-15. Delivery is defined in the [capstone plan](planning/capstone-project-plan.md); current progress is in [current status](current-status.md).
+Current scope: owner decisions through 2026-10-16. Delivery is defined in the [capstone plan](planning/capstone-project-plan.md); current progress is in [current status](current-status.md).
 
 ## Purpose
 
@@ -83,7 +83,7 @@ Set and record numerical thresholds before the applicable acceptance run. Preser
 | Azure subscription/region, resources/network, infrastructure budget, retention and account restrictions | Project/account owner, #55 before a reviewed Terraform plan/apply or hosted acceptance | Cloud direction is selected; resources/spending are not implicitly authorized |
 | Model/credential processing, rotation/retention and native pod token path | Project/account owner, before relevant operational/live acceptance | Local API-key connector evidence does not prove AKS Workload Identity |
 | Exact source/field/transmission/retention rights and representative recordings | Owner for .NET testbed; independent owners for external sources, before ingestion/shadow use | Roles are settled; source permission and evidence remain gated |
-| ML task/method and remaining release/study/operator thresholds/review coverage | Project team with owner/reviewer, before measurement; freeze before final-test access | Appropriate baselines and actual review remain required |
+| ML task/method and remaining release/study/operator thresholds/review coverage | Project team with owner/reviewer, before measurement; freeze before final-test access | Local MVP planning settings/sole owner review recorded in [the owner decision](planning/local-mvp-owner-decisions-2026-10-16.md); actual review, remaining study/operator thresholds and appropriate baselines remain required |
 | Production workload, supported action/runbook, service owner, approver and change policy | Project/production owner, before action-specific design and staged promotion | No selected target or standing mutation permission |
 
 ## Working agreement

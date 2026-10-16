@@ -1,0 +1,26 @@
+{
+  "schema_version": "local-mvp-decisions.v1",
+  "revision": "owner-inputs-pending.v1",
+  "thresholds": {
+    "schema_validity": null,
+    "cause_accuracy": null,
+    "service_accuracy": null,
+    "assessment_accuracy": null,
+    "abstention_contract_accuracy": null,
+    "citation_validity": null,
+    "timeline_complete_accuracy": null,
+    "deterministic_timeline_validity": null,
+    "human_unsupported_claim_rate": null,
+    "completion_rate": null,
+    "elapsed_p95_ms": null,
+    "estimated_cost_per_attempt_nusd": null
+  },
+  "repeats": null,
+  "review": {"claims_per_model_arm": null, "reviewers_per_claim": null, "minimum_determinate_claims_per_arm": null},
+  "limits": {"model_calls_per_attempt": null, "input_tokens_per_call": null, "output_tokens_per_call": null, "tool_calls_per_attempt": null, "attempt_deadline_ms": null},
+  "resources": {"memory_limit_mb": null, "disk_limit_mb": null, "retention_days": null, "cleanup_owner": null},
+  "provider": {"provider": "azure", "deployment": null, "model_id": null, "model_version": null, "api_revision": null, "configuration_id": null, "llm_only_prompt_revision": null, "integrated_prompt_revision": null, "tool_revision": null, "policy_revision": null},
+  "spending": {"month": null, "monthly_cap_nusd": 20000000000, "prior_spend_nusd": null, "outstanding_reservations_nusd": null, "scope_allowance_nusd": null, "journal_reference": null, "accounting_observed_at": null},
+  "authorization": {"live_run_scope_reference": null, "source_transmission_reference": null, "retention_reference": null, "stop_contact": null},
+  "approval": null
+}

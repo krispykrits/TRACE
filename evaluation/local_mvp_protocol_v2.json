@@ -1,0 +1,153 @@
+{
+  "schema_version": "local-mvp-protocol.v2",
+  "revision": "local-mvp-acceptance.v2",
+  "scope": "Local MVP synthetic development acceptance only; read-only investigation",
+  "cohort": {
+    "suite_version": "mvp-suite.v1",
+    "seed": 17,
+    "case_ids": [
+      "c01",
+      "c02",
+      "c03",
+      "c04"
+    ],
+    "related_group": "order-payment-timeout-v1",
+    "coverage": [
+      "deployment regression",
+      "dependency degradation",
+      "missing Payment capture",
+      "ambiguous mechanism",
+      "unrelated Notification deployment",
+      "unchanged Payment deployment distractor"
+    ],
+    "boundary_protocol": "evaluation/investigator_protocol_v1.json",
+    "boundary_attempt_ids": [
+      "b01",
+      "b02",
+      "b03",
+      "b04",
+      "b05",
+      "b06"
+    ],
+    "final_test": "reserved_not_generated_or_accessed"
+  },
+  "arms": [
+    {
+      "id": "llm_only",
+      "channels": [
+        "common_incident_brief"
+      ],
+      "model": true,
+      "diagnosis": true
+    },
+    {
+      "id": "evidence_bundle",
+      "channels": [
+        "common_incident_brief",
+        "authorized_operational_snapshot",
+        "deterministic_timeline"
+      ],
+      "model": false,
+      "diagnosis": false
+    },
+    {
+      "id": "rag_tools",
+      "channels": [
+        "common_incident_brief",
+        "authorized_operational_snapshot",
+        "deterministic_timeline",
+        "authorized_development_corpus",
+        "bounded_read_only_tools"
+      ],
+      "model": true,
+      "diagnosis": true
+    }
+  ],
+  "comparison": {
+    "brief": "Same observed-only service, environment, incident window and symptom; no expected cause, mechanism, fault schedule, label or answer-bearing postmortem",
+    "pairing": "Match case, seed, captured input hash and repeat across arms; fresh state and no shared model history",
+    "order": "Serial cyclic arm rotation by case index plus repeat index; repeats selected by owner before measurement",
+    "common_model": "Same approved Azure configuration, pricing and ceilings for both model arms; record distinct prompt hashes and actual consumption",
+    "intentional_differences": "LLM-only receives no retrieved evidence or tools and may need to abstain; evidence bundle predicts no cause and has no model tokens or diagnostic/support score",
+    "boundary_accounting": "Six mechanical checks run separately under #66/#67; retain all outcomes, exclude from diagnostic denominators, any critical failure blocks release"
+  },
+  "threshold_metrics": {
+    "schema_validity": {
+      "direction": "minimum",
+      "kind": "rate"
+    },
+    "cause_accuracy": {
+      "direction": "minimum",
+      "kind": "rate"
+    },
+    "service_accuracy": {
+      "direction": "minimum",
+      "kind": "rate"
+    },
+    "assessment_accuracy": {
+      "direction": "minimum",
+      "kind": "rate"
+    },
+    "abstention_contract_accuracy": {
+      "direction": "minimum",
+      "kind": "rate"
+    },
+    "citation_validity": {
+      "direction": "minimum",
+      "kind": "rate"
+    },
+    "timeline_complete_accuracy": {
+      "direction": "minimum",
+      "kind": "rate"
+    },
+    "deterministic_timeline_validity": {
+      "direction": "minimum",
+      "kind": "rate"
+    },
+    "human_unsupported_claim_rate": {
+      "direction": "maximum",
+      "kind": "rate"
+    },
+    "completion_rate": {
+      "direction": "minimum",
+      "kind": "rate"
+    },
+    "elapsed_p95_ms": {
+      "direction": "maximum",
+      "kind": "scalar"
+    },
+    "estimated_cost_per_attempt_nusd": {
+      "direction": "maximum",
+      "kind": "scalar"
+    }
+  },
+  "review": {
+    "rubric": "docs/architecture/development-evaluation.md#citation-support-review-rubric",
+    "coverage": "All 12 planned integrated reports and every emitted claim; no fixed claim quota or fabricated filler claims. Missing reports/claims and zero determinate support remain visible.",
+    "reviewer": "krispykrits, sole owner reviewer, explicitly selected by the owner for Local MVP on 2026-10-16",
+    "independence": "Single owner review; no inter-rater agreement or independent-human replication claim. Record any Codex guidance/transcription and prior scenario familiarity. Final-study independent-review requirements remain separate.",
+    "reference_arm": "LLM-only claim review and coverage are descriptive; reference abstention or fewer claims does not impose an integrated-arm release gate. Evidence bundle has no generated diagnostic claims.",
+    "judgments": "Review exact statements/citations and every report's abstention adequacy and next-check usefulness. Preserve supported, unsupported and indeterminate original judgments with identity/rationale and input/report/rubric bindings.",
+    "release": "All integrated reports and emitted claims require actual owner judgments. Primary causal assertions require supported determinate judgments; zero determinate support is unmeasured and cannot pass. Any unsupported claim fails the zero-unsupported threshold; indeterminate claims never supply positive support. Inadequate abstention, vague/unassessable consequential claims, unsupported next checks or unresolved consequential objections block release.",
+    "revisions": "A changed decision or later additional review is a separately bound revision retaining originals; no self-agreement statistic or invented second reviewer."
+  },
+  "stop_conditions": [
+    "Any source, transmission, citation, evaluator-isolation, disclosure or read-only-boundary failure",
+    "Scope/grant/retention change or protocol, decision, approval or source hash mismatch",
+    "Monthly or run-scope allowance exhausted, stale/unknown spending, or an uncertain external attempt requiring reconciliation",
+    "Cancellation, deadline, resource bound or owner stop; retain failure and partial/unknown usage without automatic paid retry"
+  ],
+  "pricing": {
+    "version": "azure-luna-global-ceiling-2026-09-22.v1",
+    "input_nusd_per_token": 250,
+    "output_nusd_per_token": 750
+  },
+  "limitations": [
+    "Four related development cases at seed 17 are not independent held-out samples; repeats do not increase family diversity",
+    "Exact labels, valid citations and structural abstention do not establish evidentiary support or operational usefulness",
+    "Existing retrieval thresholds, connector evidence and implementation deadlines do not define diagnosis or latency acceptance",
+    "No cloud, Operational Pilot, final five-arm study or production remediation acceptance",
+    "One owner reviewer with possible scenario familiarity; no independent reviewer agreement or general operational-quality inference."
+  ],
+  "owner_decision_reference": "docs/planning/local-mvp-owner-decisions-2026-10-16.md"
+}
