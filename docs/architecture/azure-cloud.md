@@ -4,12 +4,21 @@ Status: owner-selected cloud direction, 2026-10-14; implementation and hosted ac
 
 ## Runtime and delivery boundaries
 
-TRACE remains one modular Python application. Its current public interface is the configuration/synthetic CLI. The internal bounded investigator is merged; #38/#39 and S6 still establish operator CLI/scoring and Local MVP acceptance. Review bounded CLI execution as an AKS Job before selecting a persistent worker/API. There is no automatic HTTP ingress, microservice split or broker. The initial investigator remains read-only; the final remediation executor retains its separate action/approval boundary.
+## End-state delivery update — 2026-10-15
+
+[ADR 0021](../adr/0021-interactive-platform-and-repository-boundaries.md) selects an authenticated API and persistent investigation worker around the modular Python core. Retain CLI reproduction and keep evaluation in TRACE, excluded from runtime packages/images. Planned repositories: TRACE core/API/worker, trace-web, trace-testbed, trace-platform and trace-executor introduced with S14 remediation. Component CI/Dockerfiles stay with source; platform deployments pin compatible image digests. Repository extraction preserves historical reports/hashes and versioned contracts.
+
+PostgreSQL-backed durable work dispatch is the initial choice: transactional submission, atomic claims, leases, cancellation, retries and shared attempt/spending admission. Reconcile uncertain external outcomes before retrying. No separate broker is required; add one only for demonstrated throughput/latency/contention/consumer needs. Use batch Jobs for evaluation, corpus rebuilds, migrations and scenarios.
+
+Flexible capability contracts cover telemetry, knowledge, change/deployment records and workload state. JSON then Azure Monitor are first implementations. Preserve original identity/revision, timestamps, correlation, units, provenance and explicit completeness; enforce source/transmission/report rights independently, with scope/result/deadline/pagination limits. On-demand reads and batch import are initial modes; scheduled/event-driven ingestion and dedicated ingestion workers require a concrete lifecycle/volume/isolation need.
+
+**Required web delivery:** after S8 API stabilization and before S15 pilot, provide submission, progress/cancellation, evidence/timeline and protected cited reports. S14 adds ranked-response comparison, selection and concrete approval UI/API, plus separate deterministic execution with distinct credentials. This is required scope. S7 must size stories and place them within S8-S14 capacity or add an undated increment before S15; do not assume it fits the existing 18 increments unchanged.
+
 
 ```mermaid
 flowchart TD
   CI["Reviewed GitHub release"] --> Registry["ACR image digest"]
-  Registry --> Runtime["TRACE container on AKS"]
+  Registry --> Runtime["TRACE API and worker on AKS"]
   Runtime --> Model["Azure AI Foundry"]
   Runtime --> State["Azure PostgreSQL and pgvector"]
   Runtime --> Secrets["Key Vault"]
@@ -30,7 +39,7 @@ Azure Database for PostgreSQL Flexible Server is the managed database baseline; 
 
 The private Local MVP SQLite journal serializes local process admission; a copy in every pod cannot enforce a shared model budget. PostgreSQL admission/leases must prevent concurrent overspending, duplicate claims and stale-attempt reuse. Reconcile unknown in-flight outcomes conservatively before retries. The $20/month application model cap survives pod/job deletion and remains separate from account-wide billing and infrastructure cost.
 
-Do not store durable state only in an ephemeral container filesystem or scale paid workloads before shared admission is tested. Mount/use only approved persistent/cache paths, bound resources and temporary files, and make cancellation/termination/Job retries obey the application execution policy. Health probes and recovery differ between finite Jobs and long-running workers; S7 records the chosen shape.
+Do not store durable state only in an ephemeral container filesystem or scale paid workloads before shared admission is tested. Mount/use only approved persistent/cache paths, bound resources and temporary files, and make cancellation/termination/Job retries obey the application execution policy. Use API readiness and worker liveness/startup/drain checks. S7 specifies durable claims, leases, cancellation and uncertain-outcome recovery.
 
 ## Telemetry and source access
 
