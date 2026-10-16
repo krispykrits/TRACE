@@ -4,10 +4,10 @@ Owner cloud direction and document/story update authorized on 2026-10-14; planni
 
 | Issue | Native sprint milestone | Work |
 | --- | --- | --- |
-| [#55](https://github.com/krispykrits/TRACE/issues/55) | S7 | Design the Terraform-managed Azure and AKS Cloud MVP |
+| [#55](https://github.com/krispykrits/TRACE/issues/55) | S7 | Redesign TRACE repository/runtime boundaries and Azure AKS architecture |
 | [#56](https://github.com/krispykrits/TRACE/issues/56) | S8 | Build a reproducible TRACE container and publish immutable images to ACR |
 | [#57](https://github.com/krispykrits/TRACE/issues/57) | S8 | Migrate shared TRACE state and spending reservations to Azure PostgreSQL |
-| [#58](https://github.com/krispykrits/TRACE/issues/58) | S8 | Run the bounded TRACE workflow on AKS with workload identity and reviewed releases |
+| [#58](https://github.com/krispykrits/TRACE/issues/58) | S8 | Deliver the authenticated TRACE API and persistent investigation worker on AKS |
 | [#59](https://github.com/krispykrits/TRACE/issues/59) | S8 | Deliver redacted TRACE telemetry to Azure Monitor and Log Analytics |
 | [#60](https://github.com/krispykrits/TRACE/issues/60) | S9 | Verify Azure AKS Cloud MVP recovery, security, costs and teardown |
 
@@ -29,13 +29,14 @@ Flexible capability contracts cover telemetry, knowledge, change/deployment reco
 
 ## Native sprint titles and goals
 
-The owner explicitly requested replacement of AWS sprint titles/goals on 2026-10-14. The following table retains previously verified native metadata. The end-state update above governs revised scope; native milestone descriptions still need synchronization when milestone editing is available. Numeric identities and undated scheduling are retained. Corresponding Project stories carry the Cloud MVP release and future-work status described above.
+Native milestone titles and descriptions were updated and verified on 2026-10-15 to match ADR 0021. Numeric identities, open state, issue assignments and undated scheduling are retained. Descriptions include goals, deliverables, exit gates, dependencies and capacity constraints.
 
 | Milestone | Verified title | Goal and deliverables | Exit gate and dependencies |
 | --- | --- | --- | --- |
-| [7](https://github.com/krispykrits/TRACE/milestone/7) | Sprint 07 - Azure AKS design and IaC | #55: measured-workload Terraform Azure/AKS design, cluster/runtime, ACR/PostgreSQL/pgvector, Workload Identity/Key Vault, network/state, telemetry, costs/retention, migration/restore and teardown | Reviewed design/plan and scoped authority/cost assumptions, with owner inputs recorded and no apply during design; depends on S6 |
-| [8](https://github.com/krispykrits/TRACE/milestone/8) | Sprint 08 - Containerized AKS deployment and CI/CD | #56-#59: reproducible non-root ACR image, shared Azure PostgreSQL/journals, pod Workload Identity, digest promotion/rollback, lifecycle/resources and redacted Azure telemetry | Accepted synthetic AKS investigation, source/citation/review protection, shared monetary admission and pod/attempt recovery, hosted logs and rollback evidence; depends on S7 and accepted Local MVP |
-| [9](https://github.com/krispykrits/TRACE/milestone/9) | Sprint 09 - Azure Cloud MVP acceptance | #60: fault/security/concurrency/cost/retention, migration/restore/vector rebuild, operations, release rollback and teardown/recreation | No duplicate unbudgeted dispatch; recovered/restored/recreated environment, real hosted telemetry and residual-resource accounting; depends on S8 and remains distinct from Operational Pilot/remediation |
+| [7](https://github.com/krispykrits/TRACE/milestone/7) | Sprint 07 - End-state architecture, repository boundaries and Azure design | #55: API/worker architecture, repository extraction/release contracts, PostgreSQL dispatch, flexible source capabilities and distinct identities; Azure/Terraform sizing, costs, retention, recovery/teardown; #69-#72 local .NET testbed | Reviewed contracts/migration plan and resized backlog, including required web delivery before S15; reviewed infrastructure plan and owner inputs; no apply; Local MVP required before implementation acceptance |
+| [8](https://github.com/krispykrits/TRACE/milestone/8) | Sprint 08 - API/worker implementation and AKS delivery | #56-#59: API/worker/CLI entry points and immutable images, PostgreSQL dispatch/admission, authenticated API and persistent worker, scoped identities/releases/telemetry; #73-#75 JSON-first and first live Azure source adapter | Hosted submit/status/cancel/protected reports, atomic claims/leases and shared budgets across restarts/concurrency, preserved CLI, actual identity and rollback/telemetry evidence; depends on S7 contracts and accepted Local MVP |
+| [9](https://github.com/krispykrits/TRACE/milestone/9) | Sprint 09 - API/worker Cloud MVP acceptance | #60: API authorization/idempotency, worker lease/restart/cancellation and uncertain-outcome recovery, source/report rights, budgets, restore/rollback/teardown; #76 separate testbed replay/shadow comparison | Versioned evidence, no duplicate unbudgeted dispatch, protected reports, restored/recreated environment and residual-cost accounting; depends on S8; required web track before S15 and independent Pilot/remediation gates remain |
+
 
 ## Mandatory cloud behavior
 
