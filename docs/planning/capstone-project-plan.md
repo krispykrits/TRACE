@@ -6,7 +6,7 @@ Current owner decisions through 2026-10-15. The MVP-first direction was adopted 
 
 Build an evidence-first investigation slice before expanding subsystems: deterministic evidence → bounded queries/retrieval/tools → cited assessment → evaluation. Reports distinguish observations, supported/competing hypotheses, missing evidence, uncertainty and next checks.
 
-Use one modular Python application. Adapt educational components through TRACE-owned contracts; Volumes 5/6 are design inputs. Choose a justified evaluated ML contribution from suitable methods, preserving appropriate baselines and negative findings. [ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md) requires ranked applicable response options with a clearly recommended action.
+Use a modular Python core with API and persistent worker deployments under ADR 0021; retain the CLI for local execution and evaluation. Adapt educational components through TRACE-owned contracts; Volumes 5/6 are design inputs. Choose a justified evaluated ML contribution from suitable methods, preserving appropriate baselines and negative findings. [ADR 0018](../adr/0018-flexible-ml-and-ranked-response-options.md) requires ranked applicable response options with a clearly recommended action.
 
 ## Releases and acceptance
 
