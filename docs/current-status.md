@@ -1,6 +1,6 @@
 # TRACE current status
 
-Updated: 2026-10-16 against main `e45186d` and live Project Status: #63 / PR #85 is merged and Done; #64 comparisons are In progress. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
+Updated: 2026-10-16 against main `e45186d` and live Project Status: #63 / PR #85 is merged and Done; #64 comparisons are In review. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
 
 ## Implemented
 
@@ -22,7 +22,7 @@ Merged [PR #82](https://github.com/krispykrits/TRACE/pull/82) provides captured-
 
 ## Next work
 
-1. Implement [#64 comparisons](https://github.com/krispykrits/TRACE/issues/64), retaining offline contract results and named live-measurement blockers. Complete the remaining factual/authority/freeze gates before paid acceptance measurement.
+1. Review [#64 comparisons](https://github.com/krispykrits/TRACE/issues/64), retaining offline contract results and named live-measurement blockers. Complete the remaining factual/authority/freeze gates before paid acceptance measurement.
 2. Continue Sprint 6 [#64–#68](planning/capstone-project-plan.md#backlogs-and-dependencies): comparisons, actual owner review, recovery/security evidence and release decision.
 3. Follow [#55–#60](planning/azure-cloud-backlog.md) and [#70–#76](planning/dotnet-testbed-backlog.md) for cloud delivery and monitored services, in their recorded dependency order.
 
