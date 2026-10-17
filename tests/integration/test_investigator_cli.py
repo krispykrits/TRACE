@@ -294,6 +294,42 @@ class InvestigatorCliTests(unittest.TestCase):
         )
         self.assertEqual(self.report().returncode, 0)
         self.assert_denied(self.report("--format", "json"))
+
+    def test_independent_evidence_corpus_scope_and_applicability_deny_saved_delivery(
+        self,
+    ) -> None:
+        transforms = (
+            lambda d: d["evidence_scope"].__setitem__("allowed_services", ["order"]),
+            lambda d: d["knowledge_scope"].__setitem__(
+                "allowed_services", ["unrelated-service"]
+            ),
+            lambda d: d["knowledge_scope"].__setitem__(
+                "access_scope", "unrelated-corpus"
+            ),
+            lambda d: d["knowledge_scope"].__setitem__(
+                "valid_at", "2025-10-12T12:00:00Z"
+            ),
+            lambda d: (
+                d["evidence_scope"].__setitem__("environment", "development"),
+                d["knowledge_scope"].__setitem__("environment", "development"),
+            ),
+        )
+        for case, transform in enumerate(transforms):
+            with self.subTest(case=case):
+                self.change_profile(transform)
+                self.assert_denied(self.report("--format", "json"))
+
+    def test_report_artifact_paths_and_insecure_profile_do_not_supply_grants(
+        self,
+    ) -> None:
+        self.assert_denied(
+            self.report("--artifact-id", str(self.profile_path), "--format", "json")
+        )
+        self.assert_denied(
+            self.report("--citation-id", str(self.profile_path), "--format", "json")
+        )
+        self.profile_path.chmod(0o644)
+        self.assert_denied(self.report("--format", "json"))
         destination = self.root / "denied-export.json"
         self.assert_denied(
             self.report("--format", "json", "--output", str(destination))
