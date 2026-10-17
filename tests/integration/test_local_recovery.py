@@ -70,6 +70,65 @@ def ledger(directory: Path) -> tuple:
     return job, artifacts, calls, state, reservations, months
 
 
+class AcceptedRestoreTests(unittest.TestCase):
+    def test_accepted_restore_preserves_review_identity_and_rechecks_support(
+        self,
+    ) -> None:
+        # Original demonstration policy, deliberately distinct from the 40-call
+        # review-required readiness probes; fictional verdicts are not humans.
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            original, restored = root / "source", root / "restored"
+            prepare(original, reviewed=True)
+            process = run_fixture(original)
+            self.assertEqual(process.returncode, 0, process.stderr)
+            result = json.loads(process.stdout)
+            restored.mkdir(mode=0o700)
+            for name in ("evidence.sqlite3", "corpus.sqlite3", "provider.sqlite3"):
+                with (
+                    sqlite3.connect(original / name) as source,
+                    sqlite3.connect(restored / name) as target,
+                ):
+                    source.backup(target)
+                (restored / name).chmod(0o600)
+            shutil.copytree(original / "index", restored / "index")
+            data = json.loads((original / "profile.json").read_text())
+            self.assertTrue(data["reviews"])
+            reviews = data["reviews"]
+            for key, name in (
+                ("evidence_db", "evidence.sqlite3"),
+                ("corpus_db", "corpus.sqlite3"),
+                ("index_root", "index"),
+            ):
+                data[key] = str(restored / name)
+            profile = restored / "profile.json"
+            profile.write_text(json.dumps(data))
+            profile.chmod(0o600)
+            self.assertEqual(json.loads(profile.read_text())["reviews"], reviews)
+            self.assertEqual(ledger(restored), ledger(original))
+            arguments = (
+                "--",
+                "report",
+                "--investigation-id",
+                result["investigation_id"],
+                "--format",
+                "json",
+            )
+            inspected = run_fixture(restored, *arguments)
+            self.assertEqual(inspected.returncode, 0, inspected.stderr)
+            delivered = json.loads(inspected.stdout)
+            for name in ("report", "citations", "timeline"):
+                self.assertEqual(delivered[name], result[name])
+            self.assertFalse(delivered["actual_human_review"])
+            data["reviews"] = []
+            profile.write_text(json.dumps(data))
+            denied = run_fixture(restored, *arguments)
+            self.assertEqual(denied.returncode, 4, denied.stderr)
+            self.assertEqual(denied.stdout, "")
+            self.assertNotIn("synthetic_mechanism", denied.stderr)
+            self.assertEqual(ledger(restored), ledger(original))
+
+
 class LocalRecoveryTests(unittest.TestCase):
     temporary: tempfile.TemporaryDirectory[str]
     root: Path
