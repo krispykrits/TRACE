@@ -1,6 +1,6 @@
 # TRACE current status
 
-Updated: 2026-10-16 against main `0ddef38` and live Project Status: #66 / PR #91 is merged and Done; #67 local security is In progress. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
+Updated: 2026-10-16 against main `0ddef38` and live Project Status: #66 / PR #91 is merged and Done; #67 / PR #92 local security is In review. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
 
 ## Implemented
 
@@ -30,7 +30,7 @@ The [#88 implementation and fresh v3 comparison](../evaluation/reports/local_mvp
 
 The owner [selected the S6/S7 gate split](adr/0022-sprint-06-readiness-and-sprint-07-diagnostics.md): S6 local readiness/handoff, S7 actual-provider diagnostic acceptance, S8 hosted delivery and S9 Cloud MVP acceptance. This is sequencing, not a release approval or a passing fake-provider quality result.
 
-1. Complete [#67 local security](https://github.com/krispykrits/TRACE/issues/67), then #68 clean-environment readiness/owner handoff. Protected review-packet plumbing and an owner walkthrough stay S6 requirements.
+1. Review [#67 / PR #92 local security](https://github.com/krispykrits/TRACE/pull/92), then #68 clean-environment readiness/owner handoff. Protected review-packet plumbing and an owner walkthrough stay S6 requirements.
 2. In S7, [#87 actual Azure comparisons](https://github.com/krispykrits/TRACE/issues/87) provide the artifacts for #65 actual owner quality review and the Local MVP diagnostic decision. Verify actual provider/spending/source/transmission/run facts before separately authorized dispatch. #55 architecture/design can proceed in parallel; resize the added S7 scope rather than inventing capacity.
 3. S8–S9 [#55–#60 cloud delivery](planning/azure-cloud-backlog.md) and [#70–#76 monitored services](planning/dotnet-testbed-backlog.md) retain their contracts, hosted-acceptance and independent-usefulness gates.
 
