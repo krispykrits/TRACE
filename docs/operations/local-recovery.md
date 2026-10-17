@@ -70,3 +70,5 @@ The owner selected a 30-day Local MVP planning expectation; it does not implemen
 Track backup/export copies and their access and deletion responsibility. Restrict or retire restored credentials/source bindings as required by their owner; never treat copied grants or frozen reports as standing authorization. Missing cleanup ownership and any real-source retention/reconciliation policy remain explicit acceptance inputs.
 
 [Operations](README.md) · [SQLite contract](../architecture/sqlite-investigation-store.md) · [Execution policy](../architecture/investigation-budgets.md)
+
+[Recorded local verification](../../evaluation/reports/local_recovery_v1/README.md) preserves the validation history and known bounds.
