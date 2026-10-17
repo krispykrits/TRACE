@@ -43,3 +43,5 @@ The Python audit hook instruments the probe parent; it is not an OS sandbox or p
 Direct trusted filesystem/composition access can alter grants, data or backups. Local file ownership is not authentication or tenant isolation. Permissions cannot retroactively erase an authorized copy or cancel a remote request already dispatched. Operational identity/grant derivation, real-source processing/retention/deletion, shared cloud admission, native pod identity and independent Operational Pilot acceptance remain gated separately.
 
 [Security guide](README.md) · [Provider contract](../architecture/model-provider.md) · [Local recovery](../operations/local-recovery.md)
+
+[Recorded verification](../../evaluation/reports/local_security_v1/README.md) preserves the complete/focused check counts, pinned sources and canary-control finding.

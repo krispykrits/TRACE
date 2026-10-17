@@ -1,0 +1,90 @@
+{
+  "schema_version": "local-security-checks.v1",
+  "recorded_local_date": "2026-10-16",
+  "timezone": "America/New_York",
+  "issue": 67,
+  "implementation_commit": "a64497b960083cbd4cbcae52fbed12ac240f65d3",
+  "source_sha256": {
+    "scripts/local_security_fixture.py": "504c663207c0a29408d55303d57b5147eae18422327d0def4b682f229cd0eb79",
+    "scripts/investigator_suite.py": "c9c49cc5578204a41ef400c74a98a24b05e1a0d5bf43cafe5cec1010defc3a30",
+    "scripts/check_package.py": "e438e28058b7bc63dac8278798dee298bf0da3e12bcfdaeba308170b33e0ddb8",
+    "tests/integration/test_local_security.py": "f066e5443acf724c0dde59d8adbaea7af208542eae5a58af4f2413ad7c1241bb",
+    "tests/integration/test_investigator_cli.py": "aa680cdc00d3f634c46ea3692416a2e57e512c9fb14c2f65263ff4820a5b76ff",
+    "tests/contracts/test_provider_policy.py": "46a911ea038d93e643a3d764bc6d8b91449dd0728f214b5be5799de2966f7ba6",
+    "tests/contracts/test_workflow.py": "0a0cf34d4641f13eb76444ac604d62e4311a72ff239215d62be75675fdeec3bf",
+    "src/trace_app/investigation/provider_policy.py": "804ae8c04cd09aadfacfc6f673ccbd57af4ff6f947cfe1a6541a3a66246a054c",
+    "src/trace_app/investigation/assessment_validation.py": "adc630c5b21bdb5591b2684e55385aabddba0c0bf6a4e28de1797793cac12dda",
+    "src/trace_app/investigation/assessment_context.py": "ab350dec7e22cdeec2006b2646e32475ee63d238f364dfd82efe7b5f0bd01663",
+    "src/trace_app/investigation/tools.py": "ea6ecbff55d3dba08d6f81128399ec954ac8f95e835e061a7394ac2a8b446f29",
+    "src/trace_app/investigation/workflow.py": "64543a508f3d220a3102991a16f65c95c2795b361fdd051abc8b02790b915412",
+    "src/trace_app/investigation/reports.py": "ace94a11c9a23817b4561157e548b0afa72f00ef3918afa0cb1ffcdca2fac643",
+    "src/trace_app/adapters/sources/local_investigator.py": "c7ed061c2392584ebdbe88850885adf0779becd275ae59509a4082e3e16421c0",
+    "src/trace_app/adapters/storage/sqlite/corpus.py": "ef656f36f25d6592b388dfc651e03fd7f1a9e6ada571c2bfc8112b73b4b15a0c",
+    "src/trace_app/adapters/tools/local.py": "7057e764ec711f90cbaf831194aec9a689d3ae4d09c90408e7fe0819a51aab8b",
+    "Makefile": "4ac1fcd095e570c458edfc28f728dca25424f66674c677c5a59aef7be56f1429",
+    "pyproject.toml": "610836bcd6a55dc9605bab2fe762fec2a30ff8830f126419ecf8309140e7aa02",
+    "uv.lock": "139dbf8a72d42fa297b5800e7b036a1180b60ad1d92fee5ed98d3a668e94657c"
+  },
+  "scope": "trusted local synthetic CLI/SQLite/read-only worker/provider-port boundaries; no real operational source access",
+  "actual_external_provider_calls": 0,
+  "actual_human_support_judgments": 0,
+  "actual_final_test_labels_opened": false,
+  "validation": {
+    "full_command": "make check lint format-check type-check architecture-check test integration package-check",
+    "full_command_exit_code": 0,
+    "full_discovery_source_basis": "994213f58c311f2e12bd6adba1c48debb6530f6f",
+    "full_suites": {
+      "unit": {
+        "cases": 46,
+        "passed": 46
+      },
+      "contracts": {
+        "cases": 119,
+        "passed": 119
+      },
+      "integration": {
+        "cases": 220,
+        "passed": 220,
+        "seconds": 965.648
+      }
+    },
+    "other_gates": "check, lint, format-check, type-check, architecture-check and installed-wheel/entry-point/workflow/evaluator-exclusion passed",
+    "hardened_canary_rerun": {
+      "command": "uv run --locked python -m unittest tests.integration.test_local_security.LocalSecurityCanaryTests -v",
+      "cases": 4,
+      "passed": 4,
+      "seconds": 49.799
+    },
+    "added_negative_control": {
+      "command": "uv run --locked python -m unittest tests.integration.test_local_security.CanaryHarnessControlTests -v",
+      "cases": 1,
+      "passed": 1,
+      "seconds": 1.729
+    },
+    "note": "After the original canary cases ran, violation tracking was hardened. The four cases and the newly added negative control passed focused checks; fast gates passed again. The added control was not in the full discovery count of 220. No runtime core behavior changed."
+  },
+  "canary_modes": [
+    "injection",
+    "redaction",
+    "hostile_error",
+    "model_tool"
+  ],
+  "observed_properties": [
+    "Generated evaluator-only labels/report/manifest/review/reserved-file canaries absent from observed model requests, tool results, delivered reports and logs; no forbidden parent opens/imports.",
+    "Injection does not change grants, the fixed read-only tool catalog, finite admission or mutation authority.",
+    "Credential excerpt removed before model invocation; citation mappings and restricted input-derived report sensitivity retained.",
+    "Hostile exception and model shell-tool proposal fail without protected content; correlated logs and private file modes checked.",
+    "Independent evidence/corpus scope, applicability, environment, paths/IDs and insecure profile deny saved delivery.",
+    "Actual SQLite refinement/correction probes revoke access and transmission independently; no second model invocation or publication.",
+    "Installed wheel excludes canary bytes, evaluator/tests/scripts imports and non-runtime namespaces.",
+    "Negative control fails the probe when a caught observer exception would otherwise mask a detected tool-result leak."
+  ],
+  "tooling_fix": "Persistent canary violation tracking plus a negative control; suite records gain a typing annotation. Runtime controls required no behavior changes.",
+  "known_bounds": [
+    "Canary proposals use 40 tool calls and review-required delivery; refinement/correction rights probes use the existing larger demonstration policy, not an owner limit increase.",
+    "Fully reviewed scripted publication still exhausts 40; owner retained 40 for S6 and accepted-path requirements remain to be measured before S7.",
+    "Python parent audit hooks are instrumentation, not a complete child filesystem/OS sandbox; worker-result, contract and installed-wheel checks are separate.",
+    "Scripted models do not establish actual-model injection resistance or diagnostic quality; source-side field classification/review remains mandatory.",
+    "Trusted filesystem/composition is not operational authentication, tenant isolation, real-data retention acceptance or an Operational Pilot."
+  ]
+}
