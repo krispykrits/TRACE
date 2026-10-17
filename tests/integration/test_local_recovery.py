@@ -11,7 +11,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from scripts.demo_integration import AT
@@ -245,7 +245,14 @@ class LocalRecoveryTests(unittest.TestCase):
             before = ledger(original)
             profile = json.loads((original / "profile.json").read_text())
             with SQLiteInvestigationStore(path) as store:
-                self.assertGreater(store.recover(at=AT + timedelta(seconds=121)), 0)
+                active = store.get_investigation(
+                    before[0][0], access_scope=profile["evidence_scope"]["access_scope"]
+                )
+                assert active.lease_until is not None
+                expired_at = datetime.fromisoformat(active.lease_until) + timedelta(
+                    seconds=1
+                )
+                self.assertGreater(store.recover(at=expired_at), 0)
                 job = store.get_investigation(
                     before[0][0], access_scope=profile["evidence_scope"]["access_scope"]
                 )

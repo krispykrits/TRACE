@@ -34,7 +34,7 @@ uv run --locked python -m unittest tests.integration.test_local_recovery -v
 
 The harness SIGKILLs an explicitly scripted CLI at seven boundaries: before/after evidence retention, before/after durable model dispatch, before/inside/after atomic publication. It uses real SQLite and monthly journals, then starts fresh CLI processes with the same submission identity. The 40-call path publishes review-required proposals; fictional review ports are not human judgments. A separate negative regression confirms that the current fully reviewed scripted path exhausts 40 calls before accepted publication and leaves no partial accepted artifact. Existing accepted-publication regressions use their explicitly larger test policy. This is a known bound for future accepted-path design, not an increase of the owner-approved ceiling or proof that accepted publication works within 40 calls.
 
-For a separately inspectable scratch fixture, choose fresh paths:
+For a separately inspectable scratch fixture, choose fresh paths. This standalone seam inherits the original development fixture’s demonstration policy and fictional review configuration; the automated regression explicitly overrides it to 40 calls and review-required delivery. Neither authorizes a paid run:
 
 ```sh
 uv run --locked python -m scripts.local_recovery_fixture --directory /tmp/trace-recovery-demo --point after_dispatch --marker /tmp/trace-recovery-demo.marker
