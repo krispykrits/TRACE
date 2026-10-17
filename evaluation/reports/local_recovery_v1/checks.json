@@ -1,0 +1,69 @@
+{
+  "schema_version": "local-recovery-checks.v1",
+  "recorded_local_date": "2026-10-16",
+  "timezone": "America/New_York",
+  "issue": 66,
+  "implementation_commit": "284dd7e11ed843fc6abaf6438116fc4c66601613",
+  "source_sha256": {
+    "tests/integration/test_local_recovery.py": "8f428f8e63815d2d9335ff6dac18c46ab42626057f415fadd179ddeb661ae04e",
+    "scripts/local_recovery_fixture.py": "1c7931c4d56a6f331079deb4ac107b0709ae4a2e02b2d80037a09b3f5054d193",
+    "scripts/investigator_fixture.py": "bbfab8e6c3eb33ee14e94003bb680e4011227d332645c48186c0308d0b846f5d",
+    "src/trace_app/adapters/models/journal.py": "787e12c855bfc8633c5a93676c7f1e54f5f356becf60ed8931acfadba748c9b2",
+    "src/trace_app/adapters/storage/sqlite/investigations.py": "6ee4718ef1f604d69b52fd0e557bf1b3c7022f02755f8fa0293e27d2f320b055",
+    "src/trace_app/adapters/storage/sqlite/execution.py": "27501994bd65c2caf282f14fc28a682c8e8c0ae8497f11c0be68378081c8b2cb",
+    "src/trace_app/adapters/storage/sqlite/workflow.py": "5d07a6a5a5946bf9e4462468ea996eca1c711a1767b2e3506e8b4876d667c201",
+    "src/trace_app/investigation/execution.py": "bdd86ca402894867bb07a6e8efd7b1fc10fa225449b16dab3c742460e04c3928",
+    "src/trace_app/investigation/reports.py": "ace94a11c9a23817b4561157e548b0afa72f00ef3918afa0cb1ffcdca2fac643",
+    "src/trace_app/investigation/workflow.py": "64543a508f3d220a3102991a16f65c95c2795b361fdd051abc8b02790b915412",
+    "src/trace_app/bootstrap.py": "0b78dbb9cc433743b23e1ec5a0573dab6b1460389c8a400be0e0c4827f2f5959",
+    "pyproject.toml": "610836bcd6a55dc9605bab2fe762fec2a30ff8830f126419ecf8309140e7aa02",
+    "uv.lock": "139dbf8a72d42fa297b5800e7b036a1180b60ad1d92fee5ed98d3a668e94657c"
+  },
+  "environment": "synthetic local Linux/CPython 3.12; real SQLite/CLI/processes; scripted provider and fictional review ports",
+  "actual_external_provider_calls": 0,
+  "actual_human_support_judgments": 0,
+  "validation": {
+    "fast_and_package_gates": "passed: check, lint, format-check, type-check, architecture-check, test, package-check",
+    "unit_cases": 46,
+    "contract_cases": 119,
+    "full_integration_discovery": {
+      "cases": 212,
+      "passed": 211,
+      "failed": 1,
+      "seconds": 830.185,
+      "failure": "expiry regression assumed 120-second CLI lease; actual composed lease includes 5-second margin",
+      "implementation_commit": "ff9be6bd5c60cd34b6b92141f3f4a5fb4a55865e"
+    },
+    "corrected_recovery_rerun": {
+      "command": "uv run --locked python -m unittest tests.integration.test_local_recovery -v",
+      "cases": 7,
+      "passed": 7,
+      "seconds": 135.379,
+      "implementation_commit": "32b8b128cfaa3c42cb364d5433d676ff9eaf6020"
+    },
+    "additional_accepted_restore": {
+      "command": "uv run --locked python -m unittest tests.integration.test_local_recovery.AcceptedRestoreTests -v",
+      "cases": 1,
+      "passed": 1,
+      "seconds": 29.311,
+      "implementation_commit": "284dd7e11ed843fc6abaf6438116fc4c66601613"
+    },
+    "current_distinct_integration_cases_with_passing_results": 213,
+    "note": "The full make command stopped at its failing integration fixture. The fixture now derives expiry from the persisted lease; the corrected module passed. Other required gates including installed-wheel checks passed separately. No claim of one subsequent all-green full-discovery invocation."
+  },
+  "fault_points": [
+    "before_retention",
+    "after_retention",
+    "before_dispatch",
+    "after_dispatch",
+    "before_publication",
+    "during_publication",
+    "after_publication"
+  ],
+  "known_bounds": [
+    "Seven SIGKILL probes use 40 tool calls and review-required outputs; fully reviewed scripted path exhausts 40 and publishes no partial accepted report.",
+    "Accepted restore uses the existing larger demonstration policy, not an increase to owner-approved settings; fictional judgments are not human evidence.",
+    "Restore requires global quiescence and verification of latest complete monthly journal; arbitrary trusted-filesystem rollback cannot be detected automatically.",
+    "No provider reconciliation or paid replay is authorized; no Azure PostgreSQL/AKS or operational recovery acceptance is claimed."
+  ]
+}
