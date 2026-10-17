@@ -21,6 +21,37 @@ from trace_app.investigation.workflow import WorkflowOptions
 ROOT = Path(__file__).resolve().parents[2]
 
 
+class CanaryHarnessControlTests(unittest.TestCase):
+    def test_caught_tool_leak_still_fails_the_security_probe(self) -> None:
+        # Negative control: inject a canary at the backend-result observation
+        # boundary. Normal application error handling withholds the result, but
+        # that must not erase the fact that this boundary was violated.
+        with tempfile.TemporaryDirectory() as temporary:
+            code = (
+                "import sys; from pathlib import Path; from unittest.mock import patch; "
+                "from scripts import local_security_fixture as probe; "
+                "from trace_app.adapters.tools.local import LocalToolBackend; "
+                "from trace_app.investigation.tools import ToolPayload; "
+                "patcher=patch.object(LocalToolBackend,'execute',return_value=ToolPayload('ok',{'canary':probe.HIDDEN})); "
+                "patcher.start(); "
+                "probe.execute(Path(sys.argv[1]),'model_tool')"
+            )
+            process = subprocess.run(
+                [sys.executable, "-c", code, str(Path(temporary) / "negative-control")],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                env={
+                    "PATH": os.environ.get("PATH", os.defpath),
+                    "OPENBLAS_NUM_THREADS": "1",
+                },
+            )
+            self.assertNotEqual(process.returncode, 0)
+            self.assertIn("Protected canary reached delivery or audit", process.stderr)
+            self.assertNotIn(HIDDEN, process.stdout + process.stderr)
+
+
 class LocalSecurityCanaryTests(unittest.TestCase):
     temporary: tempfile.TemporaryDirectory[str]
     root: Path
@@ -73,6 +104,7 @@ class LocalSecurityCanaryTests(unittest.TestCase):
                 execution = self.read(mode, "execution.json")
                 self.assertEqual(probes["forbidden_opens"], 0)
                 self.assertEqual(probes["forbidden_imports"], 0)
+                self.assertEqual(probes["canary_violations"], 0)
                 self.assertEqual(execution["evaluation_modules_loaded"], [])
                 log_lines = [
                     line

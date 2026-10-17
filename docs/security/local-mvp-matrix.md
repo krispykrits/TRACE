@@ -30,6 +30,8 @@ uv run --locked python -m scripts.local_security_fixture --directory /tmp/trace-
 
 Other modes are `redaction`, `hostile_error` and `model_tool`. `security.json` retains content-free probe flags/tool names and correlated CLI logs; the normal harness retains controlled synthetic observed input, result and execution artifacts. Original synthetic input can include a credential canary in private `observed.json`/retained untrusted evidence; that is intentionally distinct from model context, public report export and content-free logs/audit. Never replace the synthetic string with a real credential or treat a private source artifact as a safe public export.
 
+A negative control deliberately injects a canary at the backend-result observation boundary. The probe must fail even when normal application error handling catches and withholds the result; persistent violation flags prevent that denial from masking a detected leak. This control tests the instrumentation and does not count as successful application disclosure.
+
 The four canary probes use a 40-call ceiling and review-required proposals. They change no owner setting and create no human support judgments. Refinement/correction authority probes reuse the existing larger demonstration policy to isolate fresh-permission behavior. They do not establish that refinement or accepted publication fits 40; #66's measured accepted-path bound remains explicit.
 
 ## Residual limits and gate interpretation

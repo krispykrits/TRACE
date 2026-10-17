@@ -37,6 +37,7 @@ def execute(root: Path, mode: str) -> None:
     probes: dict = {
         "forbidden_opens": 0,
         "forbidden_imports": 0,
+        "canary_violations": 0,
         "model_requests": [],
         "tool_names": [],
     }
@@ -82,6 +83,7 @@ def execute(root: Path, mode: str) -> None:
     def observed_model(self, request):
         content = request.instructions + request.source_context
         if HIDDEN in content or REMOVED in content:
+            probes["canary_violations"] += 1
             raise AssertionError("Protected canary reached a model request.")
         probes["model_requests"].append(
             {"attack_seen": suite.ATTACK in content, "canaries_absent": True}
@@ -104,6 +106,7 @@ def execute(root: Path, mode: str) -> None:
             raise RuntimeError("Authorization: Bearer " + REMOVED)
         result = backend(self, call, *arguments, **keywords)
         if HIDDEN in canonical(asdict(result)):
+            probes["canary_violations"] += 1
             raise AssertionError("Evaluator canary reached a tool result.")
         return result
 
@@ -125,7 +128,7 @@ def execute(root: Path, mode: str) -> None:
     result = (root / "result.json").read_text()
     execution = (root / "execution.json").read_text()
     combined = result + execution + "".join(logs)
-    if HIDDEN in combined or REMOVED in combined:
+    if probes["canary_violations"] or HIDDEN in combined or REMOVED in combined:
         raise AssertionError("Protected canary reached delivery or audit.")
     probes["logs"] = logs
     probes["mode"] = mode
