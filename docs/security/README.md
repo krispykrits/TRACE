@@ -33,6 +33,8 @@ Never record raw prompts/responses/provider errors, removed sensitive values, ev
 
 Accepted assessments and pending review packets inherit source sensitivity and admitted redacted citation/provenance views. Reads/exports revalidate original provider dependencies plus current evidence/knowledge policy and support bindings. The [local investigator CLI](../architecture/investigator-cli.md) restores saved results through original dependency fingerprints, independently resolved current sources/grants, input-derived clearance and current support decisions. JSON output additionally checks transmission rights; no scope-only stored-body read is exposed. Owner-managed local file composition remains trusted and does not implement operational authentication.
 
+The [Local MVP verification matrix](local-mvp-matrix.md) maps S6 assembled CLI, provider, canary/disclosure and installed-wheel checks to their exact boundaries and residual limitations. Its scripted probes do not supply real-model quality or human endorsement.
+
 ## Hosted and real-data acceptance
 
 Before real data or hosted use, record authenticated identity/grant derivation, least-privilege source/database/provider roles, field/transmission policy, processing/retention, deletion including vectors/backups and audit/support ownership. Require adversarial and failure evidence rather than inferring readiness from local tests.

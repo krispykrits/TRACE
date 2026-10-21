@@ -28,6 +28,18 @@ def main() -> int:
             raise RuntimeError("Expected exactly one runtime wheel.")
         with zipfile.ZipFile(wheels[0]) as archive:
             names = archive.namelist()
+            # Synthetic isolation/disclosure sentinels belong only to external
+            # test tooling, never to the installed application or metadata.
+            for name in names:
+                content = archive.read(name)
+                if any(
+                    marker in content
+                    for marker in (
+                        b"TRACE_EVALUATOR_ONLY_CANARY_67_94d7",
+                        b"trace_nonfunctional_credential_67_5e12",
+                    )
+                ):
+                    raise RuntimeError("Wheel contains a synthetic isolation canary.")
             if any(
                 not (name.startswith("trace_app/") or ".dist-info/" in name)
                 for name in names

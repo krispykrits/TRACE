@@ -12,6 +12,7 @@ import sys
 import time
 from dataclasses import asdict, replace
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 from scripts.demo_investigator import Clock, ScriptedModel, ScriptedReviews
@@ -128,7 +129,7 @@ def execute(
         for identity, grant in json.loads(original)["grants"].items()
     ]
     write_private(root / "sources.json", records_sources)
-    records = {
+    records: dict[str, Any] = {
         "model_invocations": 0,
         "evaluation_modules_loaded": [],
         "request_metadata": [],
