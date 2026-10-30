@@ -23,12 +23,14 @@ All 36 scheduled attempts completed, 12 in each arm. All 12 integrated attempts 
 
 Remaining checks are recorded below only when finished. Retain failed and incomplete outcomes. Installed-wheel investigation and protected inspection must be demonstrated separately from wheel packaging and synthetic fixture scripts.
 
+The complete local command `make check lint format-check type-check architecture-check test integration package-check` passed in this environment: 46 unit, 119 contract and 221 integration tests, plus the installed-wheel check. The integration suite took 751.213 seconds. No live-provider suite was run.
+
 | Readiness boundary | Result | Evidence or remaining work |
 | --- | --- | --- |
 | Clean checkout, Python 3.12, locked dependencies | Passed setup | Checkout and lock binding above; `uv sync --locked` succeeded |
 | 36 planned attempts and complete authorized captured timelines | Passed for the captured offline inputs | 36/36 completed; integrated delivered timeline 12/12; source gaps and candidate omissions remain explicit above |
 | Saved deterministic rescore | Passed | Saved and regenerated score bytes matched; no dispatch |
-| Applicable critical local checks, recovery and security | Pending | Wheel packaging passed; complete current check results and link retained recovery/security evidence |
+| Applicable critical local checks, recovery and security | Passed current offline suite | Full required command passed with counts above; original recovery/security evidence and its limits remain linked above |
 | Installed-wheel service/window investigation and protected inspection | Partial | Installed CLI evidence-only investigation/report/artifact passed; installed-wheel scripted pending report and citation passed through injected fixture composition. Owner review-packet walkthrough remains pending |
 | Owner review-packet walkthrough and binding/decision/revision | Pending | Owner participation and assistance must be recorded |
 | Owner local-readiness/handoff decision | Pending | Record only after reviewable evidence and owner decision |
