@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -40,17 +41,31 @@ class SqliteProviderJournal:
         monthly_limit_nusd: int,
         initial_spend_nusd: int,
         now: float,
+        run_id: str | None = None,
+        run_limit_nusd: int | None = None,
     ) -> None:
         if (
             type(monthly_limit_nusd) is not int
             or not 0 < monthly_limit_nusd <= 20_000_000_000
             or type(initial_spend_nusd) is not int
             or not 0 <= initial_spend_nusd <= monthly_limit_nusd
+            or (run_id is None) != (run_limit_nusd is None)
+            or (
+                run_id is not None
+                and (
+                    not isinstance(run_id, str)
+                    or re.fullmatch(r"[0-9a-f]{64}", run_id) is None
+                    or type(run_limit_nusd) is not int
+                    or not 0 < run_limit_nusd <= monthly_limit_nusd
+                )
+            )
         ):
             raise ModelProviderError(ModelErrorCode.CONFIGURATION)
         self._path = path
         self._pricing = pricing
         self._limit = monthly_limit_nusd
+        self._run_id = run_id
+        self._run_limit = run_limit_nusd
         try:
             path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
             descriptor = os.open(path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
@@ -80,6 +95,17 @@ class SqliteProviderJournal:
                         provenance TEXT NOT NULL
                     );
                 """)
+                if run_id is not None:
+                    connection.executescript("""
+                        CREATE TABLE IF NOT EXISTS scoped_runs (
+                            run_id TEXT PRIMARY KEY, limit_nusd INTEGER NOT NULL,
+                            month TEXT NOT NULL
+                        );
+                        CREATE TABLE IF NOT EXISTS scoped_run_attempts (
+                            request_id TEXT PRIMARY KEY REFERENCES attempts(request_id),
+                            run_id TEXT NOT NULL REFERENCES scoped_runs(run_id)
+                        );
+                    """)
                 connection.execute("BEGIN IMMEDIATE")
                 expected = (
                     monthly_limit_nusd,
@@ -99,6 +125,16 @@ class SqliteProviderJournal:
                     "INSERT OR IGNORE INTO months VALUES (?,?)",
                     (_month(now), initial_spend_nusd),
                 )
+                if run_id is not None:
+                    connection.execute(
+                        "INSERT OR IGNORE INTO scoped_runs VALUES (?,?,?)",
+                        (run_id, run_limit_nusd, _month(now)),
+                    )
+                    if connection.execute(
+                        "SELECT limit_nusd,month FROM scoped_runs WHERE run_id=?",
+                        (run_id,),
+                    ).fetchone() != (run_limit_nusd, _month(now)):
+                        raise ValueError("Run allowance or month differs.")
         except (OSError, sqlite3.Error, ValueError):
             raise ModelProviderError(ModelErrorCode.AUDIT) from None
 
@@ -150,6 +186,39 @@ class SqliteProviderJournal:
                 ).fetchone()
                 if uncertain or used + initial + reservation > self._limit:
                     raise ModelProviderError(ModelErrorCode.BUDGET)
+                if self._run_id is not None:
+                    current_run = connection.execute(
+                        "SELECT limit_nusd,month FROM scoped_runs WHERE run_id=?",
+                        (self._run_id,),
+                    ).fetchone()
+                    if current_run != (self._run_limit, month):
+                        raise ModelProviderError(ModelErrorCode.BUDGET)
+                    run_used = connection.execute(
+                        "SELECT COALESCE(SUM(a.charged_nusd),0) FROM attempts a "
+                        "JOIN scoped_run_attempts r ON r.request_id=a.request_id "
+                        "WHERE r.run_id=?",
+                        (self._run_id,),
+                    ).fetchone()[0]
+                    run_uncertain = connection.execute(
+                        "SELECT 1 FROM attempts a JOIN scoped_run_attempts r "
+                        "ON r.request_id=a.request_id WHERE r.run_id=? AND "
+                        "(a.outcome='reserved' OR (a.dispatched=1 AND "
+                        "a.outcome IN (?,?,?,?,?))) LIMIT 1",
+                        (
+                            self._run_id,
+                            ModelErrorCode.TIMEOUT.value,
+                            ModelErrorCode.AUDIT.value,
+                            ModelErrorCode.DEPENDENCY.value,
+                            ModelErrorCode.CANCELLED.value,
+                            ModelErrorCode.EXPIRED.value,
+                        ),
+                    ).fetchone()
+                    if (
+                        self._run_limit is None
+                        or run_uncertain
+                        or run_used + reservation > self._run_limit
+                    ):
+                        raise ModelProviderError(ModelErrorCode.BUDGET)
                 connection.execute(
                     "INSERT INTO attempts VALUES (?,?,?,?,?,?,?,?)",
                     (
@@ -170,6 +239,11 @@ class SqliteProviderJournal:
                         0,
                     ),
                 )
+                if self._run_id is not None:
+                    connection.execute(
+                        "INSERT INTO scoped_run_attempts VALUES (?,?)",
+                        (metadata["request_id"], self._run_id),
+                    )
                 connection.executemany(
                     "INSERT INTO redactions VALUES (?,?)",
                     [
