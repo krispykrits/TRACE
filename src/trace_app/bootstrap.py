@@ -97,6 +97,8 @@ def create_azure_model_provider(
     initial_spend_nusd: int,
     read_clock: Callable[[], float] = time.time,
     execution: ExecutionSession | None = None,
+    run_id: str | None = None,
+    run_limit_nusd: int | None = None,
 ) -> PolicyModelProvider:
     """Explicit, policy-gated composition; a missing source authority never defaults."""
     guard = AdmissionGuard(secrets.token_bytes(32), read_clock)
@@ -116,6 +118,8 @@ def create_azure_model_provider(
         monthly_limit_nusd=monthly_limit_nusd,
         initial_spend_nusd=initial_spend_nusd,
         now=read_clock(),
+        run_id=run_id,
+        run_limit_nusd=run_limit_nusd,
     )
     if execution is not None and execution.pricing != journal.pricing:
         raise ValueError(
@@ -147,6 +151,8 @@ def create_azure_model_provider_from_files(
     initial_spend_nusd: int,
     read_clock: Callable[[], float] = time.time,
     execution: ExecutionSession | None = None,
+    run_id: str | None = None,
+    run_limit_nusd: int | None = None,
 ) -> PolicyModelProvider:
     """Load explicit private files and return only the gated application interface."""
     settings, api_key = load_azure_settings(setup_path, secrets_path)
@@ -161,6 +167,8 @@ def create_azure_model_provider_from_files(
         initial_spend_nusd=initial_spend_nusd,
         read_clock=read_clock,
         execution=execution,
+        run_id=run_id,
+        run_limit_nusd=run_limit_nusd,
     )
 
 
@@ -260,6 +268,8 @@ def create_local_investigator(
         [ProviderScope, EvidenceAuthority, ExecutionSession], PolicyModelProvider
     ]
     | None = None,
+    run_id: str | None = None,
+    run_limit_nusd: int | None = None,
 ) -> LocalInvestigator:
     """Owner-managed local sources; offline models require an external explicit harness."""
     from trace_app.adapters.sources.local_investigator import (
@@ -363,6 +373,8 @@ def create_local_investigator(
                 initial_spend_nusd=data["initial_spend_nusd"],
                 execution=execution,
                 read_clock=clock,
+                run_id=run_id,
+                run_limit_nusd=run_limit_nusd,
             )
         return create_investigation_workflow(
             evidence_db=profile.evidence_db,

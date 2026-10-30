@@ -2,6 +2,20 @@
 
 `evaluation/` is repository-only and excluded from the runtime wheel. Expected labels, fault schedules, candidate fixtures, reviewer judgments and reference answers must never enter investigator tools, corpus ingestion, prompts or exported operational inputs.
 
+## Azure comparison preflight
+
+The Sprint 7 [#87](https://github.com/krispykrits/TRACE/issues/87) preflight reads an existing private local model journal and the supplied decision snapshot without dispatching a model. From the repository root:
+
+```sh
+uv run --locked python -m evaluation.azure_comparison_preflight --journal /absolute/private/provider-journal.sqlite3
+```
+
+Optionally pass `--decisions /absolute/private/decisions.json` for a reviewed decision snapshot. Exit 1 is expected: live composition and its use of the run-level allowance are not implemented. Exit 2 indicates invalid inputs or unavailable planning data. The command refuses missing, non-private or symlink journal files and does not initialize or repair them. It reports aggregate current-month local journal charges, configuration, and unresolved attempts; it does not expose credentials or attempt metadata. Its output is sensitive accounting information and should be handled privately.
+
+The preflight compares the recorded UTC month, monthly cap and price version/rates, flags future-dated accounting snapshots, and conservatively counts unresolved reservations or uncertain dispatched attempts across months. It does not verify journal freshness against a separately selected policy, reconcile external Azure spending, verify current source rights or authorize a run. A scoped journal primitive now reserves against a shared run allowance in the same SQLite transaction as the monthly cap; the comparison runner still must bind it to the approved run and use it for every model call. Recheck current state at dispatch; this point-in-time report is not a spending reservation. Exact provider configuration, permissions and owner approval remain separate requirements.
+
+The [candidate v2 comparison prompts](../scripts/azure_comparison_prompts.py) contain a common `assessment.v2` instruction set and a brief-only channel restriction. Both use the same declared incident brief. The integrated and brief-only prompt IDs and content are distinct and must be bound to the frozen live run. The existing v1 offline runner and historical reports are unchanged; the future live runner must explicitly select the candidates. Deterministic fixture checks verify composition only, not Azure output quality or authorization.
+
 ## What the existing artifacts establish
 
 | Material | Evidence and limits |
