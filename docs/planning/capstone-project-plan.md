@@ -36,6 +36,8 @@ The owner explicitly selected this split on 2026-10-16; [ADR 0022](../adr/0022-s
 
 The existing Azure connector/health smoke is implemented evidence under ADR 0012. It neither satisfies missing live comparison composition nor means Azure hosting is already delivered. S7 adds local Azure diagnostic integration and designs cloud delivery; S8 deploys API/worker/state/identities/telemetry on AKS, with acceptance in S9. S7 #55 design can progress independently of diagnostic completion; S8 hosted implementation acceptance requires both reviewed S7 design and diagnostic acceptance. This avoids making S6 depend on future Azure implementation or making local model evaluation depend on AKS.
 
+**Owner sequencing, 2026-10-30:** review the [#55 platform redesign](../architecture/s7-platform-design.md) before resuming #87 live-runner implementation. This replaces the earlier parallel-work order for the current work; it does not assert that AKS is a technical prerequisite for local comparison or waive diagnostic acceptance before hosted acceptance.
+
 Quality targets are retained for their applicable real-model measurement; cause/support scores from scripted fixtures are not relabeled as passes. Local timeline/completeness, mechanical and security defects stay S6 blockers. Freeze an applicable S7 protocol/decision revision before actual measurement, preserving original v1/v2 reports and v3 planning inputs. New scope must be resized, split or explicitly blocked; no extra sprint capacity, dates, budget or live permissions are inferred.
 
 ## Scope by release

@@ -16,6 +16,7 @@ Start with the [product overview and target diagram](../README.md). Use the guid
 | Trust, data transmission, protected reports and authority | [Security](security/README.md) |
 | Why an architecture decision was made | [ADR index](adr/README.md) |
 | Azure infrastructure and release responsibilities | [Deployment](../deploy/README.md), [cloud design](architecture/azure-cloud.md), [cloud backlog](planning/azure-cloud-backlog.md) |
+| S7 platform design, repository boundaries and evidence migration review | [Platform design proposal](architecture/s7-platform-design.md), [migration inventory](planning/s7-repository-and-evidence-inventory.md) |
 | Independent .NET services and JSON-first source integration | [.NET testbed backlog](planning/dotnet-testbed-backlog.md) |
 | Recommended responses and approved operational execution | [Response/remediation scope](planning/production-remediation-scope.md), [ADR 0018](adr/0018-flexible-ml-and-ranked-response-options.md) |
 | Reproduce or interpret evaluation artifacts | [Evaluation guide](../evaluation/README.md) |
