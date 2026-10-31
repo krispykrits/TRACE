@@ -92,7 +92,7 @@ The owner supplied these planning inputs on 2026-10-30. They do not authorize pr
 | Resource administrator and operator | The project owner will administer Azure resources and act as operator. Exact identities and access grants still need verification. |
 | Retention | Approximately 14 days is a tentative direction. The owner has not selected separate periods for application logs, testbed recordings, evaluation evidence and backups; verify service minimums and exceptions before configuring deletion. |
 | Infrastructure budget | **Open.** Set a monthly amount separately from the existing $20/month TRACE model allowance. |
-| Project knowledge space | **Destination open.** The owner wants an adviser to have access to detailed planning, research and academic/defense notes; select the product and define ownership, sharing and access controls. See the [inventory](../planning/s7-repository-and-evidence-inventory.md). |
+| Project knowledge space | The owner selected their OneDrive for now, with adviser access to detailed planning, research and academic/defense notes. The account type, sharing setup and continued access must be confirmed; see the [inventory](../planning/s7-repository-and-evidence-inventory.md). |
 | Artifact storage | The owner accepts private Azure Blob as the planned S8 destination for suitable large datasets and retained evaluation artifacts. Exact access, resource configuration and retention remain open; acceptance of the destination does not authorize provisioning. |
 
 ## Cost model and missing inputs
