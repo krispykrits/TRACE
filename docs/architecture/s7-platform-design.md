@@ -100,6 +100,8 @@ The owner supplied these planning inputs on 2026-10-30. They do not authorize pr
 
 No credible total can be computed yet: the owner has identified Azure for Students, a preferred North Central US region and a $15/month infrastructure planning target, but actual offer/credit, runtime hours, node and database sizes, log volume, network pattern and detailed retention/recovery settings remain unknown. Do not call a placeholder a measured estimate. Prepare a dated Azure Pricing Calculator estimate once these inputs are supplied; document currency, taxes, assumptions, calculator output and whether it fits the owner-approved planning target. An illustrative bill of resources is:
 
+The [retail-price scenario](../planning/azure-cost-scenario-s7.md) tests the $15 target against explicit hypothetical on-demand hours. Its 20-hour partial estimate excludes storage, networking and other charges and does not establish that the target is feasible.
+
 | Cost item | Quantity / driver to measure | Recurring or residual consideration |
 | --- | --- | --- |
 | AKS control plane and nodes | Chosen tier, node SKU/count, hours, disks and availability | Nodes/disks and selected tier have distinct billing drivers; capacity must fit actual workload |
