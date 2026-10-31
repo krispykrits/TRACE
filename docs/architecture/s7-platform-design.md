@@ -77,11 +77,27 @@ Start with supported JSON imports and scoped Azure Monitor reads as separate ada
 
 The target uses AKS OIDC and Entra Workload Identity bound to specific Kubernetes service accounts, with scoped Foundry/Key Vault and approved source roles. Federation subject, issuer, namespace, audience, token path, credential rotation and revoked/wrong-account cases require implementation verification. Database authentication method, private connectivity, egress policy, ingress/auth provider, tenant boundaries, Key Vault access and exact roles remain open design inputs. No local API key, user portal role or node identity proves pod authorization.
 
-Terraform design must pin compatible provider versions, use an access-controlled Azure Blob backend with locking, separate state/deployment access, produce a reviewable plan and promote approved image digests. Account restrictions, region and Foundry processing location, Kubernetes and PostgreSQL/pgvector versions, cluster mode/tier, node pools, registry/database shapes, availability and recovery objectives, retention and resource owners are **unselected**. Validate availability, quotas and cost in the actual subscription before selecting them. Trace-platform's configuration, state and plan may contain sensitive metadata and need restricted access.
+Terraform design must pin compatible provider versions, use an access-controlled Azure Blob backend with locking, separate state/deployment access, produce a reviewable plan and promote approved image digests. Validate account restrictions, quotas, Foundry processing location and regional resource availability in the actual subscription. Kubernetes and PostgreSQL/pgvector versions, cluster mode/tier, node pools, registry/database shapes, detailed recovery objectives and resource-specific retention are **unselected**. Trace-platform's configuration, state and plan may contain sensitive metadata and need restricted access.
+
+## Owner inputs
+
+The owner supplied these planning inputs on 2026-10-30. They do not authorize provisioning, paid calls or a resource configuration. Subscription IDs and Azure resource links are not recorded in this public document.
+
+| Input | Owner direction / status |
+| --- | --- |
+| Subscription | Azure for Students. Available credit, remaining balance, quotas, restrictions and eligible services must be verified in the account; no credit amount is assumed. |
+| Preferred Azure region | North Central US. The actual existing Foundry resource and model-processing location must be verified separately; a resource name does not prove deployment or processing location. |
+| Operating schedule | Run during development, experiments and demonstrations rather than continuously. Exact hours, shutdown and restart approach are not yet selected. Stopped workloads may still incur storage, network, database or other charges. |
+| Availability | Occasional downtime is acceptable; high availability is not required. Recovery time and acceptable data loss have not been set. |
+| Resource administrator and operator | The project owner will administer Azure resources and act as operator. Exact identities and access grants still need verification. |
+| Retention | Approximately 14 days is a tentative direction. The owner has not selected separate periods for application logs, testbed recordings, evaluation evidence and backups; verify service minimums and exceptions before configuring deletion. |
+| Infrastructure budget | **Open.** Set a monthly amount separately from the existing $20/month TRACE model allowance. |
+| Project knowledge space | **Open.** Select the destination, owner and access policy for detailed planning, research and academic/defense notes; see the [inventory](../planning/s7-repository-and-evidence-inventory.md). |
+| Artifact storage | Private Azure Blob is the proposed S8 destination for suitable large datasets and retained evidence; the owner's acceptance, exact access and retention remain open. |
 
 ## Cost model and missing inputs
 
-No credible total can be computed from the current repository: region, subscription offer, runtime hours, node and database sizes, log volume, network pattern, retention and recovery settings are not selected. Do not call a placeholder a measured estimate. Prepare a dated Azure Pricing Calculator estimate once these inputs are supplied; document currency, taxes, assumptions, calculator output and owner-approved infrastructure budget. An illustrative bill of resources is:
+No credible total can be computed yet: the owner has identified Azure for Students and a preferred North Central US region, but actual offer/credit, runtime hours, node and database sizes, log volume, network pattern and detailed retention/recovery settings remain unknown. Do not call a placeholder a measured estimate. Prepare a dated Azure Pricing Calculator estimate once these inputs are supplied; document currency, taxes, assumptions, calculator output and owner-approved infrastructure budget. An illustrative bill of resources is:
 
 | Cost item | Quantity / driver to measure | Recurring or residual consideration |
 | --- | --- | --- |
@@ -106,4 +122,4 @@ Use the [Azure pricing calculator](https://azure.microsoft.com/en-us/pricing/cal
 
 Per the owner's current direction, review this redesign before resuming #87's live runner; #65 remains the separate actual-output quality review. The draft #94 and additional workspace-only work are incomplete inputs, not merged runtime or diagnostic evidence. Reassess their journal/prompt and approval boundaries after this design; do not discard unmerged work or silently treat it as hosted shared admission. Hosted implementation acceptance still requires the diagnostic decision and reviewed design; no paid call or Terraform apply is implied by reviewing this document.
 
-[#55](https://github.com/krispykrits/TRACE/issues/55) is ready for owner design review only after its repository/source/identity/dispatch design, inventory, verification and open gates are linked. Final acceptance also requires the actual owner-reviewed design, selected account/region/budget/retention and a defensible bill of resources; those values remain unresolved. [#56](https://github.com/krispykrits/TRACE/issues/56)–[#60](https://github.com/krispykrits/TRACE/issues/60) own subsequent implementation and evidence. Do not mark #55 complete from a draft document.
+[#55](https://github.com/krispykrits/TRACE/issues/55) is ready for owner design review only after its repository/source/identity/dispatch design, inventory, verification and open gates are linked. Final acceptance also requires the actual owner-reviewed design, verification of account/region and the remaining budget/retention decisions, and a defensible bill of resources. [#56](https://github.com/krispykrits/TRACE/issues/56)–[#60](https://github.com/krispykrits/TRACE/issues/60) own subsequent implementation and evidence. Do not mark #55 complete from a draft document.
