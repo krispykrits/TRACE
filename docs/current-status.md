@@ -1,6 +1,6 @@
 # TRACE current status
 
-Updated: 2026-10-30 against main `61db246`: #66 / PR #91 and #67 / PR #92 are merged; #68 local-readiness preparation has begun. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
+Updated: 2026-10-30 against main `5c51f61`: #66 / PR #91, #67 / PR #92 and #68 / PR #93 are merged. The owner handoff details remain unresolved. [Project Status](https://github.com/users/krispykrits/projects/2) remains authoritative for work status.
 
 ## Implemented
 
@@ -31,7 +31,7 @@ The [#88 implementation and fresh v3 comparison](../evaluation/reports/local_mvp
 The owner [selected the S6/S7 gate split](adr/0022-sprint-06-readiness-and-sprint-07-diagnostics.md): S6 local readiness/handoff, S7 actual-provider diagnostic acceptance, S8 hosted delivery and S9 Cloud MVP acceptance. This is sequencing, not a release approval or a passing fake-provider quality result.
 
 1. Complete [#68 clean-environment readiness and owner handoff](https://github.com/krispykrits/TRACE/issues/68). The [draft Sprint 6 review](sprints/sprint-06-review.md) tracks remaining evidence, including an owner walkthrough and decision.
-2. In S7, [#87 actual Azure comparisons](https://github.com/krispykrits/TRACE/issues/87) provide the artifacts for #65 actual owner quality review and the Local MVP diagnostic decision. Verify actual provider/spending/source/transmission/run facts before separately authorized dispatch. #55 architecture/design can proceed in parallel; resize the added S7 scope rather than inventing capacity.
+2. In S7, review the [#55 platform design](architecture/s7-platform-design.md) and [repository/evidence inventory](planning/s7-repository-and-evidence-inventory.md) first, as the owner directed. Then resume [#87 actual Azure comparisons](https://github.com/krispykrits/TRACE/issues/87), which provide artifacts for #65 owner quality review and the Local MVP diagnostic decision. Draft PR #94 does not implement a live runner. Verify actual provider/spending/source/transmission/run facts before separately authorized dispatch; resize S7 scope rather than inventing capacity.
 3. S8–S9 [#55–#60 cloud delivery](planning/azure-cloud-backlog.md) and [#70–#76 monitored services](planning/dotnet-testbed-backlog.md) retain their contracts, hosted-acceptance and independent-usefulness gates.
 
 ## Acceptance still pending
@@ -43,7 +43,7 @@ The owner [selected the S6/S7 gate split](adr/0022-sprint-06-readiness-and-sprin
 - **Full capstone:** justified evaluated ML, five-arm study, ranked response contract, hardened operations and defense.
 - **Production remediation:** concrete authorized workload/action, staging validation and explicitly approved verified production execution.
 
-The owner is the planned .NET service owner and initial investigator. Exact source/field/transmission/retention policy, infrastructure budget/resources, remaining review/release/study thresholds, university rubric/deadline and capacity remain [charter inputs](charter.md#open-inputs-and-decision-gates). The $20/month application model cap is separate from Azure infrastructure/account billing.
+The owner is the planned .NET service owner and initial investigator, and will administer the Azure for Students environment. North Central US is preferred; on-demand operation, no high-availability requirement and approximately 14-day retention are the owner's initial direction. The owner accepts a $15/month infrastructure planning target; actual cost and feasibility require estimation. Exact retention by data type, resource configuration, account restrictions, source permissions, remaining review/release/study thresholds, university rubric/deadline and capacity remain [charter inputs](charter.md#open-inputs-and-decision-gates). The $20/month application model cap is separate from Azure infrastructure/account billing.
 
 ## Read next
 
