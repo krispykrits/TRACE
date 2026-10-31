@@ -18,6 +18,8 @@ Start with the [product overview and target diagram](../README.md). Use the guid
 | Azure infrastructure and release responsibilities | [Deployment](../deploy/README.md), [cloud design](architecture/azure-cloud.md), [cloud backlog](planning/azure-cloud-backlog.md) |
 | S7 platform design, repository boundaries and evidence migration review | [Platform design proposal](architecture/s7-platform-design.md), [migration inventory](planning/s7-repository-and-evidence-inventory.md) |
 | S7 Azure budget scenario and missing cost inputs | [Azure cost scenario](planning/azure-cost-scenario-s7.md) |
+| Hosted API, worker, source and data implementation contracts | [Hosted implementation contract](architecture/s7-implementation-contract.md) |
+| Azure resource candidate, cost comparison and work handoff | [Azure candidate](planning/s7-azure-deployment-candidate.md), [implementation handoff](planning/s7-implementation-handoff.md) |
 | Independent .NET services and JSON-first source integration | [.NET testbed backlog](planning/dotnet-testbed-backlog.md) |
 | Recommended responses and approved operational execution | [Response/remediation scope](planning/production-remediation-scope.md), [ADR 0018](adr/0018-flexible-ml-and-ranked-response-options.md) |
 | Reproduce or interpret evaluation artifacts | [Evaluation guide](../evaluation/README.md) |
