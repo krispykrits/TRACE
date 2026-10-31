@@ -43,7 +43,7 @@ The owner [selected the S6/S7 gate split](adr/0022-sprint-06-readiness-and-sprin
 - **Full capstone:** justified evaluated ML, five-arm study, ranked response contract, hardened operations and defense.
 - **Production remediation:** concrete authorized workload/action, staging validation and explicitly approved verified production execution.
 
-The owner is the planned .NET service owner and initial investigator, and will administer the Azure for Students environment. North Central US is preferred; on-demand operation, no high-availability requirement and approximately 14-day retention are the owner's initial direction. Exact retention by data type, infrastructure budget/resources, account restrictions, source permissions, remaining review/release/study thresholds, university rubric/deadline and capacity remain [charter inputs](charter.md#open-inputs-and-decision-gates). The $20/month application model cap is separate from Azure infrastructure/account billing.
+The owner is the planned .NET service owner and initial investigator, and will administer the Azure for Students environment. North Central US is preferred; on-demand operation, no high-availability requirement and approximately 14-day retention are the owner's initial direction. The owner accepts a $15/month infrastructure planning target; actual cost and feasibility require estimation. Exact retention by data type, resource configuration, account restrictions, source permissions, remaining review/release/study thresholds, university rubric/deadline and capacity remain [charter inputs](charter.md#open-inputs-and-decision-gates). The $20/month application model cap is separate from Azure infrastructure/account billing.
 
 ## Read next
 
