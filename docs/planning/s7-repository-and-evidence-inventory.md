@@ -2,7 +2,9 @@
 
 Status: **review draft**, coordinated with [#55](https://github.com/krispykrits/TRACE/issues/55) and [#89](https://github.com/krispykrits/TRACE/issues/89); no content has been moved. Baseline is tracked files at `5c51f61d1ba2f35c84dcf9fc7d79946c9db0499c`. Groups below include their descendants; this is a migration inventory, not a finding that every item has the same sensitivity or can be deleted. Inspect individual content and consumers before any move. See the [platform design](../architecture/s7-platform-design.md) for runtime and operational contracts.
 
-The [file-level migration inventory](s7-file-inventory.md) enumerates tracked documents and non-report corpus/evaluation inputs, and lists report bundles with their manifests. At baseline `7568d22`, a read-only SHA-256 check matched all 151 artifacts declared by `local_mvp_comparison_offline_v3`, all 45 declared by `investigator_offline_v1`, and all 18 declared by `local_mvp_tool_capacity_probe_v1`. This checks 214 declared artifact bytes; it does not validate undeclared files, source checkout compatibility, successful rescoring or destination access.
+The [file-level migration inventory](s7-file-inventory.md) enumerates tracked documents and non-report corpus/evaluation inputs, and lists report bundles with their manifests. At baseline `7568d22`, a read-only SHA-256 check matched all 151 artifacts declared by `local_mvp_comparison_offline_v3`, all 45 declared by `investigator_offline_v1`, and all 18 declared by `local_mvp_tool_capacity_probe_v1`. This checks 214 declared artifact bytes; it does not validate undeclared files or destination access.
+
+For `local_mvp_comparison_offline_v3`, a separate detached worktree at its recorded implementation commit `897caecdd1a54e14f0d7f9bbf46ef0423e5abb22` rescored the baseline report with network sockets and subprocess dispatch blocked. The result matched the saved score bytes exactly (SHA-256 `464982ddff6ecae87d49c98eee89ffea5aba4d368fc346cf3a62f7679def59c9`). This verifies that report at the recorded checkout, not the other reports, a migrated destination, live Azure output or model quality.
 
 ## Baseline inventory and proposed homes
 
