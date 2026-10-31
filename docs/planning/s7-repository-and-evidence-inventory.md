@@ -2,6 +2,8 @@
 
 Status: **review draft**, coordinated with [#55](https://github.com/krispykrits/TRACE/issues/55) and [#89](https://github.com/krispykrits/TRACE/issues/89); no content has been moved. Baseline is tracked files at `5c51f61d1ba2f35c84dcf9fc7d79946c9db0499c`. Groups below include their descendants; this is a migration inventory, not a finding that every item has the same sensitivity or can be deleted. Inspect individual content and consumers before any move. See the [platform design](../architecture/s7-platform-design.md) for runtime and operational contracts.
 
+The [file-level migration inventory](s7-file-inventory.md) enumerates tracked documents and non-report corpus/evaluation inputs, and lists report bundles with their manifests. At baseline `7568d22`, a read-only SHA-256 check matched all 151 artifacts declared by `local_mvp_comparison_offline_v3`, all 45 declared by `investigator_offline_v1`, and all 18 declared by `local_mvp_tool_capacity_probe_v1`. This checks 214 declared artifact bytes; it does not validate undeclared files, source checkout compatibility, successful rescoring or destination access.
+
 ## Baseline inventory and proposed homes
 
 | Current group | Purpose / reader | State and proposed canonical home | Dependencies, sensitivity and retention decision |
