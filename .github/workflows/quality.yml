@@ -18,6 +18,20 @@ jobs:
   quality:
     name: Fast, credential-free checks
     runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: trace_test
+          POSTGRES_PASSWORD: trace_test
+          POSTGRES_DB: trace_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U trace_test -d trace_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     permissions:
       contents: read
     steps:
@@ -52,6 +66,8 @@ jobs:
       - name: Unit and contract tests
         run: make test
       - name: Storage, evaluation and CLI integration tests
+        env:
+          TRACE_TEST_POSTGRES_DSN: postgresql://trace_test:trace_test@localhost:5432/trace_test
         run: make integration
       - name: Installed runtime wheel
         run: make package-check
