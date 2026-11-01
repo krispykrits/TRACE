@@ -6,7 +6,6 @@ This lists tracked documents and non-report corpus/evaluation files individually
 
 | Tracked path or report bundle | Purpose / reader | Candidate canonical home | Migration condition |
 | --- | --- | --- | --- |
-| `corpus/README.md` | Retrieval input / developer | TRACE development corpus | Preserve exact input bytes and hashes |
 | `corpus/development/documents/history-certificate.md` | Retrieval input / developer | TRACE development corpus | Preserve exact input bytes and hashes |
 | `corpus/development/documents/history-queue.md` | Retrieval input / developer | TRACE development corpus | Preserve exact input bytes and hashes |
 | `corpus/development/documents/order-interface.md` | Retrieval input / developer | TRACE development corpus | Preserve exact input bytes and hashes |
@@ -14,10 +13,7 @@ This lists tracked documents and non-report corpus/evaluation files individually
 | `corpus/development/documents/source-freshness.md` | Retrieval input / developer | TRACE development corpus | Preserve exact input bytes and hashes |
 | `corpus/development/documents/timeout-evidence.md` | Retrieval input / developer | TRACE development corpus | Preserve exact input bytes and hashes |
 | `corpus/development/manifest.json` | Retrieval input / developer | TRACE development corpus | Preserve exact input bytes and hashes |
-| `docs/README.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/adr/0001-repository-runtime-and-local-tooling.md` | Decision / engineer | TRACE | Retain decision history |
-| `docs/adr/0002-terraform-and-ec2-cloud-deployment.md` | Decision / engineer | TRACE | Retain decision history |
-| `docs/adr/0003-cloudwatch-hosted-logging.md` | Decision / engineer | TRACE | Retain decision history |
 | `docs/adr/0004-synchronous-synthetic-order-workflow.md` | Decision / engineer | TRACE | Retain decision history |
 | `docs/adr/0005-sqlite-local-postgresql-rds-cloud.md` | Decision / engineer | TRACE | Retain decision history |
 | `docs/adr/0006-pgvector-cloud-retrieval-storage.md` | Decision / engineer | TRACE | Retain decision history |
@@ -37,9 +33,7 @@ This lists tracked documents and non-report corpus/evaluation files individually
 | `docs/adr/0020-investigator-evaluation-and-artifact-isolation.md` | Decision / engineer | TRACE | Retain decision history |
 | `docs/adr/0021-interactive-platform-and-repository-boundaries.md` | Decision / engineer | TRACE | Retain decision history |
 | `docs/adr/0022-sprint-06-readiness-and-sprint-07-diagnostics.md` | Decision / engineer | TRACE | Retain decision history |
-| `docs/adr/README.md` | Decision / engineer | TRACE | Retain decision history |
 | `docs/adr/template.md` | Decision / engineer | TRACE | Retain decision history |
-| `docs/architecture/README.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/architecture/azure-cloud.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/architecture/bounded-evidence-queries.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/architecture/bounded-investigator.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
@@ -63,13 +57,9 @@ This lists tracked documents and non-report corpus/evaluation files individually
 | `docs/architecture/scripted-evidence-package.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/architecture/sqlite-investigation-store.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/architecture/validated-assessments.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
-| `docs/archive/2026-09-23-reuse-review.md` | Historical context / maintainer | TRACE archive | Retain until links and history verified |
-| `docs/archive/README.md` | Historical context / maintainer | TRACE archive | Retain until links and history verified |
-| `docs/archive/cloudwatch-preparation.md` | Historical context / maintainer | TRACE archive | Retain until links and history verified |
 | `docs/charter.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/current-status.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/development.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
-| `docs/operations/README.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/operations/local-readiness.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/operations/local-recovery.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/planning/azure-cloud-backlog.md` | Plan and gates / owner | TRACE + OneDrive candidate | Preserve decisions and issue links; review individually |
@@ -83,14 +73,8 @@ This lists tracked documents and non-report corpus/evaluation files individually
 | `docs/planning/s7-azure-deployment-candidate.md` | Plan and gates / owner | TRACE + OneDrive candidate | Preserve decisions and issue links; review individually |
 | `docs/planning/s7-implementation-handoff.md` | Plan and gates / owner | TRACE + OneDrive candidate | Preserve decisions and issue links; review individually |
 | `docs/planning/s7-repository-and-evidence-inventory.md` | Plan and gates / owner | TRACE + OneDrive candidate | Preserve decisions and issue links; review individually |
-| `docs/security/README.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
 | `docs/security/local-mvp-matrix.md` | Product or operations / contributor | TRACE | Keep with owning component; review links before extraction |
-| `docs/sprints/sprint-01-review.md` | Sprint evidence / reviewer | TRACE + OneDrive candidate | Preserve history; verify copy before any move |
-| `docs/sprints/sprint-04-review.md` | Sprint evidence / reviewer | TRACE + OneDrive candidate | Preserve history; verify copy before any move |
-| `docs/sprints/sprint-05-review.md` | Sprint evidence / reviewer | TRACE + OneDrive candidate | Preserve history; verify copy before any move |
-| `docs/sprints/sprint-06-review.md` | Sprint evidence / reviewer | TRACE + OneDrive candidate | Preserve history; verify copy before any move |
 | `docs/sprints/sprint-review-template.md` | Sprint evidence / reviewer | TRACE + OneDrive candidate | Preserve history; verify copy before any move |
-| `evaluation/README.md` | Evaluation tools / evaluator | TRACE evaluator area | Preserve frozen versions and no-call reproduction |
 | `evaluation/__init__.py` | Evaluation tools / evaluator | TRACE evaluator area | Preserve frozen versions and no-call reproduction |
 | `evaluation/fixtures/candidates_v1.json` | Scoring input / evaluator | TRACE evaluator area or restricted store | Keep outside runtime; verify split and access before migration |
 | `evaluation/fixtures/tool_choices_v1.json` | Scoring input / evaluator | TRACE evaluator area or restricted store | Keep outside runtime; verify split and access before migration |

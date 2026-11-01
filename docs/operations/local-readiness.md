@@ -1,6 +1,6 @@
 # Local readiness and handoff
 
-This guide supports [#68](https://github.com/krispykrits/TRACE/issues/68). It describes the local synthetic demonstration and the information needed for the owner's Sprint 6 handoff. The [Sprint 6 review](../sprints/sprint-06-review.md) records the actual run and outstanding evidence. Local readiness does not establish real-model quality or authorize Azure calls.
+This guide supports [#68](https://github.com/krispykrits/TRACE/issues/68). It describes the local synthetic demonstration and the information needed for the owner's Sprint 6 handoff. Local readiness does not establish real-model quality or authorize Azure calls.
 
 ## Setup and offline comparison
 
@@ -38,7 +38,7 @@ Saved inspection applies current source and support checks. JSON output is an ex
 
 The owner must actually walk through the protected review packet, its bound claim and citation, a decision and a revision, with the identity and any assistance recorded. Do not create verdicts on the owner's behalf. The [review rubric and bound review file](../architecture/investigator-evaluation.md#support-sample-and-independent-review) explain the separate evaluation workflow; pending runtime reports are not automatically promoted by evaluator decisions. Use synthetic material for this readiness walkthrough, and keep original decisions and any revisions distinct. The walkthrough is a usability and mechanics check, not acceptance of actual Azure diagnostic quality.
 
-The owner reviews the [Sprint 6 evidence and outstanding gates](../sprints/sprint-06-review.md), then records an explicit local-readiness/handoff decision. A missing walkthrough, incomplete installed-wheel demonstration, failed critical check or unreviewed decision remains open; green tests alone do not close #68.
+The owner reviews the Sprint 6 evidence and outstanding gates, then records an explicit local-readiness/handoff decision. A missing walkthrough, incomplete installed-wheel demonstration, failed critical check or unreviewed decision remains open; green tests alone do not close #68.
 
 ## Recovery and S7 handoff
 

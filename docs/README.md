@@ -25,7 +25,6 @@ Start with the [product overview and target diagram](../README.md). Use the guid
 | Recommended responses and approved operational execution | [Response/remediation scope](planning/production-remediation-scope.md), [ADR 0018](adr/0018-flexible-ml-and-ranked-response-options.md) |
 | Reproduce or interpret evaluation artifacts | [Evaluation guide](../evaluation/README.md) |
 | Curated development knowledge inputs | [Corpus guide](../corpus/README.md) |
-| Sprint reviews and superseded material | [Sprint 6 readiness review](sprints/sprint-06-review.md), [Archive](archive/README.md), [Sprint 1 snapshot](sprints/sprint-01-review.md), [Sprint 4 snapshot](sprints/sprint-04-review.md), [Sprint 5 review](sprints/sprint-05-review.md) |
 | Prepare a sprint review or work with an agent | [Review template](sprints/sprint-review-template.md), [contributor/agent rules](../AGENTS.md) |
 
 GitHub [Project Status](https://github.com/users/krispykrits/projects/2) is authoritative for work status. [Issues](https://github.com/krispykrits/TRACE/issues) own story acceptance criteria; [milestones](https://github.com/krispykrits/TRACE/milestones) group provisional sprints.
@@ -49,8 +48,8 @@ Review affected links, anchors, commands and status claims before handoff. Verif
 
 ## Preserve evidence while retiring documents
 
-ADRs and dated sprint reviews preserve decision/acceptance history. Add a clear later-status note when needed; retain the original scope and measurements. Historical commands that require an old checkout must name it.
+Keep active decisions and current instructions accurate.
 
 Corpus documents and evaluator review bundles are application/evaluation inputs, even when stored as Markdown. Preserve their bytes, identities and frozen report hashes. The [evaluation guide](../evaluation/README.md) explains exact historical rescoring.
 
-Consolidate duplicate active guides before deleting them, update incoming links and record their replacement in the [archive index](archive/README.md). Archive source reviews or superseded instructions that still explain a decision. Git history and pinned original-version links preserve retired text without leaving competing active requirements.
+Delete obsolete and duplicate documentation, and update incoming links.

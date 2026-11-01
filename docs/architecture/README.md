@@ -64,6 +64,6 @@ The initial investigator remains read-only. A separate deterministic executor re
 
 ## Decisions and history
 
-[ADR index](../adr/README.md) · [Delivery plan](../planning/capstone-project-plan.md) · [Historical reviews](../archive/README.md)
+[ADR index](../adr/README.md) · [Delivery plan](../planning/capstone-project-plan.md)
 
 The [local investigator CLI and saved access contract](investigator-cli.md) covers captured-window commands, trusted profile configuration, private exports and restart/cancellation behavior.

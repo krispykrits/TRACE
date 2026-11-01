@@ -5,8 +5,6 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 | ADR | Decision | Status |
 | --- | --- | --- |
 | [0001](0001-repository-runtime-and-local-tooling.md) | One modular TRACE repository, CPython 3.12/Linux and locked uv environment | Accepted foundation; dependency and integration choices remain gated |
-| [0002](0002-terraform-and-ec2-cloud-deployment.md) | Terraform and EC2 for the original Cloud MVP target | Superseded cloud target by ADR 0015; Terraform retained |
-| [0003](0003-cloudwatch-hosted-logging.md) | CloudWatch Logs for original hosted application logging | Superseded platform by ADR 0015; historical example retained |
 | [0004](0004-synchronous-synthetic-order-workflow.md) | Synchronous in-process Order–Payment demo with fixture boundaries | Accepted for scoped synthetic Sprint 2 path |
 | [0005](0005-sqlite-local-postgresql-rds-cloud.md) | Local SQLite then managed PostgreSQL state | RDS hosting superseded by ADR 0015; Local SQLite/PostgreSQL semantics retained |
 | [0006](0006-pgvector-cloud-retrieval-storage.md) | PostgreSQL/pgvector for cloud vector storage | RDS hosting superseded by ADR 0015; retrieval/authorization gates retained |
@@ -33,4 +31,4 @@ An ADR records a scoped decision and its rationale. Its original context, altern
 
 Use [the template](template.md) for a consequential decision. Update acceptance/supersession metadata when evidence changes; retain the original decision text and link a replacement for changed direction. A selection ADR can be accepted while implementation remains pending.
 
-The [charter input register](../charter.md#open-inputs-and-decision-gates) owns unresolved owner/resource/threshold/permission decisions. The [delivery plan](../planning/capstone-project-plan.md) owns release gates; avoid duplicating those registers here. [Archived source reviews](../archive/README.md) retain historical context.
+The [charter input register](../charter.md#open-inputs-and-decision-gates) owns unresolved owner/resource/threshold/permission decisions. The [delivery plan](../planning/capstone-project-plan.md) owns release gates; avoid duplicating those registers here.

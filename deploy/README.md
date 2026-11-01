@@ -44,4 +44,4 @@ No resource/account/permission or paid request is authorized by this guide. The 
 
 ## Superseded AWS material
 
-The retired CloudWatch example remains available in [repository history](https://github.com/krispykrits/TRACE/tree/d5b2a91774b8f965ff90c9a052a3c42be86fd121/deploy/cloudwatch). It does not establish Azure deployment or hosted acceptance.
+CloudWatch was superseded by Azure Monitor.
