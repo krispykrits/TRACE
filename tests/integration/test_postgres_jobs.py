@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import threading
+import time
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
@@ -11,11 +12,25 @@ from pathlib import Path
 
 import psycopg
 
+from trace_app.adapters.storage.postgres.execution import PostgresExecutionLedger
 from trace_app.adapters.storage.postgres.jobs import PostgresJobs
+from trace_app.adapters.storage.postgres.model_journal import PostgresModelJournal
+from trace_app.investigation.execution import (
+    ExecutionIdentity,
+    ExecutionPolicy,
+    ExecutionRejected,
+    ExecutionState,
+)
 from trace_app.investigation.models import (
     Investigation,
     InvestigationRequest,
     StoreStateError,
+)
+from trace_app.investigation.provider import (
+    ModelErrorCode,
+    ModelPricing,
+    ModelProviderError,
+    ModelUsage,
 )
 
 DSN = os.environ.get("TRACE_TEST_POSTGRES_DSN")
@@ -38,7 +53,7 @@ class PostgresJobsTests(unittest.TestCase):
                     "Queue tests require a disposable trace_test database."
                 )
             connection.execute(
-                "DROP TABLE IF EXISTS trace_job_attempts, trace_jobs, trace_principal_grants CASCADE"
+                "DROP TABLE IF EXISTS trace_model_redactions, trace_model_attempts, trace_model_months, trace_model_budget, trace_execution_calls, trace_execution_runs, trace_job_attempts, trace_jobs, trace_principal_grants CASCADE"
             )
             schema = Path(
                 "src/trace_app/adapters/storage/postgres/schema.sql"
@@ -146,3 +161,114 @@ class PostgresJobsTests(unittest.TestCase):
                 (job.investigation_id,),
             ).fetchone()
         self.assertEqual(row, ("failed", "access_denied"))
+
+    def test_execution_ledger_serializes_and_fences_attempts(self) -> None:
+        request = InvestigationRequest(
+            "key",
+            "orders",
+            "test",
+            "scope:a",
+            "2026-01-01T00:00:00Z",
+            "2026-01-01T00:01:00Z",
+            max_attempts=1,
+        )
+        self.store.submit(request, at=self.now)
+        job = self.store.claim(lease_seconds=60)
+        assert job is not None and job.active_attempt_id is not None
+        identity = ExecutionIdentity(
+            job.investigation_id, job.active_attempt_id, "correlation", "scope:a"
+        )
+        ledger = PostgresExecutionLedger(self.dsn)
+        barrier = threading.Barrier(2)
+
+        def increment() -> None:
+            barrier.wait()
+
+            def operation(state: ExecutionState) -> None:
+                state.tool_calls += 1
+
+            ledger.apply(identity, ExecutionPolicy(), time.time(), operation)
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            list(pool.map(lambda _: increment(), range(2)))
+        with psycopg.connect(self.dsn) as connection:
+            row = connection.execute(
+                "SELECT state FROM trace_execution_runs WHERE investigation_id=%s",
+                (job.investigation_id,),
+            ).fetchone()
+        assert row is not None
+        import json
+
+        self.assertEqual(json.loads(row[0])["tool_calls"], 2)
+        wrong_attempt = ExecutionIdentity(
+            job.investigation_id, job.active_attempt_id + 1, "correlation", "scope:a"
+        )
+        with self.assertRaises(ExecutionRejected):
+            ledger.apply(
+                wrong_attempt, ExecutionPolicy(), time.time(), lambda state: None
+            )
+        with psycopg.connect(self.dsn) as connection:
+            connection.execute(
+                "DELETE FROM trace_principal_grants WHERE tenant_id=%s AND object_id=%s",
+                PRINCIPAL,
+            )
+        with self.assertRaises(ExecutionRejected):
+            ledger.apply(identity, ExecutionPolicy(), time.time(), lambda state: None)
+
+    def test_model_budget_is_shared_and_unknown_usage_is_conservative(self) -> None:
+        pricing = ModelPricing("pricing.v1", 1, 1)
+        with psycopg.connect(self.dsn) as connection:
+            connection.execute(
+                "INSERT INTO trace_model_budget VALUES (1,15,'pricing.v1',1,1)"
+            )
+            connection.execute(
+                "INSERT INTO trace_model_months SELECT to_char(clock_timestamp() AT TIME ZONE 'UTC', 'YYYY-MM'), 0"
+            )
+        jobs = []
+        for key in ("one", "two"):
+            request = InvestigationRequest(
+                key,
+                "orders",
+                "test",
+                "scope:a",
+                "2026-01-01T00:00:00Z",
+                "2026-01-01T00:01:00Z",
+                max_attempts=1,
+            )
+            self.store.submit(request, at=self.now)
+            job = self.store.claim(lease_seconds=60)
+            assert job is not None and job.active_attempt_id is not None
+            jobs.append(job)
+        barrier = threading.Barrier(2)
+        journal = PostgresModelJournal(self.dsn, pricing, monthly_limit_nusd=15)
+
+        def reserve(index: int) -> tuple[dict[str, object], str]:
+            job = jobs[index]
+            metadata: dict[str, object] = {
+                "request_id": f"call-{index}",
+                "scope_id": job.investigation_id,
+                "attempt_id": job.active_attempt_id,
+            }
+            barrier.wait()
+            try:
+                journal.begin(metadata, (), 10, 0, time.time())
+                return metadata, "reserved"
+            except ModelProviderError as error:
+                return metadata, error.code.value
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(reserve, range(2)))
+        self.assertEqual(
+            sorted(result for _, result in results),
+            sorted(["reserved", ModelErrorCode.BUDGET.value]),
+        )
+        metadata = next(meta for meta, result in results if result == "reserved")
+        journal.finish(
+            metadata | {"outcome": "timeout"}, ModelUsage(20, None), True, time.time()
+        )
+        with psycopg.connect(self.dsn) as connection:
+            row = connection.execute(
+                "SELECT charged_nusd, dispatched FROM trace_model_attempts WHERE request_id=%s",
+                (metadata["request_id"],),
+            ).fetchone()
+        self.assertEqual(row, (20, True))

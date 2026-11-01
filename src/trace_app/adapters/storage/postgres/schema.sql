@@ -43,3 +43,44 @@ CREATE TABLE IF NOT EXISTS trace_principal_grants (
     actions TEXT[] NOT NULL,
     PRIMARY KEY (tenant_id, object_id)
 );
+
+CREATE TABLE IF NOT EXISTS trace_execution_runs (
+    investigation_id TEXT PRIMARY KEY REFERENCES trace_jobs(investigation_id),
+    policy TEXT NOT NULL,
+    state TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS trace_execution_calls (
+    call_id TEXT PRIMARY KEY,
+    investigation_id TEXT NOT NULL REFERENCES trace_jobs(investigation_id),
+    metadata TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS trace_model_budget (
+    id INTEGER PRIMARY KEY CHECK (id=1),
+    limit_nusd BIGINT NOT NULL CHECK (limit_nusd > 0 AND limit_nusd <= 20000000000),
+    pricing TEXT NOT NULL,
+    input_rate BIGINT NOT NULL,
+    output_rate BIGINT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS trace_model_months (
+    month TEXT PRIMARY KEY,
+    initial_nusd BIGINT NOT NULL CHECK (initial_nusd >= 0)
+);
+
+CREATE TABLE IF NOT EXISTS trace_model_attempts (
+    request_id TEXT PRIMARY KEY,
+    scope_id TEXT NOT NULL,
+    month TEXT NOT NULL REFERENCES trace_model_months(month),
+    allowance_nusd BIGINT NOT NULL CHECK (allowance_nusd >= 0),
+    charged_nusd BIGINT NOT NULL CHECK (charged_nusd >= 0),
+    outcome TEXT NOT NULL,
+    metadata TEXT NOT NULL,
+    dispatched BOOLEAN NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS trace_model_redactions (
+    request_id TEXT NOT NULL REFERENCES trace_model_attempts(request_id),
+    provenance TEXT NOT NULL
+);
