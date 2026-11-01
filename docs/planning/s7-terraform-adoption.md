@@ -1,12 +1,12 @@
 # Terraform adoption plan for existing TRACE development resources
 
-Status: owner selected staged adoption and a private Azure Blob backend; implementation and import plans are pending. This is the [#55](https://github.com/krispykrits/TRACE/issues/55) handoff, not a claim that Terraform currently manages any Azure resource.
+Status: owner selected staged adoption and a private Azure Blob backend. A registry import draft and preliminary plan exist; no resource has been imported. This is the [#55](https://github.com/krispykrits/TRACE/issues/55) handoff, not a claim that Terraform currently manages any Azure resource.
 
 ## Observed backend
 
 A development StorageV2 account in North Central US uses Standard LRS. Its `tfstate` blob container was created with private anonymous access. Blob versioning is enabled; blob and container soft delete were already enabled with seven-day retention. Versions are currently retained without an automatic expiry policy; review retention and cost later. The account's public endpoint permits all networks, but anonymous blob access is disabled; public network reachability and data authorization are distinct.
 
-The Terraform backend must be reachable from the selected execution environment. Entra data-plane read/write and lease permissions on the container are required. The owner's account-level IAM view showed inherited Owner roles but did not establish effective container-level blob data access; verify effective access rather than assuming Owner includes data actions. Configure a narrower network path and named principals after checking that the operator can still reach the account. Treat state, state versions, plans, backend configuration and logs as sensitive.
+The Terraform backend must be reachable from the selected execution environment. Entra data-plane read/write and lease permissions on the container are required. An Entra-authenticated operator successfully listed the state container after blob data roles were assigned. Review effective role scope and remove redundant broader grants when appropriate. Configure a narrower network path and named principals after checking that the operator can still reach the account. Treat state, state versions, plans, backend configuration and logs as sensitive.
 
 Do not place this backend's storage account or container in the same Terraform state that depends on them for its own operation. Maintain the manually bootstrapped backend separately with its own inventory and recovery procedure; do not delete it during environment teardown. This protects lifecycle independence, not authorization by itself.
 
@@ -25,7 +25,7 @@ Resource groups shared with other assets require explicit ownership decisions; a
 
 ## Initial backend configuration
 
-The backend is bootstrapped outside the deployment state. The following is a **review template**, not an initialized project or an instruction to apply. Pin and lock a compatible Terraform CLI and AzureRM provider version after checking the installed tools and provider schemas. Store the account name, resource-group name, container and key in a private, untracked backend configuration supplied at initialization; do not store credentials in it.
+The backend is bootstrapped outside the deployment state. The following remains a **review template**, not an instruction to apply. The registry draft pins AzureRM and includes a provider lock file. Store the account name, resource-group name, container and key in a private, untracked backend configuration supplied at initialization; do not store credentials in it.
 
 ```hcl
 terraform {
@@ -55,4 +55,4 @@ Use a preauthenticated Azure CLI session for the operator, confirm tenant/subscr
 5. Apply the exact reviewed, unexpired plan only when authorized, then run a fresh plan and investigate any drift. Record identity, tool/provider versions, plan summary, resource addresses, state location and result without publishing secrets. Repeat for each batch.
 6. Test state-version recovery with an isolated test state and retain a documented incident procedure. Restore of stale infrastructure state is a deliberate recovery step: reconcile live resources and sensitive state first. Backup/restore of database data and the model-spending ledger is a separate process.
 
-A private backend and a sample pull do not establish infrastructure-as-code adoption. The account was prepared without executing Terraform; Terraform CLI/provider installation, backend authentication, permissions, actual import configuration, zero-change plans, imports and recovery tests remain open. The owner accepts the current budget for now and will revisit it; version storage and other charges remain unmeasured.
+A private backend and a sample pull do not establish infrastructure-as-code adoption. Cloud Shell initialized the Blob backend using Entra authentication and verified that its state contained zero resources. A preliminary plan for the parameterized registry draft reported one import, zero additions, zero changes and zero deletions; the plan was not saved for apply. See [the registry draft](../../deploy/azure/registry/README.md). Review and save a fresh plan before any authorized apply; imports, network restriction, state recovery tests and the other resource batches remain open. The owner accepts the current budget for now and will revisit it; version storage and other charges remain unmeasured.
