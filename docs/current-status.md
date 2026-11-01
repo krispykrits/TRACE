@@ -26,6 +26,12 @@ The [#88 implementation and fresh v3 comparison](../evaluation/reports/local_mvp
 
 #67 adds the [local security matrix](security/local-mvp-matrix.md) and [canary/disclosure evidence](../evaluation/reports/local_security_v1/README.md). The full required command passes 46 unit, 119 contract and 220 integration cases plus installed-wheel checks. Hardened canary cases and one added negative control pass focused checks; all 221 current integration cases have passing results across those runs. No runtime authority/budget change, paid call or human support judgment was introduced. Local trusted composition and scripted tests do not establish operational authentication or real-model resistance.
 
+## Development Azure foundation — observed 2026-11-01
+
+Azure for Students development resources include an AKS Free cluster in West US 3 with a two-node D2s v4 pool (stopped at last inspection), Basic ACR in North Central US and PostgreSQL 18.6 B1ms in Canada Central. A sample ACR image pull and TLS-verified AKS-to-PostgreSQL connection succeeded. The portal showed AKS OIDC and Workload Identity enabled. Container Insights is enabled with a West US 3 Log Analytics workspace; actual ingestion remains unverified. The owner reports vector 0.8.7 installed in a dedicated development database after the server allowlist was updated. These are infrastructure checks, not hosted TRACE or workload-identity acceptance. See the [observed configuration and limitations](planning/s7-azure-deployment-candidate.md#observed-development-environment--2026-11-01).
+
+The owner said the budget is fine for now and will revisit it later. Actual billing and the full cost criterion remain unverified; this does not change the separate $20/month model cap. The live comparison runner remains on hold until the redesign is complete.
+
 ## Next work
 
 The owner [selected the S6/S7 gate split](adr/0022-sprint-06-readiness-and-sprint-07-diagnostics.md): S6 local readiness/handoff, S7 actual-provider diagnostic acceptance, S8 hosted delivery and S9 Cloud MVP acceptance. This is sequencing, not a release approval or a passing fake-provider quality result.
