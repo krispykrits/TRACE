@@ -36,6 +36,9 @@ class LocalJobs(Protocol):
         access_scope: str,
         at: datetime,
     ) -> int: ...
+    def get_snapshot(
+        self, investigation_id: str, *, access_scope: str
+    ) -> EvidenceSnapshot: ...
     def claim_next(
         self,
         *,
@@ -102,6 +105,69 @@ class LocalInvestigator:
     ) -> dict[str, Any]:
         if provider not in self.allowed_providers:
             raise ValueError("Selected provider is unavailable in this composition.")
+        job = self.prepare(
+            service=service,
+            environment=environment,
+            window_start=window_start,
+            window_end=window_end,
+        )
+        if job.attempt_count or job.status != "queued":
+            return self.read(job.investigation_id)
+        return self._run_prepared(job, provider)
+
+    def run_prepared(self, investigation_id: str) -> dict[str, Any]:
+        """Run one captured local job without a paid provider or automatic replay."""
+        if "evidence-only" not in self.allowed_providers:
+            raise ValueError("Evidence-only mode is unavailable in this composition.")
+        job = self.jobs.get_investigation(
+            investigation_id, access_scope=self.context.access_scope
+        )
+        self.check_job(job)
+        if job.attempt_count or job.status != "queued":
+            return self.read(investigation_id)
+        # An interrupted producer can leave a queued row before capture completes.
+        # Never claim such a row. The local store does not atomically submit + capture.
+        self.jobs.get_snapshot(investigation_id, access_scope=self.context.access_scope)
+        return self._run_prepared(job, "evidence-only")
+
+    def _run_prepared(self, job: Investigation, provider: str) -> dict[str, Any]:
+        at = datetime.fromtimestamp(self.clock(), UTC)
+        claimed = self.jobs.claim_next(
+            at=at,
+            lease_seconds=self.lease_seconds,
+            investigation_id=job.investigation_id,
+            access_scope=self.context.access_scope,
+        )
+        if claimed is None:
+            raise StoreStateError("Investigation is already claimed.")
+        try:
+            workflow = self.workflow(claimed, provider)
+        except BaseException:
+            self.jobs.cancel(
+                job.investigation_id,
+                access_scope=self.context.access_scope,
+                at=datetime.fromtimestamp(self.clock(), UTC),
+            )
+            raise
+        try:
+            workflow.run()
+        finally:
+            workflow.close()
+        return self.read(job.investigation_id)
+
+    def prepare(
+        self,
+        *,
+        service: str,
+        environment: str,
+        window_start: str,
+        window_end: str,
+    ) -> Investigation:
+        """Queue and capture a trusted-local request without starting an attempt.
+
+        This is not an authenticated API or a persistent worker interface.
+        Provider selection is not yet durably bound to queued jobs.
+        """
         start, end = _parse_utc(window_start), _parse_utc(window_end)
         if (
             start > end
@@ -145,7 +211,7 @@ class LocalInvestigator:
         job = self.jobs.submit(request, at=at)
         self.check_job(job)
         if job.attempt_count or job.status != "queued":
-            return self.read(job.investigation_id)
+            return job
         snapshot = EvidenceSnapshot(
             tuple(
                 e
@@ -164,25 +230,4 @@ class LocalInvestigator:
             access_scope=self.context.access_scope,
             at=at,
         )
-        claimed = self.jobs.claim_next(
-            at=at,
-            lease_seconds=self.lease_seconds,
-            investigation_id=job.investigation_id,
-            access_scope=self.context.access_scope,
-        )
-        if claimed is None:
-            raise StoreStateError("Investigation is already claimed.")
-        try:
-            workflow = self.workflow(claimed, provider)
-        except BaseException:
-            self.jobs.cancel(
-                job.investigation_id,
-                access_scope=self.context.access_scope,
-                at=datetime.fromtimestamp(self.clock(), UTC),
-            )
-            raise
-        try:
-            workflow.run()
-        finally:
-            workflow.close()
-        return self.read(job.investigation_id)
+        return job
