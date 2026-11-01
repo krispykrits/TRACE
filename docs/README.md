@@ -20,6 +20,7 @@ Start with the [product overview and target diagram](../README.md). Use the guid
 | S7 Azure budget scenario and missing cost inputs | [Azure cost scenario](planning/azure-cost-scenario-s7.md) |
 | Hosted API, worker, source and data implementation contracts | [Hosted implementation contract](architecture/s7-implementation-contract.md) |
 | Azure resource candidate, cost comparison and work handoff | [Azure candidate](planning/s7-azure-deployment-candidate.md), [implementation handoff](planning/s7-implementation-handoff.md) |
+| Terraform backend bootstrap and staged Azure imports | [Terraform adoption plan](planning/s7-terraform-adoption.md) |
 | Independent .NET services and JSON-first source integration | [.NET testbed backlog](planning/dotnet-testbed-backlog.md) |
 | Recommended responses and approved operational execution | [Response/remediation scope](planning/production-remediation-scope.md), [ADR 0018](adr/0018-flexible-ml-and-ranked-response-options.md) |
 | Reproduce or interpret evaluation artifacts | [Evaluation guide](../evaluation/README.md) |
