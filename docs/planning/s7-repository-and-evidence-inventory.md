@@ -2,6 +2,10 @@
 
 Status: **review draft**, coordinated with [#55](https://github.com/krispykrits/TRACE/issues/55) and [#89](https://github.com/krispykrits/TRACE/issues/89); no content has been moved. Baseline is tracked files at `5c51f61d1ba2f35c84dcf9fc7d79946c9db0499c`. Groups below include their descendants; this is a migration inventory, not a finding that every item has the same sensitivity or can be deleted. Inspect individual content and consumers before any move. See the [platform design](../architecture/s7-platform-design.md) for runtime and operational contracts.
 
+The [file-level migration inventory](s7-file-inventory.md) enumerates tracked documents and non-report corpus/evaluation inputs, and lists report bundles with their manifests. At baseline `7568d22`, a read-only SHA-256 check matched all 151 artifacts declared by `local_mvp_comparison_offline_v3`, all 45 declared by `investigator_offline_v1`, and all 18 declared by `local_mvp_tool_capacity_probe_v1`. This checks 214 declared artifact bytes; it does not validate undeclared files or destination access.
+
+For `local_mvp_comparison_offline_v3`, a separate detached worktree at its recorded implementation commit `897caecdd1a54e14f0d7f9bbf46ef0423e5abb22` rescored the baseline report with network sockets and subprocess dispatch blocked. The result matched the saved score bytes exactly (SHA-256 `464982ddff6ecae87d49c98eee89ffea5aba4d368fc346cf3a62f7679def59c9`). This verifies that report at the recorded checkout, not the other reports, a migrated destination, live Azure output or model quality.
+
 ## Baseline inventory and proposed homes
 
 | Current group | Purpose / reader | State and proposed canonical home | Dependencies, sensitivity and retention decision |
@@ -20,6 +24,8 @@ Status: **review draft**, coordinated with [#55](https://github.com/krispykrits/
 | Future .NET telemetry, operational records and datasets | Testbed engineers, authorized investigators and evaluators | Workload/source contracts in trace-testbed; approved recordings and evidence in private artifact storage | Not present merely because planned. Classify source, access/transmission, field scope, use, retention and provenance before import. |
 
 The owner accepts private Azure Blob as the planned S8 destination for appropriate large datasets and retained evaluation outputs; it is not an existing configured service or authorization to provision one. Temporary CI outputs may use GitHub Actions artifacts with explicit retention. No new documentation-only repository is proposed. The owner selected their OneDrive for project knowledge for now and requires adviser access to detailed planning, research and academic/defense notes. The account type, access configuration, retention and continued access must be confirmed before migration; no folder creation or sharing is implied.
+
+Suggested OneDrive navigation: `TRACE Capstone/Planning`, `Research`, `Adviser Reviews`, `Experiments`, and `Report and Defense`. Keep component setup, active contracts and ADRs in their owning repositories and issue acceptance/status in GitHub. For each candidate item, record the canonical home and link rather than maintaining competing copies. Grant the adviser access only after the destination and identity have been verified. [#98](https://github.com/krispykrits/TRACE/issues/98) owns the S8 Blob implementation; data migration remains gated on verified destination, permissions, hashes and reproduction.
 
 ## Artifact manifest contract for implementation
 
