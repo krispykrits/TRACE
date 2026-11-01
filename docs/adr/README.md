@@ -29,6 +29,6 @@ Use [the template](template.md) for a consequential decision. Record the owner, 
 
 An ADR records a scoped decision and its rationale. Its original context, alternatives and measurements may describe an earlier implementation. Current capability/status belongs in [architecture](../architecture/README.md) and [current status](../current-status.md).
 
-Use [the template](template.md) for a consequential decision. Update acceptance/supersession metadata when evidence changes; retain the original decision text and link a replacement for changed direction. A selection ADR can be accepted while implementation remains pending.
+Use [the template](template.md) for a consequential decision. Keep current decisions accurate and remove obsolete records. A selection ADR can be accepted while implementation remains pending.
 
 The [charter input register](../charter.md#open-inputs-and-decision-gates) owns unresolved owner/resource/threshold/permission decisions. The [delivery plan](../planning/capstone-project-plan.md) owns release gates; avoid duplicating those registers here.
