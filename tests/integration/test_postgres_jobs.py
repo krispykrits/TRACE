@@ -32,6 +32,7 @@ from trace_app.investigation.provider import (
     ModelProviderError,
     ModelUsage,
 )
+from trace_app.investigation.worker import InvestigationWorker
 
 DSN = os.environ.get("TRACE_TEST_POSTGRES_DSN")
 PRINCIPAL = (
@@ -272,3 +273,30 @@ class PostgresJobsTests(unittest.TestCase):
                 (metadata["request_id"],),
             ).fetchone()
         self.assertEqual(row, (20, True))
+
+    def test_worker_fails_unpublished_attempt_without_replay(self) -> None:
+        request = InvestigationRequest(
+            "key",
+            "orders",
+            "test",
+            "scope:a",
+            "2026-01-01T00:00:00Z",
+            "2026-01-01T00:01:00Z",
+            max_attempts=1,
+        )
+        job = self.store.submit(request, at=self.now)
+        seen: list[str] = []
+        worker = InvestigationWorker(
+            self.store,
+            lambda claimed: seen.append(claimed.investigation_id),
+            lease_seconds=60,
+        )
+        self.assertTrue(worker.run_once())
+        self.assertFalse(worker.run_once())
+        self.assertEqual(seen, [job.investigation_id])
+        result = self.store.get_investigation(
+            job.investigation_id, access_scope="scope:a"
+        )
+        self.assertEqual(
+            (result.status, result.failure_code), ("failed", "executor_incomplete")
+        )
