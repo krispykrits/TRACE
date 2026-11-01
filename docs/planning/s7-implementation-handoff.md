@@ -2,9 +2,27 @@
 
 Status: proposed handoff for [#55](https://github.com/krispykrits/TRACE/issues/55), coordinated with [#89](https://github.com/krispykrits/TRACE/issues/89). The [hosted contract](../architecture/s7-implementation-contract.md) and [Azure candidate](s7-azure-deployment-candidate.md) define design inputs, not completed cloud capabilities. Owner review and the account-specific gates below remain required. The live comparison runner remains on hold until the redesign is complete.
 
-The [Terraform adoption plan](s7-terraform-adoption.md) records the selected staged import approach, bootstrapped private state container, recovery settings, ownership boundaries, backend template and review gates. No Terraform state has been initialized or imported.
+The [Terraform adoption plan](s7-terraform-adoption.md) records the selected staged import approach, bootstrapped private state container, recovery settings, ownership boundaries, backend template and review gates. The backend was initialized and a preliminary registry plan was checked; no resource has been imported.
 
 ## Repository extraction and release sequence
+
+### Extraction baseline and copy verification (#100)
+
+The starting point for the first extraction increment is main commit `3be2f5e99e06ba69622c27c41b39b9722f01fbde`, before any files are moved. TRACE owns the Python core, CLI, planned API/worker and evaluation; independently owned infrastructure and testbed components can move only when their destination and release path exist. The existing `trace-app` entry point is declared in `pyproject.toml`; the standard credential-free CI runs `make check lint format-check type-check architecture-check test integration package-check`. The locked dependency file has SHA-256 `139dbf8a72d42fa297b5800e7b036a1180b60ad1d92fee5ed98d3a668e94657c`. The existing v3 comparison manifest has SHA-256 `049a75f23f3bf14fe4e6d2cf9b3cda649cb535bb307bad193ff47cccacde837d`; its README identifies its historical implementation checkout and artifact inventory. A baseline is not proof of a successful clean build, migration or hosted implementation.
+
+For an actual copy, maintain a private JSON file containing `version: 1` and a nonempty `files` array. Each entry has a source-relative `source`, destination-relative `destination` and independently recorded lowercase `sha256`. Paths must use POSIX separators and cannot contain dot segments or symlinks. For example, with values chosen by the operator:
+
+```json
+{"version": 1, "files": [{"source": "old/path", "destination": "new/path", "sha256": "<64 lowercase hexadecimal characters>"}]}
+```
+
+```sh
+uv run --locked python scripts/verify_extraction.py --source-root SOURCE --destination-root DESTINATION --manifest MANIFEST
+```
+
+The command compares both copies with the recorded digest and fails on missing, changed, duplicate or invalid mappings. It does not copy, delete, verify provenance or permissions, create an atomic snapshot, or prove runtime compatibility; keep the inputs stable during verification and perform independent clean-checkout builds, link checks and evidence reproduction before removal. Do not commit private manifests. The `trace-platform` destination is not currently verified; no repository or extraction is implied by this tool.
+
+In the initial #100 increment, the existing v3 comparison was rescored successfully at its recorded `897caec` implementation checkout with no provider dispatch, and a temporary renamed copy of its manifest passed the verifier. The installed wheel/CLI and evaluator-exclusion check passed in the clean baseline worktree. These checks do not verify a future destination or complete extraction.
 
 | Step | Work and dependency | Completion evidence and rollback |
 | --- | --- | --- |
