@@ -2,7 +2,7 @@
 
 Status: proposed handoff for [#55](https://github.com/krispykrits/TRACE/issues/55), coordinated with [#89](https://github.com/krispykrits/TRACE/issues/89). The [hosted contract](../architecture/s7-implementation-contract.md) and [Azure candidate](s7-azure-deployment-candidate.md) define design inputs, not completed cloud capabilities. Owner review and the account-specific gates below remain required. The live comparison runner remains on hold until the redesign is complete.
 
-The [Terraform adoption plan](s7-terraform-adoption.md) records the selected staged import approach, bootstrapped private state container, recovery settings, ownership boundaries, backend template and review gates. No Terraform state has been initialized or imported.
+The [Terraform adoption plan](s7-terraform-adoption.md) records the selected staged import approach, bootstrapped private state container, recovery settings, ownership boundaries, backend template and review gates. The backend was initialized and a preliminary registry plan was checked; no resource has been imported.
 
 ## Repository extraction and release sequence
 
