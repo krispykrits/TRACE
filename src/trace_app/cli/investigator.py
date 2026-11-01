@@ -22,7 +22,13 @@ from trace_app.investigation.models import (
 from trace_app.investigation.provider import ModelErrorCode, ModelProviderError
 from trace_app.runtime.logging import configure_logging
 
-COMMANDS = ("investigate", "report", "cancel-investigation")
+COMMANDS = (
+    "investigate",
+    "prepare-investigation",
+    "run-prepared-investigation",
+    "report",
+    "cancel-investigation",
+)
 
 
 def add_commands(commands: Any) -> None:
@@ -41,6 +47,20 @@ def add_commands(commands: Any) -> None:
         required=True,
         choices=("azure", "evidence-only", "offline-fixture"),
     )
+    prepare = commands.add_parser(
+        "prepare-investigation", help="capture and queue a trusted local investigation"
+    )
+    prepare.add_argument("--service", required=True)
+    prepare.add_argument(
+        "--environment", required=True, choices=("development", "test", "production")
+    )
+    prepare.add_argument("--window-start", required=True)
+    prepare.add_argument("--window-end", required=True)
+    worker = commands.add_parser(
+        "run-prepared-investigation",
+        help="run one captured local job in evidence-only mode",
+    )
+    worker.add_argument("--investigation-id", required=True)
     show = commands.add_parser(
         "report",
         help="inspect or export a saved investigation with current permissions",
@@ -52,7 +72,7 @@ def add_commands(commands: Any) -> None:
         "cancel-investigation", help="cancel a queued/running local investigation"
     )
     cancel.add_argument("--investigation-id", required=True)
-    for command in (start, show, cancel):
+    for command in (start, prepare, worker, show, cancel):
         command.add_argument("--format", choices=("text", "json"), default="text")
         command.add_argument(
             "--output",
@@ -126,7 +146,7 @@ def run(parsed: argparse.Namespace) -> int:
     try:
         if parsed.output and parsed.format != "json":
             raise ValueError("Export requires JSON.")
-        if parsed.command == "investigate":
+        if parsed.command in ("investigate", "prepare-investigation"):
             # Validate caller filters before opening sources, budget journals or credentials.
             from datetime import timedelta
 
@@ -155,6 +175,18 @@ def run(parsed: argparse.Namespace) -> int:
             )
             if parsed.format == "json":
                 data = app.read(data["investigation_id"], export=True)
+        elif parsed.command == "prepare-investigation":
+            job = app.prepare(
+                service=parsed.service,
+                environment=parsed.environment,
+                window_start=parsed.window_start,
+                window_end=parsed.window_end,
+            )
+            data = app.read(job.investigation_id, export=parsed.format == "json")
+        elif parsed.command == "run-prepared-investigation":
+            data = app.run_prepared(parsed.investigation_id)
+            if parsed.format == "json":
+                data = app.read(parsed.investigation_id, export=True)
         elif parsed.command == "cancel-investigation":
             data = app.cancel(parsed.investigation_id)
             if parsed.format == "json":
@@ -190,6 +222,11 @@ def run(parsed: argparse.Namespace) -> int:
             )
         else:
             print(output)
+        if (
+            parsed.command == "prepare-investigation"
+            and data.get("execution_status") == "queued"
+        ):
+            return 0
         return exit_code(data) if "execution_status" in data else 0
     except ModelProviderError as error:
         if error.code in (
