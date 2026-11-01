@@ -26,6 +26,12 @@ uv run --locked python -m scripts.investigator_fixture --directory /tmp/trace-cl
 
 An insufficient capture is a successful abstention (exit 0). The unreviewed candidate remains pending (exit 7), even when its generated assessment proposes `supported`. Timeout exits 5 with labeled retained evidence and no assessment. Invalid input exits 2 before source/provider access.
 
+## Separate local preparation and execution
+
+`trace-app prepare-investigation --service SERVICE --environment test --window-start START --window-end END --format json` captures and queues a trusted-local investigation without claiming an attempt or calling a model. Use the returned ID with `trace-app run-prepared-investigation --investigation-id ID --format json` in a separate process to run one captured job in evidence-only mode. Repeating a completed or previously attempted job returns its current protected result rather than starting another attempt. A queued row without a completed snapshot cannot be claimed by this command. Both commands use the same trusted local profile and current authorization checks as the existing CLI.
+
+This is a single-job local execution path, not an authenticated HTTP API, general queue consumer, persistent worker, or PostgreSQL dispatch. A queue row and its capture are not committed atomically, and provider configuration is not durably bound to the job; consequently the separate execution command cannot invoke Azure or another model. Hosted identity, shared state, cross-replica idempotency, lease recovery and conservative accounting remain implementation work in #57/#58.
+
 ## Trusted local configuration
 
 The application reads the absolute `TRACE_INVESTIGATOR_PROFILE` environment path. There is no CLI grant/scope/profile/module-path flag. The profile must be a regular file owned by the current Unix user, mode 0600, at most 1 MB and not a symlink. Place it and its source databases/index/private journals in an owner-controlled directory; keep it outside Git. Query service/environment/window filters narrow access and never become grants. A local user able to rewrite trusted files or application composition is trusted; this is not operational authentication or protection from that OS user.
