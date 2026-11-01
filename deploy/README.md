@@ -44,4 +44,4 @@ No resource/account/permission or paid request is authorized by this guide. The 
 
 ## Superseded AWS material
 
-The `cloudwatch/` Terraform and agent files remain unmodified historical preparation. Their old settings and commands select no Azure resources or budget and establish no hosted acceptance. The [archived runbook](../docs/archive/cloudwatch-preparation.md) and superseded ADRs 0002/0003 preserve context; use the Azure path above for future work.
+The retired CloudWatch example remains available in [repository history](https://github.com/krispykrits/TRACE/tree/d5b2a91774b8f965ff90c9a052a3c42be86fd121/deploy/cloudwatch). It does not establish Azure deployment or hosted acceptance.
