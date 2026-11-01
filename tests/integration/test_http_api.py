@@ -98,7 +98,7 @@ class HTTPAPITests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             grants = Grants()
             app = create_app(
-                InvestigationSubmission(
+                lambda _: InvestigationSubmission(
                     PerRequestSQLite(Path(directory) / "jobs.sqlite")
                 ),
                 auth,

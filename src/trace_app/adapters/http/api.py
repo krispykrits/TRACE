@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Annotated, Protocol
+from typing import Annotated, Callable, Protocol
 
 from fastapi import Depends, FastAPI, Header, HTTPException
 from psycopg.conninfo import conninfo_to_dict
@@ -50,6 +50,7 @@ class SubmitRequest(BaseModel):
 
 @dataclass(frozen=True, slots=True)
 class APIContext:
+    principal: Principal
     grant: InvestigationGrant
 
 
@@ -69,7 +70,7 @@ def _response(job: Investigation) -> dict[str, object]:
 
 
 def create_app(
-    submission: InvestigationSubmission,
+    submission_for: Callable[[Principal], InvestigationSubmission],
     authenticator: Authenticator,
     grants: GrantReader,
 ) -> FastAPI:
@@ -90,7 +91,7 @@ def create_app(
             ) from None
         try:
             return APIContext(
-                grants.grant_for(principal.tenant_id, principal.object_id)
+                principal, grants.grant_for(principal.tenant_id, principal.object_id)
             )
         except StoreAccessError:
             raise HTTPException(403, "Access denied.") from None
@@ -106,7 +107,7 @@ def create_app(
         body: SubmitRequest, context: APIContext = Depends(current_context)
     ) -> dict[str, object]:
         try:
-            job = submission.submit(
+            job = submission_for(context.principal).submit(
                 context.grant, **body.model_dump(), at=datetime.now(UTC)
             )
             return _response(job)
@@ -124,7 +125,9 @@ def create_app(
         investigation_id: str, context: APIContext = Depends(current_context)
     ) -> dict[str, object]:
         try:
-            return _response(submission.read(context.grant, investigation_id))
+            return _response(
+                submission_for(context.principal).read(context.grant, investigation_id)
+            )
         except (StoreAccessError, StoreInputError):
             raise HTTPException(404, "Investigation not found.") from None
         except StoreDependencyError:
@@ -136,7 +139,9 @@ def create_app(
     ) -> dict[str, object]:
         try:
             return _response(
-                submission.cancel(context.grant, investigation_id, at=datetime.now(UTC))
+                submission_for(context.principal).cancel(
+                    context.grant, investigation_id, at=datetime.now(UTC)
+                )
             )
         except (StoreAccessError, StoreInputError):
             raise HTTPException(404, "Investigation not found.") from None
@@ -160,4 +165,10 @@ def app_factory() -> FastAPI:
         os.environ["TRACE_ENTRA_API_CLIENT_ID"],
         os.environ["TRACE_ENTRA_DELEGATED_SCOPE"],
     )
-    return create_app(InvestigationSubmission(store), auth, store)
+    return create_app(
+        lambda principal: InvestigationSubmission(
+            PostgresJobs(dsn, principal=(principal.tenant_id, principal.object_id))
+        ),
+        auth,
+        store,
+    )

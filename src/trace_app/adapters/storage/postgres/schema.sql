@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS trace_jobs (
     investigation_id TEXT PRIMARY KEY,
+    submitted_tenant UUID NOT NULL,
+    submitted_object UUID NOT NULL,
     access_scope TEXT NOT NULL,
     submission_key TEXT NOT NULL,
     request_hash TEXT NOT NULL,

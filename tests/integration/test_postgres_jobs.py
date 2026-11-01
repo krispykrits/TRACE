@@ -19,6 +19,10 @@ from trace_app.investigation.models import (
 )
 
 DSN = os.environ.get("TRACE_TEST_POSTGRES_DSN")
+PRINCIPAL = (
+    "00000000-0000-0000-0000-000000000001",
+    "00000000-0000-0000-0000-000000000002",
+)
 
 
 @unittest.skipUnless(
@@ -34,13 +38,23 @@ class PostgresJobsTests(unittest.TestCase):
                     "Queue tests require a disposable trace_test database."
                 )
             connection.execute(
-                "DROP TABLE IF EXISTS trace_job_attempts, trace_jobs CASCADE"
+                "DROP TABLE IF EXISTS trace_job_attempts, trace_jobs, trace_principal_grants CASCADE"
             )
             schema = Path(
                 "src/trace_app/adapters/storage/postgres/schema.sql"
             ).read_text()
             connection.execute(schema)
-        self.store = PostgresJobs(self.dsn)
+            connection.execute(
+                "INSERT INTO trace_principal_grants VALUES (%s,%s,%s,%s,%s,%s)",
+                (
+                    *PRINCIPAL,
+                    "scope:a",
+                    "test",
+                    ["orders"],
+                    ["submit", "read", "cancel"],
+                ),
+            )
+        self.store = PostgresJobs(self.dsn, principal=PRINCIPAL)
         self.now = datetime.now(UTC)
 
     def test_concurrent_submission_claim_and_stale_attempt(self) -> None:
@@ -57,7 +71,11 @@ class PostgresJobsTests(unittest.TestCase):
 
         def submit() -> str:
             barrier.wait()
-            return PostgresJobs(self.dsn).submit(request, at=self.now).investigation_id
+            return (
+                PostgresJobs(self.dsn, principal=PRINCIPAL)
+                .submit(request, at=self.now)
+                .investigation_id
+            )
 
         with ThreadPoolExecutor(max_workers=2) as pool:
             ids = list(pool.map(lambda _: submit(), range(2)))
@@ -104,3 +122,27 @@ class PostgresJobsTests(unittest.TestCase):
                 "cancelled",
             )
         self.assertIsNone(self.store.claim(lease_seconds=60))
+
+    def test_revoked_submitter_cannot_be_claimed(self) -> None:
+        request = InvestigationRequest(
+            "key",
+            "orders",
+            "test",
+            "scope:a",
+            "2026-01-01T00:00:00Z",
+            "2026-01-01T00:01:00Z",
+            max_attempts=1,
+        )
+        job = self.store.submit(request, at=self.now)
+        with psycopg.connect(self.dsn) as connection:
+            connection.execute(
+                "DELETE FROM trace_principal_grants WHERE tenant_id=%s AND object_id=%s",
+                PRINCIPAL,
+            )
+        self.assertIsNone(self.store.claim(lease_seconds=60))
+        with psycopg.connect(self.dsn) as connection:
+            row = connection.execute(
+                "SELECT status, failure_code FROM trace_jobs WHERE investigation_id=%s",
+                (job.investigation_id,),
+            ).fetchone()
+        self.assertEqual(row, ("failed", "access_denied"))

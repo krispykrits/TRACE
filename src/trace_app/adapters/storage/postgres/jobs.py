@@ -59,10 +59,11 @@ def _job(row: dict[str, Any]) -> Investigation:
 class PostgresJobs:
     """One short transaction per operation; connections must use TLS in deployment."""
 
-    def __init__(self, dsn: str) -> None:
+    def __init__(self, dsn: str, *, principal: tuple[str, str] | None = None) -> None:
         if not dsn:
             raise ValueError("PostgreSQL connection configuration is required.")
         self._dsn = dsn
+        self._principal = principal
 
     @contextmanager
     def _connection(self) -> Iterator[Any]:
@@ -92,6 +93,31 @@ class PostgresJobs:
                 frozenset(row["actions"]),
             )
 
+    def _authorize(
+        self,
+        connection: Any,
+        *,
+        access_scope: str,
+        service: str,
+        environment: str,
+        action: str,
+    ) -> None:
+        if self._principal is None:
+            raise StoreAccessError("Principal is required.")
+        grant = connection.execute(
+            """SELECT access_scope, environment, services, actions
+            FROM trace_principal_grants WHERE tenant_id=%s AND object_id=%s FOR SHARE""",
+            self._principal,
+        ).fetchone()
+        if (
+            grant is None
+            or grant["access_scope"] != access_scope
+            or grant["environment"] != environment
+            or service not in grant["services"]
+            or action not in grant["actions"]
+        ):
+            raise StoreAccessError("Investigation is not accessible.")
+
     def submit(self, request: InvestigationRequest, *, at: datetime) -> Investigation:
         # Database time is authoritative for all queue and lease transitions.
         if request.max_attempts != 1:
@@ -103,14 +129,24 @@ class PostgresJobs:
         ).hexdigest()
         identity = uuid.uuid4().hex
         with self._connection() as connection:
+            self._authorize(
+                connection,
+                access_scope=request.access_scope,
+                service=request.service,
+                environment=request.environment,
+                action="submit",
+            )
+            assert self._principal is not None
             row = connection.execute(
                 """INSERT INTO trace_jobs
-                (investigation_id, access_scope, submission_key, request_hash, service,
+                (investigation_id, submitted_tenant, submitted_object, access_scope, submission_key, request_hash, service,
                  environment, window_start, window_end, expires_at, max_attempts, status)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'queued')
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'queued')
                 ON CONFLICT (access_scope, submission_key) DO NOTHING RETURNING *""",
                 (
                     identity,
+                    self._principal[0],
+                    self._principal[1],
                     request.access_scope,
                     request.submission_key,
                     digest,
@@ -145,6 +181,13 @@ class PostgresJobs:
             ).fetchone()
             if row is None:
                 raise StoreAccessError("Investigation is not accessible.")
+            self._authorize(
+                connection,
+                access_scope=row["access_scope"],
+                service=row["service"],
+                environment=row["environment"],
+                action="read",
+            )
             return _job(row)
 
     def cancel(
@@ -159,6 +202,13 @@ class PostgresJobs:
             ).fetchone()
             if row is None:
                 raise StoreAccessError("Investigation is not accessible.")
+            self._authorize(
+                connection,
+                access_scope=row["access_scope"],
+                service=row["service"],
+                environment=row["environment"],
+                action="cancel",
+            )
             if row["status"] == "cancelled":
                 return _job(row)
             if row["status"] not in ("queued", "running"):
@@ -179,6 +229,15 @@ class PostgresJobs:
         if type(lease_seconds) is not int or not 1 <= lease_seconds <= 3600:
             raise StoreInputError("Invalid lease duration.")
         with self._connection() as connection:
+            connection.execute(
+                """UPDATE trace_jobs AS j SET status='failed', failure_code='access_denied',
+                finished_at=clock_timestamp() WHERE j.status='queued' AND NOT EXISTS (
+                    SELECT 1 FROM trace_principal_grants AS g
+                    WHERE g.tenant_id=j.submitted_tenant AND g.object_id=j.submitted_object
+                    AND g.access_scope=j.access_scope AND g.environment=j.environment
+                    AND j.service=ANY(g.services) AND 'submit'=ANY(g.actions)
+                )"""
+            )
             # Never replay an expired attempt: a provider call may have occurred.
             stale = connection.execute(
                 """UPDATE trace_jobs SET status='failed', failure_code='outcome_unknown',
