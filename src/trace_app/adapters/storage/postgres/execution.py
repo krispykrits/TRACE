@@ -104,22 +104,31 @@ class PostgresExecutionLedger:
                 )
                 if record is not None:
                     previous = connection.execute(
-                        "SELECT metadata FROM trace_execution_calls WHERE call_id=%s",
+                        "SELECT investigation_id, metadata FROM trace_execution_calls WHERE call_id=%s",
                         (record["call_id"],),
                     ).fetchone()
+                    if (
+                        previous is not None
+                        and previous["investigation_id"] != identity.investigation_id
+                    ):
+                        raise ExecutionRejected("audit_unavailable")
                     merged = {
                         **(json.loads(previous["metadata"]) if previous else {}),
                         **record,
                     }
-                    connection.execute(
+                    saved = connection.execute(
                         """INSERT INTO trace_execution_calls VALUES (%s,%s,%s)
-                        ON CONFLICT (call_id) DO UPDATE SET metadata=excluded.metadata""",
+                        ON CONFLICT (call_id) DO UPDATE SET metadata=excluded.metadata
+                        WHERE trace_execution_calls.investigation_id=excluded.investigation_id
+                        RETURNING call_id""",
                         (
                             record["call_id"],
                             identity.investigation_id,
                             json.dumps(merged, allow_nan=False),
                         ),
-                    )
+                    ).fetchone()
+                    if saved is None:
+                        raise ExecutionRejected("audit_unavailable")
                 return record
         except ExecutionRejected:
             raise
