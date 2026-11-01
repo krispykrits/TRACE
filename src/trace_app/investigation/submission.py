@@ -26,6 +26,7 @@ class InvestigationGrant:
     access_scope: str
     environment: str
     services: frozenset[str]
+    actions: frozenset[str]
 
 
 class InvestigationStore(Protocol):
@@ -47,8 +48,14 @@ class InvestigationSubmission:
         self._store = store
 
     @staticmethod
-    def _authorize(grant: InvestigationGrant, service: str, environment: str) -> None:
-        if environment != grant.environment or service not in grant.services:
+    def _authorize(
+        grant: InvestigationGrant, service: str, environment: str, action: str
+    ) -> None:
+        if (
+            action not in grant.actions
+            or environment != grant.environment
+            or service not in grant.services
+        ):
             raise StoreAccessError("Investigation is not accessible.")
 
     def submit(
@@ -62,7 +69,7 @@ class InvestigationSubmission:
         window_end: str,
         at: datetime,
     ) -> Investigation:
-        self._authorize(grant, service, environment)
+        self._authorize(grant, service, environment, "submit")
         request = InvestigationRequest(
             submission_key=submission_key,
             service=service,
@@ -77,16 +84,23 @@ class InvestigationSubmission:
         return self._store.submit(request, at=at)
 
     def read(self, grant: InvestigationGrant, investigation_id: str) -> Investigation:
+        return self._load(grant, investigation_id, "read")
+
+    def _load(
+        self, grant: InvestigationGrant, investigation_id: str, action: str
+    ) -> Investigation:
+        if action not in grant.actions:
+            raise StoreAccessError("Investigation is not accessible.")
         job = self._store.get_investigation(
             investigation_id, access_scope=grant.access_scope
         )
-        self._authorize(grant, job.request.service, job.request.environment)
+        self._authorize(grant, job.request.service, job.request.environment, action)
         return job
 
     def cancel(
         self, grant: InvestigationGrant, investigation_id: str, *, at: datetime
     ) -> Investigation:
-        self.read(grant, investigation_id)
+        self._load(grant, investigation_id, "cancel")
         return self._store.cancel(
             investigation_id, access_scope=grant.access_scope, at=at
         )
