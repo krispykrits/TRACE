@@ -1,8 +1,28 @@
 # Azure deployment candidate and cost handoff
 
-Status: **candidate for #55 review**, not a selected SKU, subscription quote, resource plan or deployment authorization. The owner's $15/month infrastructure target and separate $20/month model allowance remain unchanged. The [earlier partial scenario](azure-cost-scenario-s7.md) explains 20-hour compute sensitivity; this document adds a more explicit bill of resources and implementation checks. The owner's Azure for Students offer, North Central US preference, on-demand schedule, no HA requirement and approximately 14-day retention are planning inputs, not verified account properties.
+Status: **draft for #55 review**. The original candidate and retail scenario below are historical; the observed development resources are recorded separately. They are not a subscription quote or hosted acceptance. The owner's $15/month infrastructure target and separate $20/month model allowance remain unchanged. The [earlier partial scenario](azure-cost-scenario-s7.md) explains 20-hour compute sensitivity; this document adds a more explicit bill of resources and implementation checks. The owner's Azure for Students offer, North Central US preference, on-demand schedule, no HA requirement and approximately 14-day retention are planning inputs, not verified account properties.
 
-## Candidate shape
+## Observed development environment — 2026-11-01
+
+These are development observations, not production sizing or hosted application acceptance. Subscription identifiers, endpoints, usernames and secrets stay outside this repository.
+
+| Area | Observed state and evidence | Remaining work |
+| --- | --- | --- |
+| AKS | Azure for Students, West US 3, Base/Free tier, Kubernetes 1.36.4, one manually scaled system pool with two D2s v4 Linux nodes. Cluster was stopped after monitoring setup. | Measure application requests, limits and capacity; confirm node disk and upgrade behavior. Stopped compute does not remove all retained-resource charges. |
+| AKS authentication | Portal showed Microsoft Entra authentication with Azure RBAC, local accounts disabled, OIDC issuer and Workload Identity enabled. | Bind exact service-account subjects to managed identities; assign narrow scopes and test valid, wrong-subject and revoked access. Cluster settings do not prove a pod can access Foundry, Key Vault, sources or PostgreSQL. |
+| Registry | Basic ACR in North Central US; an AKS test pod successfully pulled a published sample image. | Build and verify TRACE images, provenance and immutable digests under #56; a sample image is not a TRACE release. |
+| PostgreSQL | Flexible Server in Canada Central, PostgreSQL 18.6, B1ms (1 vCore, 2 GiB), 32 GiB storage, HA disabled; the server was running at last inspection. A TLS-verified AKS connection succeeded. | Measure cross-region latency and transfer, verify app access and roles, migration, storage type, backup/restore and recovery. Avoid logging credentials. |
+| pgvector | Server allowlist updated for vector; a dedicated development database created. Owner reports CREATE EXTENSION and query returned vector 0.8.7. | Preserve owner-reported provenance; verify vector operations, compatibility, least-privilege app roles and reproducible migrations under #57. |
+| Observability | West US 3 Log Analytics workspace connected to AKS Container Insights for container logs and Kubernetes events; workspace default retention was 30 days. A separate North Central US workspace exists. | Verify ingestion on next cluster run; approve table-specific retention and readers; test redaction and collector recovery under #59. |
+| Backups | PostgreSQL automatic backup retention was seven days; portal reports on-demand backups unsupported on the burstable tier. | Test restore and select data-specific recovery/retention requirements; 14 days remains tentative, not an instruction to change settings. |
+
+North Central US remains the preferred original location, but the deployed AKS and PostgreSQL regions differ due to observed availability and quota restrictions. The database was publicly reachable with firewall rules for the connectivity test; private connectivity is a future design objective, not a description of this deployment. Confirm exact firewall scope and suitable application connectivity before hosting.
+
+**Budget direction:** on 2026-11-01 the owner said the budget is fine for now and will be revisited later. This defers further budget decisions; it does not establish an actual monthly bill, erase unknown charges, change the earlier $15 planning target, or change the separate $20 model allowance.
+
+## Historical candidate shape
+
+The table and retail scenario below record the 2026-10-30 proposed scenario, not the deployed SKUs, regions or settings. Use the observed environment above for implementation planning.
 
 | Area | Proposed development/test choice | Review / verification before implementation |
 | --- | --- | --- |
@@ -54,6 +74,6 @@ Use dedicated subnet planning for cluster/database, private database access and 
 
 ## Evidence and gates
 
-Before #55 can be considered complete, prepare a subscription-specific Azure Pricing Calculator breakdown covering every selected component and operating/retention assumption; verify offer/credits, quotas, model location, region availability and relevant roles; record remaining security/data-retention decisions; and review the [hosted implementation contract](../architecture/s7-implementation-contract.md) and [backlog handoff](s7-implementation-handoff.md). If the full configuration exceeds $15, present alternatives and the difference for owner decision. Do not change the budget by inference.
+Owner deferred budget review on 2026-11-01. A complete subscription-specific estimate, free-service eligibility and actual billing remain unverified and should be revisited later; do not infer a new budget. Review remaining identity, network, retention, recovery, Terraform and access decisions alongside the [hosted implementation contract](../architecture/s7-implementation-contract.md) and [backlog handoff](s7-implementation-handoff.md). #55's existing acceptance criteria remain open until reviewed; deferral is not evidence of a completed cost gate.
 
-This design does not create resources, configure alerts, issue paid requests or claim the selected resources were tested. Infrastructure apply, real-source access and paid diagnostic execution retain their own authorization and acceptance gates.
+This document records the development resources and limited tests described above; it does not itself provision resources, configure alerts, issue paid requests or establish hosted application acceptance. Infrastructure apply, real-source access and paid diagnostic execution retain their own authorization and acceptance gates.
