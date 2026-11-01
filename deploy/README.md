@@ -6,7 +6,7 @@ Status: Azure/container/AKS direction is accepted; deployment implementation and
 
 | Responsibility | Planned Azure component |
 | --- | --- |
-| Application runtime | Separate API and persistent investigation worker on AKS from a modular core; shared image allowed; CLI retained |
+| Application runtime | Separate API and persistent investigation worker on AKS from a modular core; shared image allowed |
 | Image delivery | Azure Container Registry and reviewed immutable image digests |
 | Durable shared state | Azure PostgreSQL Flexible Server/pgvector, behind TRACE adapters |
 | Application identity/secrets | Scoped Entra Workload Identity and approved Key Vault access |
@@ -17,7 +17,7 @@ Independent .NET monitored workloads follow [#70–#76](../docs/planning/dotnet-
 
 ## End-state delivery update — 2026-10-15
 
-[ADR 0021](../docs/adr/0021-interactive-platform-and-repository-boundaries.md) selects an authenticated API and persistent investigation worker around the modular Python core. Retain CLI reproduction and keep evaluation in TRACE, excluded from runtime packages/images. Planned repositories: TRACE core/API/worker, trace-web, trace-testbed, trace-platform and trace-executor introduced with S14 remediation. Component CI/Dockerfiles stay with source; platform deployments pin compatible image digests. Repository extraction preserves historical reports/hashes and versioned contracts.
+[ADR 0021](../docs/adr/0021-interactive-platform-and-repository-boundaries.md) selects an authenticated API and persistent investigation worker around the modular Python core. The owner has since directed removal of the local CLI. The registry configuration is in [trace-platform](https://github.com/krispykrits/trace-platform/tree/main/azure/registry); other extraction remains in progress. Keep evaluation out of runtime packages/images, and pin compatible image digests for platform deployments. Preserve historical reports and hashes.
 
 PostgreSQL-backed durable work dispatch is the initial choice: transactional submission, atomic claims, leases, cancellation, retries and shared attempt/spending admission. Reconcile uncertain external outcomes before retrying. No separate broker is required; add one only for demonstrated throughput/latency/contention/consumer needs. Use batch Jobs for evaluation, corpus rebuilds, migrations and scenarios.
 
