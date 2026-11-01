@@ -16,7 +16,7 @@ Use repository records as durable context. Start with the [documentation map](do
 - Target CPython 3.12/Linux with `pyproject.toml` and `uv.lock`. Follow [package boundaries](docs/architecture/package-layout.md) and [ADR 0010](docs/adr/0010-capability-packages-and-adapter-boundaries.md).
 - Capability contracts/use cases depend on the standard library and other core contracts, never concrete adapters, SDKs, CLI/bootstrap, demos or evaluators. External systems belong behind adapters selected explicitly by bootstrap; CLI handlers use composition/application boundaries.
 - Keep runtime configuration/logging under runtime, synthetic fixtures/replay under demo and labels/judgments under evaluation outside the runtime wheel. Do not add flat legacy paths, empty layers/packages, generic common/utils modules, sibling editable dependencies or speculative microservices.
-- Treat Volumes 1–4 as candidate references behind versioned TRACE contracts; Volumes 5–6 are designs implemented within TRACE. The [archived reuse review](docs/archive/2026-09-23-reuse-review.md) explains source findings, not current acceptance.
+- Treat Volumes 1–4 as candidate references behind versioned TRACE contracts; Volumes 5–6 are designs implemented within TRACE.
 - Use cohesive typed modules, explicit errors/failure states and the smallest complete implementation fitting the scoped issue. Prefer standard-library/approved components; justify each dependency and update metadata/lock together.
 - Validate untrusted inputs at boundaries. Keep source access, transmission, citation/revision, support-review and input-derived report sensitivity checks intact across retries/history/storage/inspection/export. Source filters and model text never supply grants. See [security](docs/security/README.md) and [provider policy](docs/architecture/model-provider.md).
 - Keep secrets out of source/errors/logs/fixtures. Emit structured correlated metadata without raw prompts, responses, removed sensitive values or evaluator answers. Numeric usage is actual/unknown, never fabricated.
@@ -49,7 +49,7 @@ Public APIs, brokers, dashboards, new services/resources and autonomous loops re
 
 Follow the [canonical-document map](docs/README.md#keep-documentation-current). Update behavior and its guide in the same PR; update current status for material progress/blockers and charter/plan/ADR/issue when the decision changes. Keep current status short, dated and factual. Use links rather than copying merge histories or requirements across guides.
 
-Distinguish implemented, planned and historical material. Preserve dated evidence; add later acceptance/supersession notes instead of rewriting original measurements. Consolidate unique content and repair incoming links before retiring a guide; record its replacement and original-version link in the archive index.
+Distinguish implemented, planned and historical material. Preserve dated evidence; add later acceptance/supersession notes instead of rewriting original measurements. Remove outdated guides and repair incoming links.
 
 ## Git and pull requests
 

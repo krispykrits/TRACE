@@ -100,7 +100,6 @@ Key implementation references:
 - [Architecture view](docs/architecture/README.md) and [ADR index](docs/adr/README.md)
 - [Infrastructure responsibilities](deploy/README.md)
 - [Operations](docs/operations/README.md) and [security boundaries](docs/security/README.md)
-- [Sprint 1 evidence review](docs/sprints/sprint-01-review.md)
 
 ### Synthetic tool demonstration
 
@@ -119,7 +118,7 @@ uv run --locked python scripts/demo_integration.py \
 make integration-s4
 ```
 
-Produces the scripted cited timeline/context package and verifies the assembled boundary with independent evaluator fixtures. See the [integration contract](docs/architecture/scripted-evidence-package.md) and [Sprint 4 review](docs/sprints/sprint-04-review.md).
+Produces the scripted cited timeline/context package and verifies the assembled boundary with independent evaluator fixtures. See the [integration contract](docs/architecture/scripted-evidence-package.md).
 
 ### Offline investigation demonstration
 

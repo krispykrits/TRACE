@@ -53,7 +53,7 @@ The following milestone titles and descriptions were updated and verified on 202
 
 ## Historical work and platform replacement
 
-Historical #1/#3/#6/#10/#16/#29 retain their earlier local/decision acceptance and state. Their AWS-hosting directions are superseded by ADR 0015 and these cloud stories. In particular #3's closed state is not CloudWatch hosted-delivery evidence; Azure logging acceptance belongs to #59. The legacy deploy/cloudwatch example is historical and not the Azure deployment path. Existing Local MVP boundaries and final Operational Pilot/remediation gates remain in force.
+Historical #1/#3/#6/#10/#16/#29 retain their earlier local/decision acceptance and state. Their AWS-hosting directions are superseded by ADR 0015 and these cloud stories. In particular #3's closed state is not CloudWatch hosted-delivery evidence; Azure logging acceptance belongs to #59. Azure Monitor is the selected logging path. Existing Local MVP boundaries and final Operational Pilot/remediation gates remain in force.
 
 ## .NET monitored workload addition — 2026-10-14
 

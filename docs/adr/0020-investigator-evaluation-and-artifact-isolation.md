@@ -28,4 +28,4 @@ The mechanism proves local orchestration, artifact integrity and exercised bound
 
 ## Evidence
 
-The [evaluation contract](../architecture/investigator-evaluation.md), [predeclared protocol](../../evaluation/investigator_protocol_v1.json), [Sprint 5 review](../sprints/sprint-05-review.md) and linked #39 PR record commands, actual test/run results and unresolved owner gates.
+The [evaluation contract](../architecture/investigator-evaluation.md), [predeclared protocol](../../evaluation/investigator_protocol_v1.json) and linked #39 PR record commands, actual test/run results and unresolved owner gates.
