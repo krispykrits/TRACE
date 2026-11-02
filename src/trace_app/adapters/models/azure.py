@@ -128,6 +128,23 @@ def load_azure_settings(setup: Path, secrets: Path) -> tuple[AzureModelSettings,
         raise ModelProviderError(ModelErrorCode.CONFIGURATION) from None
 
 
+def load_entra_settings(setup: Path) -> AzureModelSettings:
+    values = _private_values(setup)
+    try:
+        if values["AZURE_OPENAI_AUTH_METHOD"] != "entra":
+            raise ValueError("Entra authentication is required.")
+        return AzureModelSettings(
+            values["AZURE_OPENAI_BASE_URL"],
+            values["AZURE_OPENAI_DEPLOYMENT"],
+            values.get("AZURE_OPENAI_MODEL_ID", "gpt-6-luna"),
+            values["AZURE_OPENAI_MODEL_VERSION"],
+            values.get("AZURE_OPENAI_CONFIGURATION_ID", "azure-luna-config.v1"),
+            values["AZURE_OPENAI_DEPLOYMENT_TYPE"],
+        )
+    except (KeyError, ValueError):
+        raise ModelProviderError(ModelErrorCode.CONFIGURATION) from None
+
+
 class AzureResponsesTransport:
     """Only prepared text reaches this edge; no evidence or policy-store handles."""
 
@@ -137,11 +154,12 @@ class AzureResponsesTransport:
         api_key: str,
         guard: AdmissionGuard,
         *,
+        token_provider: Callable[[], str] | None = None,
         connection_factory: Callable[
             ..., http.client.HTTPSConnection
         ] = http.client.HTTPSConnection,
     ) -> None:
-        if (
+        if token_provider is None and (
             not api_key
             or not api_key.isascii()
             or not api_key.isprintable()
@@ -150,6 +168,7 @@ class AzureResponsesTransport:
             raise ModelProviderError(ModelErrorCode.CREDENTIALS_MISSING)
         self._settings = settings
         self._key = api_key
+        self._token_provider = token_provider
         self._guard = guard
         self._connection_factory = connection_factory
 
@@ -160,11 +179,17 @@ class AzureResponsesTransport:
             or request.bounds.max_output_tokens < 16
         ):
             raise ModelProviderError(ModelErrorCode.CONFIGURATION)
+        try:
+            credential = self._token_provider() if self._token_provider else self._key
+        except Exception:
+            raise ModelProviderError(ModelErrorCode.AUTHENTICATION) from None
+        if not credential or not credential.isascii() or not credential.isprintable():
+            raise ModelProviderError(ModelErrorCode.AUTHENTICATION)
         # Defense in depth for credential-bearing metadata or trusted templates.
         if (
-            self._key in request.instructions
-            or self._key in request.source_context
-            or self._key in json.dumps(request.metadata())
+            credential in request.instructions
+            or credential in request.source_context
+            or credential in json.dumps(request.metadata())
         ):
             raise ModelProviderError(ModelErrorCode.POLICY)
         endpoint = urlsplit(self._settings.base_url)
@@ -191,7 +216,14 @@ class AzureResponsesTransport:
                         "truncation": "disabled",
                     }
                 ).encode(),
-                headers={"Content-Type": "application/json", "api-key": self._key},
+                headers={
+                    "Content-Type": "application/json",
+                    **(
+                        {"Authorization": f"Bearer {credential}"}
+                        if self._token_provider
+                        else {"api-key": credential}
+                    ),
+                },
             )
             response = connection.getresponse()
             if response.status != 200:
@@ -276,8 +308,9 @@ class AzureResponsesTransport:
             operation_id = envelope.get("id")
             if (
                 len(texts) != 1
+                or credential in texts[0]
                 or not isinstance(operation_id, str)
-                or self._key in operation_id
+                or credential in operation_id
             ):
                 raise ModelProviderError(ModelErrorCode.MALFORMED_RESPONSE, usage=usage)
             return ModelReply(

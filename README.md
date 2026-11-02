@@ -24,7 +24,7 @@ flowchart TD
     Executor --> Target["Approved action and verification"]
 ```
 
-TRACE retains a modular Python core deployed as an HTTP API and persistent investigation worker. CLI remains for local execution and evaluation. PostgreSQL supplies durable work dispatch and shared admission; a separate broker is not initially required. Planned repositories separate TRACE core/API/worker, web, monitored .NET testbed, platform and later executor. JSON and Azure Monitor are initial implementations behind flexible capability contracts.
+TRACE retains a modular Python core deployed as an HTTP API and persistent investigation worker. PostgreSQL supplies durable work dispatch and shared admission; a separate broker is not initially required. Planned repositories separate TRACE core/API/worker, web, monitored .NET testbed, platform and later executor. JSON and Azure Monitor are initial implementations behind flexible capability contracts.
 
 ML addresses a justified incident-analysis task, such as anomaly detection or signal prioritization. Candidate approaches include classical ML, deep learning, pretrained models and other suitable ML methods. The use case and method are selected through measured benefit against appropriate baselines, considering quality, reliability, latency, cost and operational complexity.
 
@@ -81,7 +81,7 @@ Customer and Notification begin as lightweight fixtures. The first investigator 
 
 Sprint numbers are provisional scope increments, not calendar commitments. Capacity, budgets, remaining technology choices and acceptance thresholds are recorded in the charter, plan and ADRs.
 
-The repository currently contains planning records, a Python CLI, synthetic workflows and local investigation demonstrations. The roadmap and linked acceptance evidence track delivery of the target architecture.
+The repository contains the investigation core, hosted API and worker, synthetic workflows and evaluation tools. The roadmap and linked acceptance evidence track delivery of the target architecture.
 
 ## Local development
 
@@ -129,12 +129,6 @@ uv run --locked python -m scripts.demo_investigator \
 
 Use a fresh private output path. The demonstration covers answerable, insufficient-evidence and timeout cases using hand-authored model/review records.
 
-Investigate and inspect saved results through the [local investigator CLI](docs/architecture/investigator-cli.md). One-command offline reproduction (fresh directory):
-
-~~~sh
-uv run --locked python -m scripts.investigator_fixture --directory /tmp/trace-cli-example
-~~~
-
 The [bounded investigation use case](docs/architecture/bounded-investigator.md) connects scoped evidence, provider policy, finite execution and protected assessment publication. These offline demonstrations do not establish live diagnostic quality or grant operational execution authority.
 
-Run and deterministically rescore the first investigator's ten-case development/boundary protocol with `python -m evaluation.investigator run --output <fresh-directory>` and `rescore --run-dir <directory>`. The [Sprint 5 evaluation contract](docs/architecture/investigator-evaluation.md) separates actual CLI assembly with a hand-authored provider from real diagnosis, actual human support and Local MVP acceptance.
+Run and deterministically rescore the first investigator's ten-case development/boundary protocol with `python -m evaluation.investigator run --output <fresh-directory>` and `rescore --run-dir <directory>`. The [Sprint 5 evaluation contract](docs/architecture/investigator-evaluation.md) separates the investigation workflow with a hand-authored provider from real diagnosis, actual human support and Local MVP acceptance.

@@ -1,10 +1,8 @@
-"""Observed-only child harness for actual CLI outputs. Never imports evaluation."""
+"""Observed-only child harness for investigation evaluation. Never imports evaluation."""
 
 from __future__ import annotations
 
 import argparse
-import contextlib
-import io
 import json
 import os
 import sqlite3
@@ -25,8 +23,12 @@ from trace_app.adapters.sources.local_investigator import (
 from trace_app.adapters.storage.sqlite.investigations import SQLiteInvestigationStore
 from trace_app.adapters.tools.local import LocalToolBackend
 from trace_app.bootstrap import create_local_investigator
-from trace_app.cli import main as cli_main
-from trace_app.investigation.models import EvidenceSnapshot, LogPayload
+from trace_app.investigation.assessment_context import AssessmentBoundaryError
+from trace_app.investigation.models import (
+    EvidenceSnapshot,
+    LogPayload,
+    StoreAccessError,
+)
 from trace_app.investigation.provider import (
     AdmissionGuard,
     ModelConfiguration,
@@ -234,36 +236,41 @@ def execute(
             duration_clock=clock,
         )
 
-    def invoke(arguments):
-        output, errors = io.StringIO(), io.StringIO()
-        with contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
-            status = cli_main(arguments)
-        return status, output.getvalue()
+    def invoke(investigation_id=None):
+        app = None
+        try:
+            app = create_local_investigator(
+                profile_path, clock=clock, fixture_provider=provider
+            )
+            if investigation_id is None:
+                data = app.investigate(
+                    service="order",
+                    environment="test",
+                    window_start=configuration["window_start"],
+                    window_end=configuration["window_end"],
+                    provider="offline-fixture",
+                )
+                investigation_id = data["investigation_id"]
+            data = app.read(investigation_id, export=True)
+            failure = data.get("failure_code")
+            status = (
+                5
+                if failure in ("timeout", "expired")
+                else 3
+                if data.get("execution_status") == "failed"
+                else 7
+                if data.get("assessment_status") == "pending" and data.get("report")
+                else 0
+            )
+            return status, json.dumps(data)
+        except (AssessmentBoundaryError, StoreAccessError, ModelProviderError):
+            return 4, ""
+        finally:
+            if app is not None:
+                app.close()
 
     configuration = json.loads(profile_path.read_text())["fixture"]
-    args = [
-        "investigate",
-        "--service",
-        "order",
-        "--environment",
-        "test",
-        "--window-start",
-        configuration["window_start"],
-        "--window-end",
-        configuration["window_end"],
-        "--provider",
-        "offline-fixture",
-        "--format",
-        "json",
-    ]
     with (
-        patch.dict(os.environ, {"TRACE_INVESTIGATOR_PROFILE": str(profile_path)}),
-        patch(
-            "trace_app.cli.investigator.create_local_investigator",
-            lambda path: create_local_investigator(
-                path, clock=clock, fixture_provider=provider
-            ),
-        ),
         patch.object(LocalSupportReviews, "read", reviews),
         patch("trace_app.investigation.workflow.WORKFLOW_PROMPT", prompt_id),
     ):
@@ -274,9 +281,9 @@ def execute(
                 "execute",
                 side_effect=RuntimeError("Synthetic source failure"),
             ):
-                status, output = invoke(args)
+                status, output = invoke()
         else:
-            status, output = invoke(args)
+            status, output = invoke()
         latency = (time.perf_counter() - started) * 1000
         result = json.loads(output) if output else None
         if result and result.get("report"):
@@ -289,29 +296,13 @@ def execute(
                 data = json.loads(retained)
                 data[field] = value
                 profile_path.write_text(json.dumps(data))
-                denied, content = invoke(
-                    [
-                        "report",
-                        "--investigation-id",
-                        result["investigation_id"],
-                        "--format",
-                        "json",
-                    ]
-                )
+                denied, content = invoke(result["investigation_id"])
                 records["guard_checks"][probe] = denied == 4 and not content
             data = json.loads(retained)
             for grant in data["grants"].values():
                 grant["transmission_allowed"] = False
             profile_path.write_text(json.dumps(data))
-            denied, content = invoke(
-                [
-                    "report",
-                    "--investigation-id",
-                    result["investigation_id"],
-                    "--format",
-                    "json",
-                ]
-            )
+            denied, content = invoke(result["investigation_id"])
             records["guard_checks"]["transmission_revoked"] = (
                 denied == 4 and not content
             )

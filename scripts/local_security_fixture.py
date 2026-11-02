@@ -77,7 +77,6 @@ def execute(root: Path, mode: str) -> None:
 
     generate = ScriptedModel.generate
     backend = LocalToolBackend.execute
-    cli = suite.cli_main
     logs: list[str] = []
 
     def observed_model(self, request):
@@ -110,21 +109,19 @@ def execute(root: Path, mode: str) -> None:
             raise AssertionError("Evaluator canary reached a tool result.")
         return result
 
-    def observed_cli(arguments):
-        stream = io.StringIO()
-        with contextlib.redirect_stderr(stream):
-            result = cli(arguments)
-        logs.append(stream.getvalue())
-        return result
-
     policy = asdict(replace(DEMO_POLICY, max_tool_calls=40, max_input_tokens=16384))
+    stream = io.StringIO()
     with (
         patch.object(suite, "transform", source),
         patch.object(ScriptedModel, "generate", observed_model),
         patch.object(LocalToolBackend, "execute", observed_tool),
-        patch.object(suite, "cli_main", observed_cli),
+        contextlib.redirect_stderr(stream),
     ):
+        from trace_app.runtime.logging import configure_logging
+
+        configure_logging(level="INFO")
         suite.execute(root, "c01", "none", policy=policy, reviewed=False)
+    logs.append(stream.getvalue())
     result = (root / "result.json").read_text()
     execution = (root / "execution.json").read_text()
     combined = result + execution + "".join(logs)

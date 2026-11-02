@@ -1,10 +1,7 @@
-.PHONY: sync run check lint format-check type-check architecture-check package-check test integration integration-live integration-semantic retrieval-evaluate integration-s4 clean
+.PHONY: sync check lint format-check type-check architecture-check package-check test integration integration-live integration-semantic retrieval-evaluate integration-s4 clean
 
 sync:
 	uv sync --locked
-
-run:
-	uv run --locked trace-app
 
 check:
 	uv run --locked python -m compileall -q src tests scripts evaluation

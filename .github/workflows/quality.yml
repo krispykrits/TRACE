@@ -51,10 +51,43 @@ jobs:
         run: make architecture-check
       - name: Unit and contract tests
         run: make test
-      - name: Storage, evaluation and CLI integration tests
+      - name: Storage and evaluation integration tests
         run: make integration
       - name: Installed runtime wheel
         run: make package-check
+
+  postgres-integration:
+    name: PostgreSQL queue integration
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: trace_test
+          POSTGRES_PASSWORD: trace_test
+          POSTGRES_DB: trace_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U trace_test -d trace_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: "0.12.17"
+      - run: uv sync --locked
+      - name: Exercise concurrent queue operations
+        env:
+          TRACE_TEST_POSTGRES_DSN: postgresql://trace_test:trace_test@localhost:5432/trace_test
+        run: uv run --locked python -m unittest tests.integration.test_postgres_jobs -v
 
   live-provider-integration:
     name: Opt-in live provider integration
