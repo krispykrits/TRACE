@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import threading
 import time
@@ -456,10 +458,12 @@ class PostgresJobsTests(unittest.TestCase):
 
         class Authority:
             allowed = True
+            calls = 0
 
             def resolve(
                 self, current: ProviderScope, evidence_id: str
             ) -> AuthorizedEvidence | None:
+                self.calls += 1
                 if (
                     current != scope
                     or evidence_id != record.evidence_id
@@ -487,6 +491,16 @@ class PostgresJobsTests(unittest.TestCase):
                 )
 
         authority = Authority()
+        wrong_scope = ProviderScope("wrong-principal", job.investigation_id)
+        denied = PostgresEvidenceStore(
+            PostgresWorkflowStore(self.dsn),
+            identity,
+            SourceAccessPolicy(authority, wrong_scope),
+            clearance=Sensitivity.INTERNAL,
+        )
+        with self.assertRaises(StoreAccessError):
+            denied.ingest_snapshot(snapshot)
+        self.assertEqual(authority.calls, 0)
         evidence = PostgresEvidenceStore(
             PostgresWorkflowStore(self.dsn),
             identity,
@@ -499,6 +513,28 @@ class PostgresJobsTests(unittest.TestCase):
             evidence.get_snapshot(job.investigation_id, access_scope="scope:a"),
             snapshot,
         )
+        with psycopg.connect(self.dsn) as connection:
+            original = connection.execute(
+                "SELECT body, fingerprint FROM trace_snapshots WHERE investigation_id=%s",
+                (job.investigation_id,),
+            ).fetchone()
+            assert original is not None
+            changed = json.loads(original[0])
+            changed["data"]["entries"][0]["payload"]["message"] = "changed"
+            forged_hash = hashlib.sha256(
+                canonical(changed["data"]).encode()
+            ).hexdigest()
+            connection.execute(
+                "UPDATE trace_snapshots SET body=%s, fingerprint=%s WHERE investigation_id=%s",
+                (json.dumps(changed), forged_hash, job.investigation_id),
+            )
+        with self.assertRaises(ModelProviderError):
+            evidence.get_snapshot(job.investigation_id, access_scope="scope:a")
+        with psycopg.connect(self.dsn) as connection:
+            connection.execute(
+                "UPDATE trace_snapshots SET body=%s, fingerprint=%s WHERE investigation_id=%s",
+                (*original, job.investigation_id),
+            )
         authority.allowed = False
         with self.assertRaises(ModelProviderError):
             evidence.get_snapshot(job.investigation_id, access_scope="scope:a")

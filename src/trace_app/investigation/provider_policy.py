@@ -361,6 +361,10 @@ class SourceAccessPolicy:
     ) -> None:
         self._authority, self._scope, self._clock = authority, scope, clock
 
+    @property
+    def scope(self) -> ProviderScope:
+        return self._scope
+
     def _sensitive_text(self, value: str) -> bool:
         return bool(_EVALUATOR.search(value)) or any(
             pattern.search(value) for _, pattern in _TEXT_RULES

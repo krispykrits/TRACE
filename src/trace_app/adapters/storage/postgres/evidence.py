@@ -84,37 +84,15 @@ class PostgresEvidenceStore:
         serialized = canonical(data)
         if len(serialized.encode()) > 1_000_000:
             raise StoreInputError("Evidence snapshot exceeds its byte limit.")
-        selections = tuple(
-            EvidenceSelection(
-                entry.record.evidence_id, entry.record.source_revision, ("content",)
-            )
-            for entry in snapshot.entries
-        )
-        contents = {
-            entry.record.evidence_id: canonical(
-                {
-                    "kind": entry.kind,
-                    "record": entry.record.to_dict(),
-                    "payload": asdict(entry.payload),
-                }
-            )
-            for entry in snapshot.entries
-        }
-        binding = self._policy.bind(selections, expected_content=contents)
-        self._policy.check_saved(binding, transmission=False, clearance=self._clearance)
+        selections, contents = self._selections(snapshot)
         fingerprint = hashlib.sha256(serialized.encode()).hexdigest()
-        body = json.dumps(
-            {"data": data, "binding": binding},
-            sort_keys=True,
-            separators=(",", ":"),
-            allow_nan=False,
-        )
         with self._workflow._jobs._connection() as connection:
             job = self._workflow._active(connection, self._identity)
             principal = f"entra:{job['submitted_tenant']}:{job['submitted_object']}"
             if (
-                binding.get("principal_id") != principal
-                or binding.get("investigation_id") != self._identity.investigation_id
+                self._policy.scope.principal_id != principal
+                or self._policy.scope.investigation_id
+                != self._identity.investigation_id
             ):
                 raise StoreAccessError(
                     "Evidence authority does not match the submitter."
@@ -136,8 +114,15 @@ class PostgresEvidenceStore:
                 for entry in snapshot.entries
             ):
                 raise StoreAccessError("Evidence is outside the authorized scope.")
+            binding = self._policy.bind(selections, expected_content=contents)
             self._policy.check_saved(
                 binding, transmission=False, clearance=self._clearance
+            )
+            body = json.dumps(
+                {"data": data, "binding": binding},
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
             )
             row = connection.execute(
                 "INSERT INTO trace_snapshots VALUES (%s,%s,%s,%s) ON CONFLICT (investigation_id) DO NOTHING RETURNING investigation_id",
@@ -163,6 +148,28 @@ class PostgresEvidenceStore:
                     )
                 return 0
             return len(snapshot.entries)
+
+    @staticmethod
+    def _selections(
+        snapshot: EvidenceSnapshot,
+    ) -> tuple[tuple[EvidenceSelection, ...], dict[str, str]]:
+        selections = tuple(
+            EvidenceSelection(
+                entry.record.evidence_id, entry.record.source_revision, ("content",)
+            )
+            for entry in snapshot.entries
+        )
+        contents = {
+            entry.record.evidence_id: canonical(
+                {
+                    "kind": entry.kind,
+                    "record": entry.record.to_dict(),
+                    "payload": asdict(entry.payload),
+                }
+            )
+            for entry in snapshot.entries
+        }
+        return selections, contents
 
     def get_snapshot(
         self, investigation_id: str, *, access_scope: str
@@ -217,9 +224,15 @@ class PostgresEvidenceStore:
                 )
                 if not snapshot.entries or len(snapshot.entries) > 256:
                     raise ValueError("Invalid snapshot size.")
+                selections, contents = self._selections(snapshot)
+                current_binding = self._policy.bind(
+                    selections, expected_content=contents
+                )
+                if current_binding != stored["binding"]:
+                    raise StoreAccessError("Evidence source permissions have changed.")
                 self._policy.check_saved(
                     stored["binding"], transmission=False, clearance=self._clearance
                 )
                 return snapshot
-            except (KeyError, TypeError, ValueError):
+            except (AttributeError, KeyError, TypeError, ValueError):
                 raise StoreDependencyError("Stored evidence is invalid.") from None
