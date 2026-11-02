@@ -7,7 +7,6 @@ permissions:
 jobs:
   publish:
     if: github.ref == 'refs/heads/main'
-    environment: development
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
