@@ -48,7 +48,6 @@ def main() -> int:
                     "Wheel contains content outside the runtime package."
                 )
             if not {
-                "trace_app/cli/__main__.py",
                 "trace_app/knowledge/search.py",
                 "trace_app/investigation/tools.py",
                 "trace_app/investigation/bundle.py",
@@ -66,7 +65,6 @@ def main() -> int:
                 "trace_app/investigation/workflow.py",
                 "trace_app/investigation/reports.py",
                 "trace_app/investigation/local_service.py",
-                "trace_app/cli/investigator.py",
                 "trace_app/adapters/storage/sqlite/reports.py",
                 "trace_app/adapters/sources/local_investigator.py",
                 "trace_app/investigation/workflow_prompt.py",
@@ -125,91 +123,17 @@ def main() -> int:
         )
         # Only the installed wheel and locked runtime dependencies are available.
         child_env = {"PATH": os.environ.get("PATH", os.defpath)}
-        version = subprocess.run(
-            [str(python), "-I", "-m", "trace_app.cli", "--version"],
-            cwd=temporary,
-            env=child_env,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        if not version.stdout.startswith("trace-app "):
-            raise RuntimeError(
-                "Installed module entry point did not report its version."
-            )
-        console = subprocess.run(
-            [str(environment / "bin/trace-app"), "--version"],
-            cwd=temporary,
-            env=child_env,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        if console.stdout != version.stdout:
-            raise RuntimeError("Console and module entry points disagree.")
-        help_result = subprocess.run(
-            [str(environment / "bin/trace-app"), "--help"],
-            cwd=temporary,
-            env=child_env,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        if not all(
-            command in help_result.stdout
-            for command in ("investigate", "report", "cancel-investigation")
-        ):
-            raise RuntimeError("Installed investigator commands are missing.")
-        invalid = subprocess.run(
-            [
-                str(environment / "bin/trace-app"),
-                "investigate",
-                "--service",
-                "order",
-                "--environment",
-                "test",
-                "--provider",
-                "azure",
-                "--window-start",
-                "invalid",
-                "--window-end",
-                "invalid",
-            ],
-            cwd=temporary,
-            env=child_env,
-            capture_output=True,
-            text=True,
-        )
-        if invalid.returncode != 2 or invalid.stdout:
-            raise RuntimeError(
-                "Installed investigator did not reject invalid input before setup."
-            )
-        env_file = temporary / "settings.env"
-        env_file.write_text("TRACE_ENVIRONMENT=test\n")
-        demo = subprocess.run(
+        subprocess.run(
             [
                 str(python),
                 "-I",
-                "-m",
-                "trace_app.cli",
-                "demo-order",
-                "--env-file",
-                str(env_file),
-                "--order-id",
-                "order-package",
-                "--customer-id",
-                "customer-001",
-                "--amount-cents",
-                "1250",
+                "-c",
+                "import trace_app.adapters.hosted; import trace_app.adapters.http.api",
             ],
             cwd=temporary,
             env=child_env,
             check=True,
-            capture_output=True,
-            text=True,
         )
-        if json.loads(demo.stdout)["status"] != "accepted":
-            raise RuntimeError("Installed synthetic workflow did not complete.")
         excluded = subprocess.run(
             [
                 str(python),
@@ -236,7 +160,7 @@ def main() -> int:
                 "Installed tool worker failed closed-protocol verification."
             )
         print(
-            "Built wheel, installed entry points, synthetic workflow and evaluator exclusion passed."
+            "Built wheel, hosted imports, tool worker and evaluator exclusion passed."
         )
     return excluded.returncode
 

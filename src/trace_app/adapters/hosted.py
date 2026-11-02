@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import os
+import secrets
 import threading
+from collections.abc import Callable
 from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
+from trace_app.adapters.models.azure import AzureResponsesTransport, load_azure_settings
 from trace_app.adapters.models.journal import ModelPricing
+from trace_app.adapters.models.process import ProcessModelProvider
 from trace_app.adapters.sources.local_investigator import (
     LocalEvidenceAuthority,
     LocalInvestigatorProfile,
@@ -17,6 +21,7 @@ from trace_app.adapters.sources.local_investigator import (
 from trace_app.adapters.storage.postgres.evidence import PostgresEvidenceStore
 from trace_app.adapters.storage.postgres.execution import PostgresExecutionLedger
 from trace_app.adapters.storage.postgres.jobs import PostgresJobs
+from trace_app.adapters.storage.postgres.model_journal import PostgresModelJournal
 from trace_app.adapters.storage.postgres.reports import PostgresReportReader
 from trace_app.adapters.storage.postgres.workflow import PostgresWorkflowStore
 from trace_app.adapters.storage.sqlite.investigations import SQLiteInvestigationStore
@@ -32,7 +37,13 @@ from trace_app.investigation.models import (
     Investigation,
     StoreAccessError,
 )
-from trace_app.investigation.provider_policy import ProviderScope, SourceAccessPolicy
+from trace_app.investigation.provider import AdmissionGuard
+from trace_app.investigation.provider_policy import (
+    EvidenceAuthority,
+    PolicyModelProvider,
+    ProviderScope,
+    SourceAccessPolicy,
+)
 from trace_app.investigation.reports import ReportAccess
 from trace_app.investigation.tools import (
     ToolCall,
@@ -42,7 +53,12 @@ from trace_app.investigation.tools import (
     ToolSession,
 )
 from trace_app.investigation.worker import InvestigationWorker
-from trace_app.investigation.workflow import BoundedInvestigation, WorkflowOptions
+from trace_app.investigation.workflow import (
+    WORKFLOW_PROMPT,
+    BoundedInvestigation,
+    WorkflowOptions,
+)
+from trace_app.investigation.workflow_prompt import ASSESSMENT_PROMPT
 
 
 class SourceTools:
@@ -100,8 +116,17 @@ def report_access(
 
 
 class HostedProcessor:
-    def __init__(self, dsn: str, profile: LocalInvestigatorProfile) -> None:
+    def __init__(
+        self,
+        dsn: str,
+        profile: LocalInvestigatorProfile,
+        provider: Callable[
+            [ProviderScope, EvidenceAuthority, ExecutionSession], PolicyModelProvider
+        ]
+        | None = None,
+    ) -> None:
         self.dsn, self.profile = dsn, profile
+        self.provider = provider
 
     def __call__(self, job: Investigation) -> None:
         if job.active_attempt_id is None:
@@ -180,12 +205,12 @@ class HostedProcessor:
         workflow = BoundedInvestigation(
             store,
             tools,
-            None,
+            self.provider(scope, authority, execution) if self.provider else None,
             authority,
             LocalSupportReviews(self.profile),
             execution,
             scope,
-            options=WorkflowOptions(evidence_only=True),
+            options=WorkflowOptions(evidence_only=self.provider is None),
         )
         try:
             workflow.run()
@@ -201,9 +226,47 @@ def main() -> None:
     if settings.get("sslmode") != "verify-full" or not settings.get("host"):
         raise ValueError("PostgreSQL must use a hostname and sslmode=verify-full.")
     profile = LocalInvestigatorProfile(Path(os.environ["TRACE_SOURCE_PROFILE"]))
+    mode = os.environ.get("TRACE_WORKER_MODE", "azure")
+    provider = None
+    if mode == "azure":
+        azure_settings, api_key = load_azure_settings(
+            Path(os.environ["TRACE_AZURE_SETUP"]),
+            Path(os.environ["TRACE_AZURE_SECRETS"]),
+        )
+
+        def provider(
+            scope: ProviderScope,
+            authority: EvidenceAuthority,
+            execution: ExecutionSession,
+        ) -> PolicyModelProvider:
+            guard = AdmissionGuard(secrets.token_bytes(32))
+            transport = AzureResponsesTransport(azure_settings, api_key, guard)
+            model = ProcessModelProvider(
+                azure_settings.configuration(),
+                azure_settings.capabilities(),
+                transport,
+                credential_present=True,
+                admission_guard=guard,
+            )
+            journal = PostgresModelJournal(
+                dsn, execution.pricing, monthly_limit_nusd=20_000_000_000
+            )
+            return PolicyModelProvider(
+                azure_settings.configuration(),
+                model,
+                authority,
+                journal,
+                guard,
+                scope,
+                {WORKFLOW_PROMPT: ASSESSMENT_PROMPT},
+                known_secrets=(api_key,),
+                execution=execution,
+            )
+    elif mode != "evidence-only":
+        raise ValueError("Unsupported worker mode.")
     worker = InvestigationWorker(
         PostgresJobs(dsn),
-        HostedProcessor(dsn, profile),
+        HostedProcessor(dsn, profile, provider),
         lease_seconds=min(3600, (profile.policy.deadline_ms + 999) // 1000 + 10),
     )
     worker.run(threading.Event())

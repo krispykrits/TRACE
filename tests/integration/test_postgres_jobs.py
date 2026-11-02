@@ -98,10 +98,10 @@ class PostgresJobsTests(unittest.TestCase):
     def test_hosted_worker_and_protected_report(self) -> None:
         from scripts.demo_investigator import Clock
         from scripts.investigator_fixture import prepare
+        from trace_app.adapters.hosted import HostedProcessor, report_access
         from trace_app.adapters.sources.local_investigator import (
             LocalInvestigatorProfile,
         )
-        from trace_app.hosted import HostedProcessor, report_access
 
         with tempfile.TemporaryDirectory() as directory:
             path = prepare(Path(directory) / "source")

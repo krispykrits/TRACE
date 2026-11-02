@@ -51,7 +51,7 @@ jobs:
         run: make architecture-check
       - name: Unit and contract tests
         run: make test
-      - name: Storage, evaluation and CLI integration tests
+      - name: Storage and evaluation integration tests
         run: make integration
       - name: Installed runtime wheel
         run: make package-check

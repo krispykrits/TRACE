@@ -182,8 +182,8 @@ def app_factory() -> FastAPI:
     """Compose the service with operator-provided Entra and PostgreSQL settings."""
     from pathlib import Path
 
+    from trace_app.adapters.hosted import report_access
     from trace_app.adapters.sources.local_investigator import LocalInvestigatorProfile
-    from trace_app.hosted import report_access
 
     dsn = os.environ["TRACE_POSTGRES_DSN"]
     settings = conninfo_to_dict(dsn)
