@@ -15,6 +15,7 @@ import psycopg
 from trace_app.adapters.storage.postgres.execution import PostgresExecutionLedger
 from trace_app.adapters.storage.postgres.jobs import PostgresJobs
 from trace_app.adapters.storage.postgres.model_journal import PostgresModelJournal
+from trace_app.adapters.storage.postgres.reports import PostgresReportReader
 from trace_app.adapters.storage.postgres.workflow import PostgresWorkflowStore
 from trace_app.investigation.bundle import EvidencePackage
 from trace_app.investigation.execution import (
@@ -26,6 +27,7 @@ from trace_app.investigation.execution import (
 from trace_app.investigation.models import (
     Investigation,
     InvestigationRequest,
+    StoreAccessError,
     StoreStateError,
 )
 from trace_app.investigation.provider import (
@@ -365,7 +367,7 @@ class PostgresJobsTests(unittest.TestCase):
         )
         workflow.start(second_identity, at=self.now)
         workflow.phase(second_identity, "gathering", at=self.now)
-        workflow.retain(
+        second_artifact = workflow.retain(
             second_identity,
             EvidencePackage(
                 "partial",
@@ -384,3 +386,14 @@ class PostgresJobsTests(unittest.TestCase):
         self.assertEqual(
             (completed.status, completed.assessment_status), ("completed", "pending")
         )
+        reader = PostgresReportReader(self.dsn, principal=PRINCIPAL)
+        saved = reader.load(second_job.investigation_id, access_scope="scope:a")
+        self.assertEqual(saved.artifacts[0]["artifact_id"], second_artifact)
+        self.assertEqual(saved.attempts[0].outcome, "completed")
+        with psycopg.connect(self.dsn) as connection:
+            connection.execute(
+                "DELETE FROM trace_principal_grants WHERE tenant_id=%s AND object_id=%s",
+                PRINCIPAL,
+            )
+        with self.assertRaises(StoreAccessError):
+            reader.load(second_job.investigation_id, access_scope="scope:a")

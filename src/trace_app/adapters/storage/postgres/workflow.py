@@ -192,7 +192,9 @@ class PostgresWorkflowStore:
         body: str,
     ) -> None:
         connection.execute(
-            "INSERT INTO trace_workflow_artifacts VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+            """INSERT INTO trace_workflow_artifacts
+            (artifact_id,investigation_id,attempt_id,role,version,sensitivity,metadata,body)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
             (
                 artifact_id,
                 identity.investigation_id,

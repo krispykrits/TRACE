@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS trace_snapshots (
 
 CREATE TABLE IF NOT EXISTS trace_workflow_artifacts (
     artifact_id TEXT PRIMARY KEY,
+    ordinal BIGINT GENERATED ALWAYS AS IDENTITY UNIQUE,
     investigation_id TEXT NOT NULL REFERENCES trace_jobs(investigation_id),
     attempt_id BIGINT NOT NULL REFERENCES trace_job_attempts(attempt_id),
     role TEXT NOT NULL,
