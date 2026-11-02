@@ -154,7 +154,7 @@ class PostgresJobsTests(unittest.TestCase):
             self.assertTrue(report["timeline"])
             config["grants"] = {}
             path.write_text(json.dumps(config))
-            with self.assertRaises(Exception):
+            with self.assertRaises(ModelProviderError) as denied:
                 report_access(
                     self.dsn,
                     profile,
@@ -162,6 +162,7 @@ class PostgresJobsTests(unittest.TestCase):
                     job.investigation_id,
                     profile.evidence.access_scope,
                 ).read()
+            self.assertEqual(denied.exception.code, ModelErrorCode.POLICY)
 
     def test_concurrent_submission_claim_and_stale_attempt(self) -> None:
         request = InvestigationRequest(
