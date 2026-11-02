@@ -45,9 +45,3 @@ No resource/account/permission or paid request is authorized by this guide. The 
 ## Superseded AWS material
 
 CloudWatch was superseded by Azure Monitor.
-
-## AKS runtime
-
-The application image is defined by `Dockerfile`; `deploy/aks` defines the internal API and worker. Before applying, set the image to a reviewed ACR digest and replace the worker service-account identity placeholder with the client ID of an identity federated to `system:serviceaccount:trace:trace-worker` and authorized for Foundry. The cluster must have OIDC and workload identity enabled.
-
-The `trace` namespace needs a `trace-runtime` Secret containing `TRACE_POSTGRES_DSN` (TLS `verify-full`), `TRACE_ENTRA_TENANT_ID`, `TRACE_ENTRA_API_CLIENT_ID`, and `TRACE_ENTRA_DELEGATED_SCOPE`. A separately provisioned `trace-source` volume must contain the current authorized `profile.json`, its referenced read-only source databases and knowledge index, and `azure.env` with the Entra model settings. The profile must be owned by UID 10001 with mode 0600. These are prerequisites; the checked-in manifest intentionally does not create credentials, source grants, storage, or a deployable image reference.
