@@ -1,0 +1,35 @@
+name: Publish TRACE image
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    environment: development
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_PUBLISHER_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Build and publish
+        env:
+          ACR_NAME: ${{ vars.ACR_NAME }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$ACR_NAME" =~ ^[a-zA-Z0-9]+$ ]]
+          registry=$(az acr show --name "$ACR_NAME" --query loginServer --output tsv)
+          [[ "$registry" =~ ^[a-z0-9-]+\.azurecr\.io$ ]]
+          az acr login --name "$ACR_NAME"
+          image="$registry/trace:$SOURCE_SHA"
+          docker build --tag "$image" .
+          docker push "$image"
+          digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$image")
+          [[ "$digest" =~ @sha256:[a-f0-9]{64}$ ]]
+          printf 'Image: `%s`\nSource: `%s`\n' "$digest" "$SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
