@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import tempfile
 import threading
 import time
 import unittest
@@ -93,6 +94,74 @@ class PostgresJobsTests(unittest.TestCase):
             )
         self.store = PostgresJobs(self.dsn, principal=PRINCIPAL)
         self.now = datetime.now(UTC)
+
+    def test_hosted_worker_and_protected_report(self) -> None:
+        from scripts.demo_investigator import Clock
+        from scripts.investigator_fixture import prepare
+        from trace_app.adapters.sources.local_investigator import (
+            LocalInvestigatorProfile,
+        )
+        from trace_app.hosted import HostedProcessor, report_access
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = prepare(Path(directory) / "source")
+            config = json.loads(path.read_text())
+            config["principal_id"] = f"entra:{PRINCIPAL[0]}:{PRINCIPAL[1]}"
+            config["expires_at"] = "2099-01-01T00:00:00Z"
+            for grant in config["grants"].values():
+                grant["expires_at"] = config["expires_at"]
+            path.write_text(json.dumps(config))
+            profile = LocalInvestigatorProfile(path, clock=Clock())
+            with psycopg.connect(self.dsn) as connection:
+                connection.execute(
+                    "UPDATE trace_principal_grants SET access_scope=%s,services=%s WHERE tenant_id=%s AND object_id=%s",
+                    (
+                        profile.evidence.access_scope,
+                        list(profile.evidence.allowed_services),
+                        *PRINCIPAL,
+                    ),
+                )
+            request = InvestigationRequest(
+                "hosted",
+                "order",
+                "test",
+                profile.evidence.access_scope,
+                config["fixture"]["window_start"],
+                config["fixture"]["window_end"],
+                max_attempts=1,
+            )
+            job = self.store.submit(request, at=self.now)
+            worker = InvestigationWorker(
+                PostgresJobs(self.dsn),
+                HostedProcessor(self.dsn, profile),
+                lease_seconds=180,
+            )
+            self.assertTrue(worker.run_once())
+            completed = self.store.get_investigation(
+                job.investigation_id, access_scope=profile.evidence.access_scope
+            )
+            self.assertEqual(
+                (completed.status, completed.failure_code), ("completed", None)
+            )
+            report = report_access(
+                self.dsn,
+                profile,
+                PRINCIPAL,
+                job.investigation_id,
+                profile.evidence.access_scope,
+            ).read()
+            self.assertEqual(report["investigation_id"], job.investigation_id)
+            self.assertTrue(report["timeline"])
+            config["grants"] = {}
+            path.write_text(json.dumps(config))
+            with self.assertRaises(Exception):
+                report_access(
+                    self.dsn,
+                    profile,
+                    PRINCIPAL,
+                    job.investigation_id,
+                    profile.evidence.access_scope,
+                ).read()
 
     def test_concurrent_submission_claim_and_stale_attempt(self) -> None:
         request = InvestigationRequest(

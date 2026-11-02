@@ -18,6 +18,7 @@ from trace_app.adapters.auth.entra import EntraAuthenticator
 from trace_app.adapters.http.api import create_app
 from trace_app.adapters.storage.sqlite.investigations import SQLiteInvestigationStore
 from trace_app.investigation.models import Investigation, InvestigationRequest
+from trace_app.investigation.provider import ModelErrorCode, ModelProviderError
 from trace_app.investigation.submission import (
     InvestigationGrant,
     InvestigationSubmission,
@@ -97,12 +98,23 @@ class HTTPAPITests(unittest.TestCase):
         }
         with tempfile.TemporaryDirectory() as directory:
             grants = Grants()
+
+            class Report:
+                denied = False
+
+                def read(self) -> dict[str, str]:
+                    if self.denied:
+                        raise ModelProviderError(ModelErrorCode.POLICY)
+                    return {"report": "authorized"}
+
+            report = Report()
             app = create_app(
                 lambda _: InvestigationSubmission(
                     PerRequestSQLite(Path(directory) / "jobs.sqlite")
                 ),
                 auth,
                 grants,
+                lambda _principal, _job, _scope: report,
             )
             with TestClient(app) as client:
                 self.assertEqual(
@@ -121,6 +133,19 @@ class HTTPAPITests(unittest.TestCase):
                 )
                 self.assertEqual(submitted.status_code, 202)
                 job_id = submitted.json()["investigation_id"]
+                self.assertEqual(
+                    client.get(
+                        f"/investigations/{job_id}/report", headers=headers
+                    ).json(),
+                    {"report": "authorized"},
+                )
+                report.denied = True
+                self.assertEqual(
+                    client.get(
+                        f"/investigations/{job_id}/report", headers=headers
+                    ).status_code,
+                    404,
+                )
                 self.assertEqual(
                     client.post(
                         "/investigations", json=request, headers=headers

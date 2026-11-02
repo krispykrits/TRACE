@@ -17,6 +17,7 @@ from trace_app.adapters.auth.entra import (
     Principal,
 )
 from trace_app.adapters.storage.postgres.jobs import PostgresJobs
+from trace_app.investigation.assessment_context import AssessmentBoundaryError
 from trace_app.investigation.models import (
     Investigation,
     StoreAccessError,
@@ -25,6 +26,7 @@ from trace_app.investigation.models import (
     StoreInputError,
     StoreStateError,
 )
+from trace_app.investigation.provider import ModelProviderError
 from trace_app.investigation.submission import (
     InvestigationGrant,
     InvestigationSubmission,
@@ -73,6 +75,7 @@ def create_app(
     submission_for: Callable[[Principal], InvestigationSubmission],
     authenticator: Authenticator,
     grants: GrantReader,
+    report_for: Callable[[Principal, str, str], object] | None = None,
 ) -> FastAPI:
     app = FastAPI(title="TRACE API", docs_url=None, redoc_url=None, openapi_url=None)
 
@@ -150,16 +153,44 @@ def create_app(
         except StoreDependencyError:
             raise HTTPException(503, "Service unavailable.") from None
 
+    @app.get("/investigations/{investigation_id}/report")
+    def report(
+        investigation_id: str, context: APIContext = Depends(current_context)
+    ) -> dict[str, object]:
+        try:
+            submission_for(context.principal).read(context.grant, investigation_id)
+            if report_for is None:
+                raise StoreDependencyError("Report source is unavailable.")
+            reader = report_for(
+                context.principal, investigation_id, context.grant.access_scope
+            )
+            return reader.read()  # type: ignore[no-any-return,attr-defined]
+        except (
+            StoreAccessError,
+            StoreInputError,
+            AssessmentBoundaryError,
+            ModelProviderError,
+        ):
+            raise HTTPException(404, "Investigation not found.") from None
+        except (StoreDependencyError, OSError):
+            raise HTTPException(503, "Service unavailable.") from None
+
     return app
 
 
 def app_factory() -> FastAPI:
     """Compose the service with operator-provided Entra and PostgreSQL settings."""
+    from pathlib import Path
+
+    from trace_app.adapters.sources.local_investigator import LocalInvestigatorProfile
+    from trace_app.hosted import report_access
+
     dsn = os.environ["TRACE_POSTGRES_DSN"]
     settings = conninfo_to_dict(dsn)
     if settings.get("sslmode") != "verify-full" or not settings.get("host"):
         raise ValueError("PostgreSQL must use a hostname and sslmode=verify-full.")
     store = PostgresJobs(dsn)
+    profile = LocalInvestigatorProfile(Path(os.environ["TRACE_SOURCE_PROFILE"]))
     auth = EntraAuthenticator(
         os.environ["TRACE_ENTRA_TENANT_ID"],
         os.environ["TRACE_ENTRA_API_CLIENT_ID"],
@@ -171,4 +202,11 @@ def app_factory() -> FastAPI:
         ),
         auth,
         store,
+        lambda principal, job_id, access_scope: report_access(
+            dsn,
+            profile,
+            (principal.tenant_id, principal.object_id),
+            job_id,
+            access_scope,
+        ),
     )
