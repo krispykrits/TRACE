@@ -15,6 +15,8 @@ import psycopg
 from trace_app.adapters.storage.postgres.execution import PostgresExecutionLedger
 from trace_app.adapters.storage.postgres.jobs import PostgresJobs
 from trace_app.adapters.storage.postgres.model_journal import PostgresModelJournal
+from trace_app.adapters.storage.postgres.workflow import PostgresWorkflowStore
+from trace_app.investigation.bundle import EvidencePackage
 from trace_app.investigation.execution import (
     ExecutionIdentity,
     ExecutionPolicy,
@@ -54,7 +56,7 @@ class PostgresJobsTests(unittest.TestCase):
                     "Queue tests require a disposable trace_test database."
                 )
             connection.execute(
-                "DROP TABLE IF EXISTS trace_model_redactions, trace_model_attempts, trace_model_months, trace_model_budget, trace_execution_calls, trace_execution_runs, trace_job_attempts, trace_jobs, trace_principal_grants CASCADE"
+                "DROP TABLE IF EXISTS trace_workflow_artifacts, trace_workflow_runs, trace_snapshots, trace_model_redactions, trace_model_attempts, trace_model_months, trace_model_budget, trace_execution_calls, trace_execution_runs, trace_job_attempts, trace_jobs, trace_principal_grants CASCADE"
             )
             schema = Path(
                 "src/trace_app/adapters/storage/postgres/schema.sql"
@@ -300,3 +302,43 @@ class PostgresJobsTests(unittest.TestCase):
         self.assertEqual(
             (result.status, result.failure_code), ("failed", "executor_incomplete")
         )
+
+    def test_workflow_retention_completion_and_fencing(self) -> None:
+        request = InvestigationRequest(
+            "key",
+            "orders",
+            "test",
+            "scope:a",
+            "2026-01-01T00:00:00Z",
+            "2026-01-01T00:01:00Z",
+            max_attempts=1,
+        )
+        self.store.submit(request, at=self.now)
+        job = self.store.claim(lease_seconds=60)
+        assert job is not None and job.active_attempt_id is not None
+        identity = ExecutionIdentity(
+            job.investigation_id, job.active_attempt_id, "correlation", "scope:a"
+        )
+        workflow = PostgresWorkflowStore(self.dsn)
+        workflow.start(identity, at=self.now)
+        with self.assertRaises(StoreStateError):
+            workflow.start(identity, at=self.now)
+        workflow.phase(identity, "gathering", at=self.now)
+        package = EvidencePackage(
+            "partial", {"events": []}, "digest", job.investigation_id, (), None
+        )
+        artifact = workflow.retain(identity, package, at=self.now)
+        self.assertTrue(artifact)
+        with psycopg.connect(self.dsn) as connection:
+            connection.execute(
+                "UPDATE trace_jobs SET lease_until=clock_timestamp()-interval '1 second' WHERE investigation_id=%s",
+                (job.investigation_id,),
+            )
+        with self.assertRaises(StoreStateError):
+            workflow.phase(identity, "evidence_only", at=self.now)
+        with psycopg.connect(self.dsn) as connection:
+            row = connection.execute(
+                "SELECT status FROM trace_jobs WHERE investigation_id=%s",
+                (job.investigation_id,),
+            ).fetchone()
+        self.assertEqual(row, ("running",))

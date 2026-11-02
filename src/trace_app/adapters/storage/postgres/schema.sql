@@ -34,6 +34,32 @@ CREATE TABLE IF NOT EXISTS trace_job_attempts (
 
 CREATE INDEX IF NOT EXISTS trace_jobs_queue_idx ON trace_jobs(status, created_at, investigation_id);
 
+CREATE TABLE IF NOT EXISTS trace_workflow_runs (
+    investigation_id TEXT PRIMARY KEY REFERENCES trace_jobs(investigation_id),
+    attempt_id BIGINT NOT NULL REFERENCES trace_job_attempts(attempt_id),
+    phase TEXT NOT NULL,
+    outcome TEXT,
+    failure_code TEXT
+);
+
+CREATE TABLE IF NOT EXISTS trace_snapshots (
+    investigation_id TEXT PRIMARY KEY REFERENCES trace_jobs(investigation_id),
+    schema_version TEXT NOT NULL,
+    fingerprint TEXT NOT NULL,
+    body TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS trace_workflow_artifacts (
+    artifact_id TEXT PRIMARY KEY,
+    investigation_id TEXT NOT NULL REFERENCES trace_jobs(investigation_id),
+    attempt_id BIGINT NOT NULL REFERENCES trace_job_attempts(attempt_id),
+    role TEXT NOT NULL,
+    version TEXT NOT NULL,
+    sensitivity TEXT NOT NULL,
+    metadata TEXT NOT NULL,
+    body TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS trace_principal_grants (
     tenant_id UUID NOT NULL,
     object_id UUID NOT NULL,
