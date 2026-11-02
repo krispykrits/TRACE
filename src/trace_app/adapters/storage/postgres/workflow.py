@@ -119,6 +119,15 @@ class PostgresWorkflowStore:
                 (name, identity.investigation_id),
             )
             if name == "evidence_only":
+                evidence = connection.execute(
+                    """SELECT 1 FROM trace_workflow_artifacts WHERE investigation_id=%s
+                    AND attempt_id=%s AND role='untrusted_evidence' LIMIT 1""",
+                    (identity.investigation_id, identity.attempt_id),
+                ).fetchone()
+                if evidence is None:
+                    raise StoreStateError(
+                        "Evidence must be retained before completion."
+                    )
                 self._complete(connection, identity, "pending")
                 connection.execute(
                     "UPDATE trace_workflow_runs SET outcome='evidence_only' WHERE investigation_id=%s",

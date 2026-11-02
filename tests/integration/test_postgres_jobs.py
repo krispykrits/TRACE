@@ -324,6 +324,8 @@ class PostgresJobsTests(unittest.TestCase):
         with self.assertRaises(StoreStateError):
             workflow.start(identity, at=self.now)
         workflow.phase(identity, "gathering", at=self.now)
+        with self.assertRaises(StoreStateError):
+            workflow.phase(identity, "evidence_only", at=self.now)
         package = EvidencePackage(
             "partial", {"events": []}, "digest", job.investigation_id, (), None
         )
@@ -342,3 +344,43 @@ class PostgresJobsTests(unittest.TestCase):
                 (job.investigation_id,),
             ).fetchone()
         self.assertEqual(row, ("running",))
+
+        second = InvestigationRequest(
+            "key-2",
+            "orders",
+            "test",
+            "scope:a",
+            "2026-01-01T00:00:00Z",
+            "2026-01-01T00:01:00Z",
+            max_attempts=1,
+        )
+        self.store.submit(second, at=self.now)
+        second_job = self.store.claim(lease_seconds=60)
+        assert second_job is not None and second_job.active_attempt_id is not None
+        second_identity = ExecutionIdentity(
+            second_job.investigation_id,
+            second_job.active_attempt_id,
+            "correlation",
+            "scope:a",
+        )
+        workflow.start(second_identity, at=self.now)
+        workflow.phase(second_identity, "gathering", at=self.now)
+        workflow.retain(
+            second_identity,
+            EvidencePackage(
+                "partial",
+                {"events": []},
+                "digest",
+                second_job.investigation_id,
+                (),
+                None,
+            ),
+            at=self.now,
+        )
+        workflow.phase(second_identity, "evidence_only", at=self.now)
+        completed = self.store.get_investigation(
+            second_job.investigation_id, access_scope="scope:a"
+        )
+        self.assertEqual(
+            (completed.status, completed.assessment_status), ("completed", "pending")
+        )
