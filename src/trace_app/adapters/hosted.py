@@ -10,7 +10,9 @@ from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 
-from trace_app.adapters.models.azure import AzureResponsesTransport, load_azure_settings
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+
+from trace_app.adapters.models.azure import AzureResponsesTransport, load_entra_settings
 from trace_app.adapters.models.journal import ModelPricing
 from trace_app.adapters.models.process import ProcessModelProvider
 from trace_app.adapters.sources.local_investigator import (
@@ -229,10 +231,7 @@ def main() -> None:
     mode = os.environ.get("TRACE_WORKER_MODE", "azure")
     provider = None
     if mode == "azure":
-        azure_settings, api_key = load_azure_settings(
-            Path(os.environ["TRACE_AZURE_SETUP"]),
-            Path(os.environ["TRACE_AZURE_SECRETS"]),
-        )
+        azure_settings = load_entra_settings(Path(os.environ["TRACE_AZURE_SETUP"]))
 
         def provider(
             scope: ProviderScope,
@@ -240,7 +239,13 @@ def main() -> None:
             execution: ExecutionSession,
         ) -> PolicyModelProvider:
             guard = AdmissionGuard(secrets.token_bytes(32))
-            transport = AzureResponsesTransport(azure_settings, api_key, guard)
+            credential = DefaultAzureCredential()
+            token_provider = get_bearer_token_provider(
+                credential, "https://ai.azure.com/.default"
+            )
+            transport = AzureResponsesTransport(
+                azure_settings, "", guard, token_provider=token_provider
+            )
             model = ProcessModelProvider(
                 azure_settings.configuration(),
                 azure_settings.capabilities(),
@@ -259,7 +264,6 @@ def main() -> None:
                 guard,
                 scope,
                 {WORKFLOW_PROMPT: ASSESSMENT_PROMPT},
-                known_secrets=(api_key,),
                 execution=execution,
             )
     elif mode != "evidence-only":

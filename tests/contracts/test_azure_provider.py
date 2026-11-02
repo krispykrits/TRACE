@@ -20,6 +20,7 @@ from tests.fixtures.provider_policy import (
 from trace_app.adapters.models.azure import (
     AzureResponsesTransport,
     load_azure_settings,
+    load_entra_settings,
 )
 from trace_app.investigation.provider import (
     AdmissionGuard,
@@ -33,6 +34,40 @@ from trace_app.investigation.provider import (
 
 
 class AzureContractTests(unittest.TestCase):
+    def test_entra_token_is_sent_as_bearer_and_auth_failure_stops_dispatch(
+        self,
+    ) -> None:
+        token = "nonfunctional-entratoken-for-test"
+        transport = AzureResponsesTransport(
+            SETTINGS,
+            "",
+            self.guard,
+            token_provider=lambda: token,
+            connection_factory=cast(Any, HttpConnection),
+        )
+        transport.generate(self.request)
+        sent = HttpConnection.instances[-1].requests[0]
+        self.assertEqual(sent["headers"]["Authorization"], f"Bearer {token}")
+        self.assertNotIn("api-key", sent["headers"])
+        self.assertNotIn(token, sent["body"].decode())
+
+        def unavailable() -> str:
+            raise RuntimeError(token)
+
+        transport = AzureResponsesTransport(
+            SETTINGS,
+            "",
+            self.guard,
+            token_provider=unavailable,
+            connection_factory=cast(Any, HttpConnection),
+        )
+        count = len(HttpConnection.instances)
+        with self.assertRaises(ModelProviderError) as failure:
+            transport.generate(self.request)
+        self.assertEqual(failure.exception.code, ModelErrorCode.AUTHENTICATION)
+        self.assertNotIn(token, str(failure.exception))
+        self.assertEqual(len(HttpConnection.instances), count)
+
     def test_expiry_during_connect_blocks_http_and_constructor_errors_are_safe(
         self,
     ) -> None:
@@ -299,6 +334,13 @@ class AzureContractTests(unittest.TestCase):
             settings, key = load_azure_settings(setup, secret)
             self.assertEqual(settings, SETTINGS)
             self.assertEqual(key, TEST_AUTH_VALUE)
+            setup.write_text(
+                setup.read_text().replace("AUTH_METHOD=api_key", "AUTH_METHOD=entra")
+            )
+            self.assertEqual(load_entra_settings(setup), SETTINGS)
+            setup.write_text(
+                setup.read_text().replace("AUTH_METHOD=entra", "AUTH_METHOD=api_key")
+            )
             secret.chmod(0o644)
             with self.assertRaises(ModelProviderError):
                 load_azure_settings(setup, secret)

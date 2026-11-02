@@ -9,6 +9,7 @@ description = "Evidence-supported incident diagnosis capstone scaffold"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "azure-identity>=1.25,<2",
     "fastapi>=0.162.0",
     "numpy==2.5.3",
     "psycopg[binary]==3.3.6",
