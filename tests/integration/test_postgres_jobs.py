@@ -7,16 +7,19 @@ import threading
 import time
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
 
 import psycopg
 
+from trace_app.adapters.storage.postgres.evidence import PostgresEvidenceStore
 from trace_app.adapters.storage.postgres.execution import PostgresExecutionLedger
 from trace_app.adapters.storage.postgres.jobs import PostgresJobs
 from trace_app.adapters.storage.postgres.model_journal import PostgresModelJournal
 from trace_app.adapters.storage.postgres.reports import PostgresReportReader
 from trace_app.adapters.storage.postgres.workflow import PostgresWorkflowStore
+from trace_app.evidence.models import EvidenceRecord, SourceAvailability
 from trace_app.investigation.bundle import EvidencePackage
 from trace_app.investigation.execution import (
     ExecutionIdentity,
@@ -25,8 +28,11 @@ from trace_app.investigation.execution import (
     ExecutionState,
 )
 from trace_app.investigation.models import (
+    EvidenceEntry,
+    EvidenceSnapshot,
     Investigation,
     InvestigationRequest,
+    LogPayload,
     StoreAccessError,
     StoreStateError,
 )
@@ -36,7 +42,16 @@ from trace_app.investigation.provider import (
     ModelProviderError,
     ModelUsage,
 )
+from trace_app.investigation.provider_policy import (
+    AuthorizedEvidence,
+    EvidenceField,
+    ProviderScope,
+    Sensitivity,
+    SourceAccessPolicy,
+    SourceKind,
+)
 from trace_app.investigation.worker import InvestigationWorker
+from trace_app.knowledge.models import canonical
 
 DSN = os.environ.get("TRACE_TEST_POSTGRES_DSN")
 PRINCIPAL = (
@@ -397,3 +412,93 @@ class PostgresJobsTests(unittest.TestCase):
             )
         with self.assertRaises(StoreAccessError):
             reader.load(second_job.investigation_id, access_scope="scope:a")
+
+    def test_snapshot_ingestion_rechecks_source_access(self) -> None:
+        request = InvestigationRequest(
+            "key",
+            "orders",
+            "test",
+            "scope:a",
+            "2026-01-01T00:00:00Z",
+            "2026-01-01T00:01:00Z",
+            max_attempts=1,
+        )
+        self.store.submit(request, at=self.now)
+        job = self.store.claim(lease_seconds=60)
+        assert job is not None and job.active_attempt_id is not None
+        identity = ExecutionIdentity(
+            job.investigation_id, job.active_attempt_id, "correlation", "scope:a"
+        )
+        scope = ProviderScope(
+            f"entra:{PRINCIPAL[0]}:{PRINCIPAL[1]}", job.investigation_id
+        )
+        record = EvidenceRecord(
+            "event-1",
+            "orders",
+            "test",
+            "2026-01-01T00:00:20Z",
+            "2026-01-01T00:00:21Z",
+            "source-1",
+            "revision-1",
+            "internal",
+            "reviewed",
+            "corr-1",
+            "order.failed",
+            "a" * 64,
+        )
+        entry = EvidenceEntry("log", record, LogPayload("order failed"))
+        snapshot = EvidenceSnapshot(
+            (entry,),
+            request.window_start,
+            request.window_end,
+            (SourceAvailability("export", "available"),),
+        )
+
+        class Authority:
+            allowed = True
+
+            def resolve(
+                self, current: ProviderScope, evidence_id: str
+            ) -> AuthorizedEvidence | None:
+                if (
+                    current != scope
+                    or evidence_id != record.evidence_id
+                    or not self.allowed
+                ):
+                    return None
+                content = canonical(
+                    {
+                        "kind": entry.kind,
+                        "record": record.to_dict(),
+                        "payload": asdict(entry.payload),
+                    }
+                )
+                return AuthorizedEvidence(
+                    record.evidence_id,
+                    "source",
+                    record.source_revision,
+                    SourceKind.LOGS,
+                    (EvidenceField("content", content, Sensitivity.INTERNAL, True),),
+                    True,
+                    True,
+                    True,
+                    True,
+                    time.time() + 3600,
+                )
+
+        authority = Authority()
+        evidence = PostgresEvidenceStore(
+            PostgresWorkflowStore(self.dsn),
+            identity,
+            SourceAccessPolicy(authority, scope),
+            clearance=Sensitivity.INTERNAL,
+        )
+        self.assertEqual(evidence.ingest_snapshot(snapshot), 1)
+        self.assertEqual(evidence.ingest_snapshot(snapshot), 0)
+        self.assertEqual(
+            evidence.get_snapshot(job.investigation_id, access_scope="scope:a"),
+            snapshot,
+        )
+        authority.allowed = False
+        with self.assertRaises(ModelProviderError):
+            evidence.get_snapshot(job.investigation_id, access_scope="scope:a")
