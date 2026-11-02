@@ -10,6 +10,7 @@ from typing import Any
 import psycopg
 from psycopg.rows import dict_row
 
+from trace_app.adapters.storage.postgres.connection import connect
 from trace_app.investigation.execution import (
     CallTicket,
     ExecutionIdentity,
@@ -36,7 +37,7 @@ class PostgresExecutionLedger:
     ) -> dict[str, object] | None:
         policy_json = json.dumps(asdict(policy), sort_keys=True)
         try:
-            with psycopg.connect(
+            with connect(
                 self._dsn, row_factory=dict_row, connect_timeout=5
             ) as connection:
                 job = connection.execute(

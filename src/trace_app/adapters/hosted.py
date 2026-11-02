@@ -221,6 +221,8 @@ class HostedProcessor:
 
 
 def main() -> None:
+    if os.environ.get("TRACE_POSTGRES_AUTH") != "entra":
+        raise ValueError("Hosted PostgreSQL requires Entra authentication.")
     dsn = os.environ["TRACE_POSTGRES_DSN"]
     from psycopg.conninfo import conninfo_to_dict
 

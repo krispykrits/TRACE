@@ -185,6 +185,8 @@ def app_factory() -> FastAPI:
     from trace_app.adapters.hosted import report_access
     from trace_app.adapters.sources.local_investigator import LocalInvestigatorProfile
 
+    if os.environ.get("TRACE_POSTGRES_AUTH") != "entra":
+        raise ValueError("Hosted PostgreSQL requires Entra authentication.")
     dsn = os.environ["TRACE_POSTGRES_DSN"]
     settings = conninfo_to_dict(dsn)
     if settings.get("sslmode") != "verify-full" or not settings.get("host"):
