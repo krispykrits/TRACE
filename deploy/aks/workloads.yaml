@@ -1,0 +1,155 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: trace
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: trace-worker
+  annotations:
+    azure.workload.identity/client-id: REPLACE_WITH_MANAGED_IDENTITY_CLIENT_ID
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trace-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trace-api
+  template:
+    metadata:
+      labels:
+        app: trace-api
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: api
+          image: trace-runtime
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: trace-runtime
+          env:
+            - name: TRACE_SOURCE_PROFILE
+              value: /var/lib/trace/profile.json
+          volumeMounts:
+            - name: source
+              mountPath: /var/lib/trace
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: source
+          persistentVolumeClaim:
+            claimName: trace-source
+            readOnly: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trace-api
+spec:
+  type: ClusterIP
+  selector:
+    app: trace-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trace-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trace-worker
+  template:
+    metadata:
+      labels:
+        app: trace-worker
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: trace-worker
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: worker
+          image: trace-runtime
+          imagePullPolicy: IfNotPresent
+          command: [python, -m, trace_app.adapters.hosted]
+          envFrom:
+            - secretRef:
+                name: trace-runtime
+          env:
+            - name: TRACE_SOURCE_PROFILE
+              value: /var/lib/trace/profile.json
+            - name: TRACE_AZURE_SETUP
+              value: /var/lib/trace/azure.env
+            - name: TRACE_WORKER_MODE
+              value: azure
+          volumeMounts:
+            - name: source
+              mountPath: /var/lib/trace
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: source
+          persistentVolumeClaim:
+            claimName: trace-source
+            readOnly: true

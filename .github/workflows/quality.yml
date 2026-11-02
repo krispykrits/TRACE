@@ -15,6 +15,16 @@ on:
 permissions: {}
 
 jobs:
+  container-build:
+    name: Build application image
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build --tag trace-runtime:check .
+      - run: docker run --rm --read-only --tmpfs /tmp --entrypoint python trace-runtime:check -c 'import os; import trace_app.adapters.hosted; import trace_app.adapters.http.api; assert os.getuid() == 10001'
+
   quality:
     name: Fast, credential-free checks
     runs-on: ubuntu-24.04
