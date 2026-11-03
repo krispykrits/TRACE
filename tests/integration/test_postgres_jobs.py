@@ -206,10 +206,14 @@ class PostgresJobsTests(unittest.TestCase):
                 return execute(backend, call, scope, policy, timeout_ms=timeout_ms)
 
             with (
+                self.assertLogs("trace_app.worker", level="INFO") as worker_logs,
                 patch.object(ExecutionSession, "dispatch", slow_dispatch),
                 patch.object(PostgresToolBackend, "execute", slow_execute),
             ):
                 self.assertTrue(worker.run_once())
+            self.assertTrue(
+                any("job_completed" in entry for entry in worker_logs.output)
+            )
             self.assertEqual(delayed, {"dispatch": True, "execute": True})
             completed = self.store.get_investigation(
                 job.investigation_id, access_scope=profile.evidence.access_scope

@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import logging
 import threading
 from collections.abc import Callable
 from typing import Protocol
 
 from trace_app.investigation.models import Investigation, StoreStateError
+
+_LOG = logging.getLogger("trace_app.worker")
 
 
 class WorkQueue(Protocol):
@@ -40,20 +43,38 @@ class InvestigationWorker:
         job = self._queue.claim(lease_seconds=self._lease_seconds)
         if job is None:
             return False
+        _LOG.info(
+            "job_started investigation_id=%s attempt=%s",
+            job.investigation_id,
+            job.active_attempt_id,
+        )
         try:
             self._process(job)
-        except Exception:
+        except Exception as error:
             failure = "executor_failed"
+            _LOG.error(
+                "job_failed investigation_id=%s failure_code=%s error_type=%s",
+                job.investigation_id,
+                failure,
+                type(error).__name__,
+            )
         else:
             failure = "executor_incomplete"
         try:
             # A completed, cancelled or expired attempt cannot be overwritten.
             self._queue.fail(job, failure_code=failure)
+            if failure == "executor_incomplete":
+                _LOG.error(
+                    "job_failed investigation_id=%s failure_code=%s",
+                    job.investigation_id,
+                    failure,
+                )
         except StoreStateError:
             pass
         return True
 
     def run(self, stop: threading.Event) -> None:
+        _LOG.info("worker_started")
         while not stop.is_set():
             if not self.run_once():
                 stop.wait(self._poll_seconds)
