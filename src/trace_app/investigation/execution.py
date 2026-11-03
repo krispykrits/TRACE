@@ -523,12 +523,15 @@ class ExecutionSession:
     ) -> str:
         if outcome not in _OUTCOMES:
             raise ExecutionRejected("invalid_outcome")
+        completed_at = self._clock()
+        if type(completed_at) not in (int, float) or not math.isfinite(completed_at):
+            raise ExecutionRejected("clock_invalid")
         final = outcome
 
         def finish(state: ExecutionState, now: float) -> dict[str, object]:
             nonlocal final
             active = self._active(state, ticket)
-            late = (now - active.started_at) * 1000 >= active.timeout_ms
+            late = (completed_at - active.started_at) * 1000 >= active.timeout_ms
             if late and active.dispatched:
                 final = "timeout"
             final = state.stop_reason or final
@@ -582,6 +585,7 @@ class ExecutionSession:
             )
             return {
                 **self._record(state, active, now, final),
+                "duration_ms": max(0, int((completed_at - active.started_at) * 1000)),
                 **self._metadata(metadata or {}),
                 "usage": usage.to_dict(),
                 "usage_basis": "provider_reported",

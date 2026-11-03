@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 import time
 import uuid
@@ -349,6 +350,12 @@ class ToolSession:
             )
             if final != result.payload.status:
                 payload = _execution_failure(final)
+                logging.getLogger("trace_app.tools").warning(
+                    "tool_final_outcome investigation_id=%s tool=%s outcome=%s",
+                    self._scope.investigation_id,
+                    result.audit.tool,
+                    payload.status,
+                )
                 return ToolResult(
                     replace(result.audit, outcome=payload.status), payload
                 )

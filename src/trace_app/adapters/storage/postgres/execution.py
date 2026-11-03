@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
+import threading
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from dataclasses import asdict
 from typing import Any
 
@@ -27,6 +29,30 @@ class PostgresExecutionLedger:
         if not dsn:
             raise ValueError("PostgreSQL connection configuration is required.")
         self._dsn = dsn
+        self._connection: Any = None
+        self._lock = threading.Lock()
+
+    def __enter__(self) -> PostgresExecutionLedger:
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        self.close()
+
+    def close(self) -> None:
+        with self._lock:
+            if self._connection is not None:
+                self._connection.close()
+                self._connection = None
+
+    @contextmanager
+    def _transaction(self) -> Iterator[Any]:
+        with self._lock:
+            if self._connection is None or self._connection.closed:
+                self._connection = connect(
+                    self._dsn, row_factory=dict_row, connect_timeout=5, autocommit=True
+                )
+            with self._connection.transaction():
+                yield self._connection
 
     def apply(
         self,
@@ -37,9 +63,7 @@ class PostgresExecutionLedger:
     ) -> dict[str, object] | None:
         policy_json = json.dumps(asdict(policy), sort_keys=True)
         try:
-            with connect(
-                self._dsn, row_factory=dict_row, connect_timeout=5
-            ) as connection:
+            with self._transaction() as connection:
                 job = connection.execute(
                     """SELECT status, active_attempt_id, lease_until, created_at,
                     submitted_tenant, submitted_object, access_scope, service, environment,

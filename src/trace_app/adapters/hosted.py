@@ -178,47 +178,50 @@ class HostedProcessor:
             SourceAccessPolicy(authority, scope),
             clearance=self.profile.clearance,
         ).ingest_snapshot(selected)
-        execution = ExecutionSession(
-            identity,
-            self.profile.policy,
-            PostgresExecutionLedger(self.dsn),
-            ModelPricing("azure-luna-global-ceiling-2026-09-22.v1", 250, 750),
-        )
-        tools = ToolSession(
-            SourceTools(self.profile),
-            ToolScope(
-                job.investigation_id,
-                identity.correlation_id,
-                replace(self.profile.evidence, allowed_services=evidence_services),
-                replace(self.profile.knowledge, allowed_services=knowledge_services),
-            ),
-            LoggingToolAudit(),
-            ToolPolicy(max_attempts=self.profile.policy.max_tool_calls),
-            execution=execution,
-        )
-        workflow = BoundedInvestigation(
-            store,
-            tools,
-            self.provider(scope, authority, execution) if self.provider else None,
-            authority,
-            LocalSupportReviews(self.profile),
-            execution,
-            scope,
-            options=WorkflowOptions(evidence_only=self.provider is None),
-        )
-        try:
-            result = workflow.run()
-            logging.getLogger("trace_app.worker").info(
-                "%s investigation_id=%s status=%s failure_code=%s",
-                "job_completed"
-                if result.execution_status == "completed"
-                else "job_failed",
-                job.investigation_id,
-                result.execution_status,
-                result.failure_code,
+        with PostgresExecutionLedger(self.dsn) as ledger:
+            execution = ExecutionSession(
+                identity,
+                self.profile.policy,
+                ledger,
+                ModelPricing("azure-luna-global-ceiling-2026-09-22.v1", 250, 750),
             )
-        finally:
-            workflow.close()
+            tools = ToolSession(
+                SourceTools(self.profile),
+                ToolScope(
+                    job.investigation_id,
+                    identity.correlation_id,
+                    replace(self.profile.evidence, allowed_services=evidence_services),
+                    replace(
+                        self.profile.knowledge, allowed_services=knowledge_services
+                    ),
+                ),
+                LoggingToolAudit(),
+                ToolPolicy(max_attempts=self.profile.policy.max_tool_calls),
+                execution=execution,
+            )
+            workflow = BoundedInvestigation(
+                store,
+                tools,
+                self.provider(scope, authority, execution) if self.provider else None,
+                authority,
+                LocalSupportReviews(self.profile),
+                execution,
+                scope,
+                options=WorkflowOptions(evidence_only=self.provider is None),
+            )
+            try:
+                result = workflow.run()
+                logging.getLogger("trace_app.worker").info(
+                    "%s investigation_id=%s status=%s failure_code=%s",
+                    "job_completed"
+                    if result.execution_status == "completed"
+                    else "job_failed",
+                    job.investigation_id,
+                    result.execution_status,
+                    result.failure_code,
+                )
+            finally:
+                workflow.close()
 
 
 def main() -> None:
