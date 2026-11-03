@@ -33,6 +33,7 @@ from trace_app.investigation.bundle import (
     EvidencePackage,
     build_evidence_package,
 )
+from trace_app.investigation.diagnostics import safe_traceback
 from trace_app.investigation.execution import (
     ExecutionIdentity,
     ExecutionRejected,
@@ -409,6 +410,7 @@ class BoundedInvestigation:
         )
         started = False
         status, failure = "failed", None
+        failure_error: BaseException | None = None
         try:
             job = self.store.get_investigation(self.execution.identity)
             if (
@@ -550,11 +552,14 @@ class BoundedInvestigation:
                 self.store.publish(publication, at=self._at())
                 artifacts.append(publication.artifact_id)
                 status = "completed"
-        except KeyboardInterrupt:
+        except KeyboardInterrupt as error:
+            failure_error = error
             failure = "cancelled"
         except ModelProviderError as error:
+            failure_error = error
             failure = error.code.value
         except ExecutionRejected as error:
+            failure_error = error
             failure = (
                 error.outcome
                 if error.outcome
@@ -567,14 +572,25 @@ class BoundedInvestigation:
                 )
                 else "execution_stopped"
             )
-        except ReportInputError:
+        except ReportInputError as error:
+            failure_error = error
             failure = "malformed_assessment"
         except AssessmentBoundaryError as error:
+            failure_error = error
             failure = error.code
-        except StoreStateError:
+        except StoreStateError as error:
+            failure_error = error
             failure = "attempt_not_active"
-        except Exception:
+        except Exception as error:
+            failure_error = error
             failure = "dependency_failure"
+        if failure_error is not None:
+            logging.getLogger("trace_app.worker").error(
+                "workflow_failed investigation_id=%s failure_code=%s\n%s",
+                self.scope.investigation_id,
+                failure,
+                safe_traceback(failure_error),
+            )
         if failure is not None:
             publication = None
             if started:
@@ -651,6 +667,14 @@ class BoundedInvestigation:
             knowledge_query=knowledge_query,
         )
         if package.status == "failed":
+            detail = package.failure or {}
+            logging.getLogger("trace_app.worker").warning(
+                "evidence_failed investigation_id=%s tool=%s status=%s reason=%s",
+                self.scope.investigation_id,
+                detail.get("tool"),
+                detail.get("status"),
+                detail.get("reason"),
+            )
             raise AssessmentBoundaryError("execution_failure")
         return package
 

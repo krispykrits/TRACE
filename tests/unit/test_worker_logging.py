@@ -23,6 +23,8 @@ class WorkerLoggingTests(unittest.TestCase):
         self.assertIn("worker_started", output)
         self.assertIn("job_started investigation_id=investigation-1", output)
         self.assertIn("failure_code=executor_failed error_type=ValueError", output)
+        self.assertIn("Traceback (most recent call last)", output)
+        self.assertIn('File "worker.py"', output)
         self.assertNotIn("secret evidence", output)
 
     def test_tool_log_contains_outcome_and_duration(self) -> None:

@@ -31,7 +31,6 @@ class PostgresToolBackend:
     def execute(
         self, call: ToolCall, scope: ToolScope, policy: ToolPolicy, *, timeout_ms: int
     ) -> ToolPayload:
-        self.profile.current()
         source_scope = replace(
             scope, investigation_id=self.profile.source_investigation_id
         )

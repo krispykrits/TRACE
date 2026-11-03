@@ -196,7 +196,10 @@ class HostedProcessor:
                     ),
                 ),
                 LoggingToolAudit(),
-                ToolPolicy(max_attempts=self.profile.policy.max_tool_calls),
+                ToolPolicy(
+                    max_attempts=self.profile.policy.max_tool_calls,
+                    call_timeout_ms=self.profile.policy.tool_timeout_ms,
+                ),
                 execution=execution,
             )
             workflow = BoundedInvestigation(
