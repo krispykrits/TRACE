@@ -132,6 +132,33 @@ class PostgresInvestigatorProfile:
         ):
             raise AssessmentBoundaryError("access_denied")
 
+    def allowed_for_job(self, investigation_id: str) -> tuple[str, ...]:
+        """Recheck the submitter's current service grant for an active job."""
+        with connect(self.dsn, row_factory=dict_row, connect_timeout=5) as connection:
+            row = connection.execute(
+                """SELECT j.submitted_tenant, j.submitted_object, j.access_scope,
+                          j.environment, j.service, g.services, g.actions,
+                          g.access_scope AS grant_scope, g.environment AS grant_environment
+                   FROM trace_jobs j JOIN trace_principal_grants g
+                     ON g.tenant_id=j.submitted_tenant AND g.object_id=j.submitted_object
+                   WHERE j.investigation_id=%s AND j.status='running'
+                     AND j.lease_until > clock_timestamp()""",
+                (investigation_id,),
+            ).fetchone()
+        if (
+            row is None
+            or self.principal_id
+            != f"entra:{row['submitted_tenant']}:{row['submitted_object']}"
+            or row["access_scope"] != self.evidence.access_scope
+            or row["environment"] != self.evidence.environment
+            or row["grant_scope"] != row["access_scope"]
+            or row["grant_environment"] != row["environment"]
+            or row["service"] not in row["services"]
+            or "submit" not in row["actions"]
+        ):
+            raise StoreAccessError("Investigation authority is no longer active.")
+        return tuple(row["services"])
+
     def get_investigation(
         self, investigation_id: str, *, access_scope: str
     ) -> Investigation:

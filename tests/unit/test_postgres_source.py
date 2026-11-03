@@ -6,7 +6,7 @@ from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from scripts.demo_investigator import Clock
 from scripts.investigator_fixture import prepare
@@ -17,6 +17,7 @@ from trace_app.adapters.storage.postgres.evidence import PostgresEvidenceStore
 from trace_app.adapters.storage.sqlite.corpus import SQLiteCorpusStore
 from trace_app.adapters.storage.sqlite.investigations import SQLiteInvestigationStore
 from trace_app.adapters.tools.local import _read
+from trace_app.investigation.models import StoreAccessError
 from trace_app.investigation.tools import ToolCall, ToolPolicy, ToolScope
 
 
@@ -71,6 +72,32 @@ def synthetic_package(path):
 
 
 class PostgresSourceTest(unittest.TestCase):
+    def test_active_job_service_grants_are_rechecked(self):
+        profile = object.__new__(PostgresInvestigatorProfile)
+        profile.dsn = "unused"
+        profile.principal_id = "entra:tenant:user"
+        profile.evidence = MagicMock(access_scope="scope", environment="test")
+        row = {
+            "submitted_tenant": "tenant",
+            "submitted_object": "user",
+            "access_scope": "scope",
+            "environment": "test",
+            "grant_scope": "scope",
+            "grant_environment": "test",
+            "service": "order",
+            "services": ["order"],
+            "actions": ["submit"],
+        }
+        with patch(
+            "trace_app.adapters.sources.postgres_investigator.connect"
+        ) as connect:
+            connection = connect.return_value.__enter__.return_value
+            connection.execute.return_value.fetchone.return_value = row
+            self.assertEqual(profile.allowed_for_job("job"), ("order",))
+            row["actions"] = []
+            with self.assertRaises(StoreAccessError):
+                profile.allowed_for_job("job")
+
     def test_evidence_and_knowledge_are_read_and_rechecked(self):
         with TemporaryDirectory() as temp:
             path = prepare(Path(temp) / "source")
