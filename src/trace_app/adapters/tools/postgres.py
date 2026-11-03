@@ -5,8 +5,12 @@ import os
 import sys
 from dataclasses import asdict, replace
 from datetime import UTC, datetime
+from typing import Any
+
+from psycopg.rows import dict_row
 
 from trace_app.adapters.sources.postgres_investigator import PostgresInvestigatorProfile
+from trace_app.adapters.storage.postgres.connection import connect
 from trace_app.adapters.tools.local import _encoded, _read, _run_process
 from trace_app.evidence.models import _parse_utc, format_utc
 from trace_app.evidence.queries import TrustedQueryContext
@@ -105,37 +109,13 @@ def main() -> int:
             CorpusReadContext(**knowledge),
         )
         call = ToolCall.parse(value["name"], value["arguments"], policy)
-        profile = PostgresInvestigatorProfile(
-            os.environ["TRACE_POSTGRES_DSN"], os.environ["TRACE_SOURCE_ID"]
-        )
-        allowed = set(profile.allowed_for_job(value["job_id"]))
-        # The database profile, rather than tool arguments, supplies authority.
-        if (
-            replace(scope.evidence, allowed_services=profile.evidence.allowed_services)
-            != profile.evidence
-            or replace(
-                scope.knowledge, allowed_services=profile.knowledge.allowed_services
-            )
-            != profile.knowledge
-            or not set(scope.evidence.allowed_services)
-            <= allowed.intersection(profile.evidence.allowed_services)
-            or not set(scope.knowledge.allowed_services)
-            <= allowed.intersection(profile.knowledge.allowed_services)
-            or scope.investigation_id != profile.source_investigation_id
-        ):
-            raise PermissionError("Source scope changed.")
-        payload = _read(
-            call,
-            scope,
-            None,
-            policy,
-            at=_parse_utc(value["read_at"]),
-            reader=profile,
-            corpus_reader=profile,
-            index_generation=None
-            if isinstance(call.arguments, EvidenceArguments)
-            else profile.index(),
-        )
+        with connect(
+            os.environ["TRACE_POSTGRES_DSN"],
+            row_factory=dict_row,
+            connect_timeout=5,
+            autocommit=True,
+        ) as connection:
+            payload = _execute(value, scope, call, policy, connection)
         if len(_encoded(payload)) > policy.max_result_bytes:
             payload = ToolPayload(
                 "partial",
@@ -152,6 +132,46 @@ def main() -> int:
         payload = ToolPayload("dependency_failure", {}, "source_unavailable")
     sys.stdout.buffer.write(_encoded(payload))
     return 0
+
+
+def _execute(
+    value: dict[str, Any],
+    scope: ToolScope,
+    call: ToolCall,
+    policy: ToolPolicy,
+    connection: Any,
+) -> ToolPayload:
+    profile = PostgresInvestigatorProfile(
+        os.environ["TRACE_POSTGRES_DSN"],
+        os.environ["TRACE_SOURCE_ID"],
+        connection=connection,
+    )
+    allowed = set(profile.allowed_for_job(value["job_id"]))
+    # The database profile, rather than tool arguments, supplies authority.
+    if (
+        replace(scope.evidence, allowed_services=profile.evidence.allowed_services)
+        != profile.evidence
+        or replace(scope.knowledge, allowed_services=profile.knowledge.allowed_services)
+        != profile.knowledge
+        or not set(scope.evidence.allowed_services)
+        <= allowed.intersection(profile.evidence.allowed_services)
+        or not set(scope.knowledge.allowed_services)
+        <= allowed.intersection(profile.knowledge.allowed_services)
+        or scope.investigation_id != profile.source_investigation_id
+    ):
+        raise PermissionError("Source scope changed.")
+    return _read(
+        call,
+        scope,
+        None,
+        policy,
+        at=_parse_utc(value["read_at"]),
+        reader=profile,
+        corpus_reader=profile,
+        index_generation=None
+        if isinstance(call.arguments, EvidenceArguments)
+        else profile.index(),
+    )
 
 
 if __name__ == "__main__":

@@ -75,6 +75,7 @@ class PostgresSourceTest(unittest.TestCase):
     def test_active_job_service_grants_are_rechecked(self):
         profile = object.__new__(PostgresInvestigatorProfile)
         profile.dsn = "unused"
+        profile._connection = None
         profile.principal_id = "entra:tenant:user"
         profile.evidence = MagicMock(access_scope="scope", environment="test")
         row = {
@@ -97,6 +98,25 @@ class PostgresSourceTest(unittest.TestCase):
             row["actions"] = []
             with self.assertRaises(StoreAccessError):
                 profile.allowed_for_job("job")
+
+    def test_tool_reads_share_connection_but_recheck_source(self):
+        profile = object.__new__(PostgresInvestigatorProfile)
+        profile.dsn = "unused"
+        profile.source_id = "synthetic"
+        profile._source_loader = None
+        connection = MagicMock()
+        profile._connection = connection
+        connection.execute.return_value.fetchone.side_effect = [
+            {"profile": {"version": 1}, "capture": {}, "knowledge": {}},
+            {"profile": {"version": 2}, "capture": {}, "knowledge": {}},
+        ]
+        with patch(
+            "trace_app.adapters.sources.postgres_investigator.connect"
+        ) as connect:
+            self.assertEqual(profile._package()["profile"]["version"], 1)
+            self.assertEqual(profile._package()["profile"]["version"], 2)
+            connect.assert_not_called()
+            self.assertEqual(connection.execute.call_count, 2)
 
     def test_evidence_and_knowledge_are_read_and_rechecked(self):
         with TemporaryDirectory() as temp:

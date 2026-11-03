@@ -2,6 +2,7 @@
 
 import json
 import time
+from contextlib import nullcontext
 from dataclasses import asdict
 from datetime import UTC, datetime
 from typing import Any, Callable
@@ -53,10 +54,12 @@ class PostgresInvestigatorProfile:
         *,
         clock: Callable[[], float] = time.time,
         source_loader: Callable[[], dict[str, Any]] | None = None,
+        connection: Any = None,
     ):
         _identifier("source_id", source_id)
         self.dsn, self.source_id, self.clock = dsn, source_id, clock
         self._source_loader = source_loader
+        self._connection = connection
         data = self._package()["profile"]
         if data.get("schema_version") != "postgres-investigator.v1":
             raise AssessmentBoundaryError("access_denied")
@@ -97,7 +100,12 @@ class PostgresInvestigatorProfile:
     def _package(self) -> dict[str, Any]:
         if self._source_loader is not None:
             return self._source_loader()
-        with connect(self.dsn, row_factory=dict_row, connect_timeout=5) as connection:
+        manager = (
+            nullcontext(self._connection)
+            if self._connection is not None
+            else connect(self.dsn, row_factory=dict_row, connect_timeout=5)
+        )
+        with manager as connection:
             row = connection.execute(
                 "SELECT profile, capture, knowledge FROM trace_source_packages WHERE source_id=%s",
                 (self.source_id,),
@@ -134,7 +142,12 @@ class PostgresInvestigatorProfile:
 
     def allowed_for_job(self, investigation_id: str) -> tuple[str, ...]:
         """Recheck the submitter's current service grant for an active job."""
-        with connect(self.dsn, row_factory=dict_row, connect_timeout=5) as connection:
+        manager = (
+            nullcontext(self._connection)
+            if self._connection is not None
+            else connect(self.dsn, row_factory=dict_row, connect_timeout=5)
+        )
+        with manager as connection:
             row = connection.execute(
                 """SELECT j.submitted_tenant, j.submitted_object, j.access_scope,
                           j.environment, j.service, g.services, g.actions,
