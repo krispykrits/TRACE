@@ -24,6 +24,8 @@ def synthetic_package(path):
     old = LocalInvestigatorProfile(path, clock=Clock())
     profile = json.loads(path.read_text())
     profile["schema_version"] = "postgres-investigator.v1"
+    for key in ("evidence_db", "corpus_db", "index_root"):
+        profile.pop(key)
     with SQLiteInvestigationStore(old.evidence_db, read_only=True) as source:
         job = source.get_investigation(
             old.source_investigation_id, access_scope=old.evidence.access_scope
