@@ -30,9 +30,8 @@ make check lint format-check type-check architecture-check test integration pack
 | `make type-check` | Static typing |
 | `make architecture-check` | Dependency direction and evaluator isolation |
 | `make test` | Unit and contract suites |
-| `make integration` | SQLite, evaluator, process/CLI and workflow integration |
+| `make integration` | API, storage, model process, security and workflow integration |
 | `make package-check` | Build/install/smoke-test the runtime wheel outside the checkout |
-| `make integration-s4` | Scripted evidence-package and tool-evaluation checks |
 | `make integration-semantic` / `make retrieval-evaluate` | Separately opted-in cached-model retrieval comparisons |
 | `make integration-live` | Explicitly authorized paid provider gate |
 | `make clean` | Remove `.venv`, `build` and `dist`; optional cleanup |

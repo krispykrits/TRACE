@@ -48,7 +48,6 @@ uv run --locked python scripts/demo_integration.py --case c03 --output /tmp/trac
 uv run --locked python scripts/demo_integration.py --limit 1 --output /tmp/trace-s4-truncated.json
 uv run --locked python -m evaluation.tool_evaluation --output /tmp/trace-s4-tool-checks.json
 uv run --locked python -m evaluation.tool_evaluation --rescore evaluation/reports/tool_choices_development_v1.json
-make integration-s4
 make check lint format-check type-check architecture-check test integration package-check
 ```
 

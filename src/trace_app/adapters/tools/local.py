@@ -53,7 +53,11 @@ class LocalToolSources:
 class LoggingToolAudit:
     def emit(self, record: ToolAudit) -> None:
         logging.getLogger("trace_app.tools").info(
-            "Read-only tool attempt completed.",
+            "tool_finished correlation_id=%s tool=%s outcome=%s duration_ms=%.0f",
+            record.correlation_id,
+            record.tool,
+            record.outcome,
+            record.duration_ms,
             extra={"event": "tools.attempt.completed", **asdict(record)},
         )
 

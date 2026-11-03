@@ -428,6 +428,9 @@ class ToolSession:
                         try:
                             if ticket is not None and self._execution is not None:
                                 timeout = min(timeout, self._execution.dispatch(ticket))
+                            backend_started = (
+                                self._clock() if ticket is not None else started
+                            )
                             payload = (
                                 ToolPayload(
                                     "budget_exhausted", {}, "session_budget_exhausted"
@@ -437,7 +440,7 @@ class ToolSession:
                                     call, self._scope, self._policy, timeout_ms=timeout
                                 )
                             )
-                            if (self._clock() - started) * 1000 > timeout:
+                            if (self._clock() - backend_started) * 1000 > timeout:
                                 payload = ToolPayload(
                                     "timeout", {}, "call_deadline_exceeded"
                                 )

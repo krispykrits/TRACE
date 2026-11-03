@@ -58,6 +58,27 @@ class ExecutionContracts(unittest.TestCase):
             backend,
         )
 
+    def test_tool_dispatch_latency_is_counted_once(self) -> None:
+        _, ledger, clock, _, _, _, _, tools, backend = self.fixture()
+
+        def delay_dispatch():
+            if ledger.state.active is not None and not ledger.state.active.dispatched:
+                clock.now += 1.5
+
+        ledger.before_operation = delay_dispatch
+        backend.after_dispatch = lambda: setattr(clock, "now", clock.now + 2.4)
+        result = tools.invoke("logs.query", QUERY)
+        self.assertEqual(result.payload.status, "ok")
+        self.assertEqual(backend.calls, 1)
+
+    def test_tool_result_after_deadline_is_still_rejected(self) -> None:
+        _, _, clock, _, _, _, _, tools, backend = self.fixture()
+        backend.payload = ToolPayload("ok", {"content": "must not escape"})
+        backend.after_dispatch = lambda: setattr(clock, "now", clock.now + 5.1)
+        result = tools.invoke("logs.query", QUERY)
+        self.assertEqual(result.payload.status, "timeout")
+        self.assertEqual(result.payload.data, {})
+
     def test_shared_counts_are_durable_and_exhaustion_stops_both_ports(self) -> None:
         _, ledger, _, provider, transport, _, journal, tools, backend = self.fixture(
             ExecutionPolicy(max_model_calls=1)

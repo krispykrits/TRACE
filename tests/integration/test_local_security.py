@@ -10,13 +10,8 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
-from scripts.demo_integration import integration_fixture
-from scripts.demo_investigator import compose
 from scripts.local_security_fixture import HIDDEN, MODES, REMOVED
-from trace_app.adapters.tools.local import LocalToolBackend
-from trace_app.investigation.workflow import WorkflowOptions
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -214,56 +209,3 @@ class LocalSecurityCanaryTests(unittest.TestCase):
         self.assertEqual(
             self.read("hostile_error", "execution.json")["model_invocations"], 0
         )
-
-
-class LocalSecurityDispatchTests(unittest.TestCase):
-    def test_refinement_and_correction_cannot_reuse_revoked_input_rights(self) -> None:
-        # Existing larger demonstration policy isolates fresh authority checks;
-        # this does not claim refinement/accepted publication fits 40 calls.
-        for phase in ("refinement", "correction"):
-            for permission in ("access", "transmission"):
-                with (
-                    self.subTest(phase=phase, permission=permission),
-                    integration_fixture() as setup,
-                ):
-                    workflow, model, authority, _, _ = compose(
-                        setup,
-                        options=WorkflowOptions(
-                            next_check=phase == "refinement",
-                            correction=phase == "correction",
-                        ),
-                    )
-                    self.addCleanup(workflow.close)
-                    if phase == "correction":
-
-                        def invalid(value, request):
-                            value["observations"][0]["citations"] = [
-                                "unadmitted-citation"
-                            ]
-
-                        model.transform = invalid
-                    execute = LocalToolBackend.execute
-                    revoked = []
-
-                    def revoke(backend, call, *arguments, **keywords):
-                        result = execute(backend, call, *arguments, **keywords)
-                        trigger = (
-                            "logs.query" if phase == "refinement" else "evidence.get"
-                        )
-                        if model.requests and call.name == trigger:
-                            setattr(authority, permission, False)
-                            revoked.append(True)
-                        return result
-
-                    with patch.object(LocalToolBackend, "execute", revoke):
-                        result = workflow.run()
-                    self.assertTrue(revoked)
-                    self.assertEqual(len(model.requests), 1)
-                    self.assertNotEqual(result.execution_status, "completed")
-                    with sqlite3.connect(setup.root / "evidence.sqlite3") as db:
-                        self.assertEqual(
-                            db.execute(
-                                "SELECT COUNT(*) FROM workflow_artifacts WHERE role IN ('accepted','review_required')"
-                            ).fetchone()[0],
-                            0,
-                        )

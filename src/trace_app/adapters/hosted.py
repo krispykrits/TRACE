@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import secrets
+import sys
 import threading
 from collections.abc import Callable
 from dataclasses import replace
@@ -205,12 +207,28 @@ class HostedProcessor:
             options=WorkflowOptions(evidence_only=self.provider is None),
         )
         try:
-            workflow.run()
+            result = workflow.run()
+            logging.getLogger("trace_app.worker").info(
+                "%s investigation_id=%s status=%s failure_code=%s",
+                "job_completed"
+                if result.execution_status == "completed"
+                else "job_failed",
+                job.investigation_id,
+                result.execution_status,
+                result.failure_code,
+            )
         finally:
             workflow.close()
 
 
 def main() -> None:
+    logging.basicConfig(
+        level=logging.WARNING,
+        format="%(asctime)s %(levelname)s %(name)s %(message)s",
+        stream=sys.stdout,
+    )
+    logging.getLogger("trace_app.worker").setLevel(logging.INFO)
+    logging.getLogger("trace_app.tools").setLevel(logging.INFO)
     if os.environ.get("TRACE_POSTGRES_AUTH") != "entra":
         raise ValueError("Hosted PostgreSQL requires Entra authentication.")
     dsn = os.environ["TRACE_POSTGRES_DSN"]

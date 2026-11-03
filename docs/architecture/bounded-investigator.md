@@ -60,7 +60,7 @@ Raw gathered content is private and conservatively `unknown` sensitivity. Valida
 
 ```sh
 uv run --locked python -m scripts.demo_investigator --output /tmp/trace-investigator-demo.json
-uv run --locked python -m unittest tests.contracts.test_workflow tests.integration.test_workflow -v
+uv run --locked python -m unittest tests.contracts.test_workflow -v
 make check lint format-check type-check architecture-check test integration package-check
 ```
 
