@@ -6,32 +6,25 @@ import os
 import secrets
 import threading
 from collections.abc import Callable
-from dataclasses import replace
-from datetime import UTC, datetime
-from pathlib import Path
 
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
-from trace_app.adapters.models.azure import AzureResponsesTransport, load_entra_settings
+from trace_app.adapters.models.azure import AzureResponsesTransport, entra_settings
 from trace_app.adapters.models.journal import ModelPricing
 from trace_app.adapters.models.process import ProcessModelProvider
-from trace_app.adapters.sources.local_investigator import (
+from trace_app.adapters.sources.authority import (
     LocalEvidenceAuthority,
-    LocalInvestigatorProfile,
     LocalSupportReviews,
 )
+from trace_app.adapters.sources.postgres_investigator import PostgresInvestigatorProfile
 from trace_app.adapters.storage.postgres.evidence import PostgresEvidenceStore
 from trace_app.adapters.storage.postgres.execution import PostgresExecutionLedger
 from trace_app.adapters.storage.postgres.jobs import PostgresJobs
 from trace_app.adapters.storage.postgres.model_journal import PostgresModelJournal
 from trace_app.adapters.storage.postgres.reports import PostgresReportReader
 from trace_app.adapters.storage.postgres.workflow import PostgresWorkflowStore
-from trace_app.adapters.storage.sqlite.investigations import SQLiteInvestigationStore
-from trace_app.adapters.tools.local import (
-    LocalToolBackend,
-    LocalToolSources,
-    LoggingToolAudit,
-)
+from trace_app.adapters.tools.local import LoggingToolAudit
+from trace_app.adapters.tools.postgres import PostgresToolBackend
 from trace_app.evidence.models import _parse_utc
 from trace_app.investigation.execution import ExecutionIdentity, ExecutionSession
 from trace_app.investigation.models import (
@@ -66,27 +59,19 @@ from trace_app.investigation.workflow_prompt import ASSESSMENT_PROMPT
 class SourceTools:
     """Read the configured source capture while retaining the hosted job identity."""
 
-    def __init__(self, profile: LocalInvestigatorProfile) -> None:
+    def __init__(self, profile: PostgresInvestigatorProfile) -> None:
         self.profile = profile
-        self.backend = LocalToolBackend(
-            LocalToolSources(
-                profile.evidence_db, profile.corpus_db, profile.index_root
-            ),
-            read_clock=lambda: datetime.fromtimestamp(profile.clock(), UTC),
-        )
+        self.backend = PostgresToolBackend(profile)
 
     def execute(
         self, call: ToolCall, scope: ToolScope, policy: ToolPolicy, *, timeout_ms: int
     ) -> ToolPayload:
         self.profile.current()
-        source_scope = replace(
-            scope, investigation_id=self.profile.source_investigation_id
-        )
-        return self.backend.execute(call, source_scope, policy, timeout_ms=timeout_ms)
+        return self.backend.execute(call, scope, policy, timeout_ms=timeout_ms)
 
 
 def _scope(
-    profile: LocalInvestigatorProfile,
+    profile: PostgresInvestigatorProfile,
     principal: tuple[str, str],
     job_id: str,
     access_scope: str,
@@ -101,7 +86,7 @@ def _scope(
 
 def report_access(
     dsn: str,
-    profile: LocalInvestigatorProfile,
+    profile: PostgresInvestigatorProfile,
     principal: tuple[str, str],
     job_id: str,
     access_scope: str,
@@ -121,7 +106,7 @@ class HostedProcessor:
     def __init__(
         self,
         dsn: str,
-        profile: LocalInvestigatorProfile,
+        profile: PostgresInvestigatorProfile,
         provider: Callable[
             [ProviderScope, EvidenceAuthority, ExecutionSession], PolicyModelProvider
         ]
@@ -147,18 +132,10 @@ class HostedProcessor:
             self.profile, principal, job.investigation_id, job.request.access_scope
         )
         self.profile.check_job(job)
-        with SQLiteInvestigationStore(
-            self.profile.evidence_db, read_only=True
-        ) as source:
-            source_job = source.get_investigation(
-                self.profile.source_investigation_id,
-                access_scope=self.profile.evidence.access_scope,
-            )
-            self.profile.check_job(source_job)
-            snapshot = source.get_snapshot(
-                self.profile.source_investigation_id,
-                access_scope=self.profile.evidence.access_scope,
-            )
+        snapshot = self.profile.get_snapshot(
+            self.profile.source_investigation_id,
+            access_scope=self.profile.evidence.access_scope,
+        )
         start, end = (
             _parse_utc(job.request.window_start),
             _parse_utc(job.request.window_end),
@@ -229,11 +206,11 @@ def main() -> None:
     settings = conninfo_to_dict(dsn)
     if settings.get("sslmode") != "verify-full" or not settings.get("host"):
         raise ValueError("PostgreSQL must use a hostname and sslmode=verify-full.")
-    profile = LocalInvestigatorProfile(Path(os.environ["TRACE_SOURCE_PROFILE"]))
+    profile = PostgresInvestigatorProfile(dsn, os.environ["TRACE_SOURCE_ID"])
     mode = os.environ.get("TRACE_WORKER_MODE", "azure")
     provider = None
     if mode == "azure":
-        azure_settings = load_entra_settings(Path(os.environ["TRACE_AZURE_SETUP"]))
+        azure_settings = entra_settings(dict(os.environ))
 
         def provider(
             scope: ProviderScope,

@@ -111,3 +111,12 @@ CREATE TABLE IF NOT EXISTS trace_model_redactions (
     request_id TEXT NOT NULL REFERENCES trace_model_attempts(request_id),
     provenance TEXT NOT NULL
 );
+
+-- Owner-managed source package. Evidence, knowledge and their grants remain
+-- separate fields so source content cannot grant itself access.
+CREATE TABLE IF NOT EXISTS trace_source_packages (
+    source_id TEXT PRIMARY KEY,
+    profile JSONB NOT NULL,
+    capture JSONB NOT NULL,
+    knowledge JSONB NOT NULL
+);

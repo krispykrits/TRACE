@@ -1,0 +1,133 @@
+"""Check hosted PostgreSQL sources preserve the existing evidence boundaries."""
+
+import json
+import unittest
+from dataclasses import asdict
+from datetime import UTC, datetime
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
+
+from scripts.demo_investigator import Clock
+from scripts.investigator_fixture import prepare
+from trace_app.adapters.sources.authority import LocalEvidenceAuthority
+from trace_app.adapters.sources.local_investigator import LocalInvestigatorProfile
+from trace_app.adapters.sources.postgres_investigator import PostgresInvestigatorProfile
+from trace_app.adapters.storage.postgres.evidence import PostgresEvidenceStore
+from trace_app.adapters.storage.sqlite.corpus import SQLiteCorpusStore
+from trace_app.adapters.storage.sqlite.investigations import SQLiteInvestigationStore
+from trace_app.adapters.tools.local import _read
+from trace_app.investigation.tools import ToolCall, ToolPolicy, ToolScope
+
+
+def synthetic_package(path):
+    old = LocalInvestigatorProfile(path, clock=Clock())
+    profile = json.loads(path.read_text())
+    profile["schema_version"] = "postgres-investigator.v1"
+    with SQLiteInvestigationStore(old.evidence_db, read_only=True) as source:
+        job = source.get_investigation(
+            old.source_investigation_id, access_scope=old.evidence.access_scope
+        )
+        snapshot = source.get_snapshot(
+            old.source_investigation_id, access_scope=old.evidence.access_scope
+        )
+    root = old.index_root / (old.index_root / "CURRENT").read_text().strip()
+    manifest = json.loads((root / "manifest.json").read_text())
+    with SQLiteCorpusStore(old.corpus_db, read_only=True) as corpus:
+        generation = json.loads(
+            corpus._connection.execute(
+                "SELECT manifest FROM generations WHERE id=?",
+                (manifest["corpus_generation_id"],),
+            ).fetchone()[0]
+        )
+        rows = corpus._connection.execute(
+            "SELECT c.payload, s.metadata, s.status FROM chunks c JOIN sources s ON c.document_id=s.document_id WHERE c.generation_id=?",
+            (manifest["corpus_generation_id"],),
+        ).fetchall()
+        chunks = [
+            {
+                "chunk": json.loads(r[0]),
+                "current_metadata": json.loads(r[1]),
+                "status": r[2],
+            }
+            for r in rows
+        ]
+    package = {
+        "profile": profile,
+        "capture": {
+            "investigation": asdict(job),
+            "snapshot": PostgresEvidenceStore._data(snapshot),
+        },
+        "knowledge": {
+            "manifest": generation,
+            "index_manifest": manifest,
+            "index_records": json.loads((root / "records.json").read_text()),
+            "chunks": chunks,
+        },
+    }
+    return old, package, job, snapshot
+
+
+class PostgresSourceTest(unittest.TestCase):
+    def test_evidence_and_knowledge_are_read_and_rechecked(self):
+        with TemporaryDirectory() as temp:
+            path = prepare(Path(temp) / "source")
+            old, package, job, snapshot = synthetic_package(path)
+            with patch.object(
+                PostgresInvestigatorProfile, "_package", return_value=package
+            ):
+                new = PostgresInvestigatorProfile("unused", "synthetic", clock=Clock())
+                self.assertEqual(
+                    new.get_snapshot(
+                        job.investigation_id, access_scope=old.evidence.access_scope
+                    ),
+                    snapshot,
+                )
+                self.assertEqual(new.source_content(), old.source_content())
+                scope = ToolScope(
+                    job.investigation_id, "test", new.evidence, new.knowledge
+                )
+                policy = ToolPolicy()
+                call = ToolCall.parse(
+                    "logs.query",
+                    {
+                        "window_start": snapshot.window_start,
+                        "window_end": snapshot.window_end,
+                    },
+                    policy,
+                )
+                result = _read(
+                    call,
+                    scope,
+                    None,
+                    policy,
+                    reader=new,
+                    corpus_reader=new,
+                    index_generation=new.index(),
+                )
+                self.assertIn(result.status, ("ok", "partial", "empty"))
+                search = ToolCall.parse(
+                    "knowledge.search",
+                    {"query": "HTTP 504", "service": "payment"},
+                    policy,
+                )
+                result = _read(
+                    search,
+                    scope,
+                    None,
+                    policy,
+                    reader=new,
+                    corpus_reader=new,
+                    index_generation=new.index(),
+                    at=datetime.fromtimestamp(Clock()(), UTC),
+                )
+                self.assertIn(result.status, ("ok", "partial"))
+                authority = LocalEvidenceAuthority(new, new.scope("job-1"))
+                identity = next(iter(new.source_content()))
+                self.assertIsNotNone(authority.resolve(new.scope("job-1"), identity))
+                package["profile"]["grants"].pop(identity)
+                self.assertIsNone(authority.resolve(new.scope("job-1"), identity))
+
+
+if __name__ == "__main__":
+    unittest.main()
