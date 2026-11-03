@@ -17,6 +17,7 @@ from unittest.mock import patch
 
 import psycopg
 
+from trace_app.adapters.storage.postgres.connection import connect
 from trace_app.adapters.storage.postgres.evidence import PostgresEvidenceStore
 from trace_app.adapters.storage.postgres.execution import PostgresExecutionLedger
 from trace_app.adapters.storage.postgres.jobs import PostgresJobs
@@ -367,6 +368,7 @@ class PostgresJobsTests(unittest.TestCase):
             job.investigation_id, job.active_attempt_id, "correlation", "scope:a"
         )
         ledger = PostgresExecutionLedger(self.dsn)
+        self.addCleanup(ledger.close)
         barrier = threading.Barrier(2)
 
         def increment() -> None:
@@ -377,8 +379,12 @@ class PostgresJobsTests(unittest.TestCase):
 
             ledger.apply(identity, ExecutionPolicy(), time.time(), operation)
 
-        with ThreadPoolExecutor(max_workers=2) as pool:
-            list(pool.map(lambda _: increment(), range(2)))
+        with patch(
+            "trace_app.adapters.storage.postgres.execution.connect", wraps=connect
+        ) as open_connection:
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                list(pool.map(lambda _: increment(), range(2)))
+            self.assertEqual(open_connection.call_count, 1)
         with psycopg.connect(self.dsn) as connection:
             row = connection.execute(
                 "SELECT state FROM trace_execution_runs WHERE investigation_id=%s",

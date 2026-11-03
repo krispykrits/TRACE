@@ -79,6 +79,30 @@ class ExecutionContracts(unittest.TestCase):
         self.assertEqual(result.payload.status, "timeout")
         self.assertEqual(result.payload.data, {})
 
+    def test_completed_tool_is_not_timed_out_by_final_ledger_update(self) -> None:
+        _, ledger, clock, _, _, _, _, tools, backend = self.fixture()
+        backend.after_dispatch = lambda: setattr(clock, "now", clock.now + 4.5)
+
+        def slow_finish():
+            if ledger.state.active is not None and ledger.state.active.dispatched:
+                clock.now += 1
+
+        ledger.before_operation = slow_finish
+        self.assertEqual(tools.invoke("logs.query", QUERY).payload.status, "ok")
+
+    def test_global_deadline_is_still_checked_during_final_update(self) -> None:
+        _, ledger, clock, _, _, _, _, tools, backend = self.fixture(
+            ExecutionPolicy(deadline_ms=5000)
+        )
+        backend.after_dispatch = lambda: setattr(clock, "now", clock.now + 4.5)
+
+        def slow_finish():
+            if ledger.state.active is not None and ledger.state.active.dispatched:
+                clock.now += 1
+
+        ledger.before_operation = slow_finish
+        self.assertEqual(tools.invoke("logs.query", QUERY).payload.status, "expired")
+
     def test_shared_counts_are_durable_and_exhaustion_stops_both_ports(self) -> None:
         _, ledger, _, provider, transport, _, journal, tools, backend = self.fixture(
             ExecutionPolicy(max_model_calls=1)
