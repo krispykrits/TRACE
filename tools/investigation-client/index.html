@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TRACE investigation test</title>
+  <style>
+    body { font: 16px system-ui, sans-serif; max-width: 48rem; margin: 2rem auto; padding: 0 1rem; }
+    label { display: block; margin: .8rem 0; } input { display: block; width: 100%; box-sizing: border-box; padding: .4rem; }
+    button { padding: .5rem .8rem; margin: .3rem .3rem .3rem 0; } pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f3f3f3; padding: 1rem; }
+  </style>
+  <script defer src="/msal-browser.js"></script>
+  <script defer src="/client.js"></script>
+</head>
+<body>
+  <h1>TRACE investigation test</h1>
+  <p>Use a dedicated Entra SPA registration. Redirect URI: <code>http://localhost:8765/redirect.html</code></p>
+  <label>Tenant ID <input id="tenant" autocomplete="off"></label>
+  <label>Test client application ID <input id="client" autocomplete="off"></label>
+  <label>TRACE API application ID <input id="api" autocomplete="off" value="4a425ed8-589d-4d73-93e2-84a079d0c16a"></label>
+  <button id="signin">Sign in</button>
+  <h2>Investigation</h2>
+  <label>Service <input id="service" value="order"></label>
+  <label>Environment <input id="environment" value="test"></label>
+  <label>Window start (UTC) <input id="start" value="2026-01-01T00:00:17Z"></label>
+  <label>Window end (UTC) <input id="end" value="2026-01-01T00:00:24Z"></label>
+  <button id="submit">Submit investigation</button>
+  <label>Investigation ID <input id="investigation" autocomplete="off"></label>
+  <button id="status">Check status</button><button id="report">View report</button>
+  <p id="message" role="status"></p>
+  <pre id="output"></pre>
+</body>
+</html>
