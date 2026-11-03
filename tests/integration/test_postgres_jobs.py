@@ -158,7 +158,7 @@ class PostgresJobsTests(unittest.TestCase):
                     "UPDATE trace_principal_grants SET access_scope=%s,services=%s WHERE tenant_id=%s AND object_id=%s",
                     (
                         profile.evidence.access_scope,
-                        list(profile.evidence.allowed_services),
+                        ["order"],
                         *PRINCIPAL,
                     ),
                 )
@@ -183,6 +183,20 @@ class PostgresJobsTests(unittest.TestCase):
             )
             self.assertEqual(
                 (completed.status, completed.failure_code), ("completed", None)
+            )
+            with psycopg.connect(self.dsn) as connection:
+                snapshot_row = connection.execute(
+                    "SELECT body FROM trace_snapshots WHERE investigation_id=%s",
+                    (job.investigation_id,),
+                ).fetchone()
+            assert snapshot_row is not None
+            body = snapshot_row[0]
+            self.assertEqual(
+                {
+                    entry["record"]["service"]
+                    for entry in json.loads(body)["data"]["entries"]
+                },
+                {"order"},
             )
             report = report_access(
                 self.dsn,

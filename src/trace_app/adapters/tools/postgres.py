@@ -34,6 +34,7 @@ class PostgresToolBackend:
         request = json.dumps(
             {
                 "name": call.name,
+                "job_id": scope.investigation_id,
                 "arguments": call.to_arguments(),
                 "scope": asdict(source_scope),
                 "policy": asdict(policy),
@@ -107,10 +108,19 @@ def main() -> int:
         profile = PostgresInvestigatorProfile(
             os.environ["TRACE_POSTGRES_DSN"], os.environ["TRACE_SOURCE_ID"]
         )
+        allowed = set(profile.allowed_for_job(value["job_id"]))
         # The database profile, rather than tool arguments, supplies authority.
         if (
-            scope.evidence != profile.evidence
-            or scope.knowledge != profile.knowledge
+            replace(scope.evidence, allowed_services=profile.evidence.allowed_services)
+            != profile.evidence
+            or replace(
+                scope.knowledge, allowed_services=profile.knowledge.allowed_services
+            )
+            != profile.knowledge
+            or not set(scope.evidence.allowed_services)
+            <= allowed.intersection(profile.evidence.allowed_services)
+            or not set(scope.knowledge.allowed_services)
+            <= allowed.intersection(profile.knowledge.allowed_services)
             or scope.investigation_id != profile.source_investigation_id
         ):
             raise PermissionError("Source scope changed.")

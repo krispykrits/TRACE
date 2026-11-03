@@ -6,6 +6,7 @@ import os
 import secrets
 import threading
 from collections.abc import Callable
+from dataclasses import replace
 
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
@@ -132,6 +133,19 @@ class HostedProcessor:
             self.profile, principal, job.investigation_id, job.request.access_scope
         )
         self.profile.check_job(job)
+        granted = self.profile.allowed_for_job(job.investigation_id)
+        evidence_services = tuple(
+            service
+            for service in self.profile.evidence.allowed_services
+            if service in granted
+        )
+        knowledge_services = tuple(
+            service
+            for service in self.profile.knowledge.allowed_services
+            if service in granted
+        )
+        if not evidence_services or not knowledge_services:
+            raise StoreAccessError("No source services are authorized.")
         snapshot = self.profile.get_snapshot(
             self.profile.source_investigation_id,
             access_scope=self.profile.evidence.access_scope,
@@ -149,7 +163,7 @@ class HostedProcessor:
                 e
                 for e in snapshot.entries
                 if start <= _parse_utc(e.record.observed_at) <= end
-                and e.record.service in self.profile.evidence.allowed_services
+                and e.record.service in evidence_services
                 and e.record.environment == job.request.environment
             ),
             job.request.window_start,
@@ -174,8 +188,8 @@ class HostedProcessor:
             ToolScope(
                 job.investigation_id,
                 identity.correlation_id,
-                self.profile.evidence,
-                self.profile.knowledge,
+                replace(self.profile.evidence, allowed_services=evidence_services),
+                replace(self.profile.knowledge, allowed_services=knowledge_services),
             ),
             LoggingToolAudit(),
             ToolPolicy(max_attempts=self.profile.policy.max_tool_calls),
