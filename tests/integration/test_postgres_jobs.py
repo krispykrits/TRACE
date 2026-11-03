@@ -13,6 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
+from unittest.mock import patch
 
 import psycopg
 
@@ -25,9 +26,11 @@ from trace_app.adapters.storage.postgres.workflow import PostgresWorkflowStore
 from trace_app.evidence.models import EvidenceRecord, SourceAvailability
 from trace_app.investigation.bundle import EvidencePackage
 from trace_app.investigation.execution import (
+    CallTicket,
     ExecutionIdentity,
     ExecutionPolicy,
     ExecutionRejected,
+    ExecutionSession,
     ExecutionState,
 )
 from trace_app.investigation.models import (
@@ -53,6 +56,7 @@ from trace_app.investigation.provider_policy import (
     SourceAccessPolicy,
     SourceKind,
 )
+from trace_app.investigation.tools import ToolCall, ToolPayload, ToolPolicy, ToolScope
 from trace_app.investigation.worker import InvestigationWorker
 from trace_app.knowledge.models import canonical
 
@@ -133,6 +137,7 @@ class PostgresJobsTests(unittest.TestCase):
         from trace_app.adapters.sources.postgres_investigator import (
             PostgresInvestigatorProfile,
         )
+        from trace_app.adapters.tools.postgres import PostgresToolBackend
 
         with tempfile.TemporaryDirectory() as directory:
             path = prepare(Path(directory) / "source")
@@ -177,7 +182,35 @@ class PostgresJobsTests(unittest.TestCase):
                 HostedProcessor(self.dsn, profile),
                 lease_seconds=180,
             )
-            self.assertTrue(worker.run_once())
+            dispatch = ExecutionSession.dispatch
+            execute = PostgresToolBackend.execute
+            delayed = {"dispatch": False, "execute": False}
+
+            def slow_dispatch(session: ExecutionSession, ticket: CallTicket) -> int:
+                if ticket.kind == "tool" and not delayed["dispatch"]:
+                    delayed["dispatch"] = True
+                    time.sleep(1.9)
+                return dispatch(session, ticket)
+
+            def slow_execute(
+                backend: PostgresToolBackend,
+                call: ToolCall,
+                scope: ToolScope,
+                policy: ToolPolicy,
+                *,
+                timeout_ms: int,
+            ) -> ToolPayload:
+                if not delayed["execute"]:
+                    delayed["execute"] = True
+                    time.sleep(1.3)
+                return execute(backend, call, scope, policy, timeout_ms=timeout_ms)
+
+            with (
+                patch.object(ExecutionSession, "dispatch", slow_dispatch),
+                patch.object(PostgresToolBackend, "execute", slow_execute),
+            ):
+                self.assertTrue(worker.run_once())
+            self.assertEqual(delayed, {"dispatch": True, "execute": True})
             completed = self.store.get_investigation(
                 job.investigation_id, access_scope=profile.evidence.access_scope
             )
