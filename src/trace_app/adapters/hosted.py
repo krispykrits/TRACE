@@ -67,7 +67,6 @@ class SourceTools:
     def execute(
         self, call: ToolCall, scope: ToolScope, policy: ToolPolicy, *, timeout_ms: int
     ) -> ToolPayload:
-        self.profile.current()
         return self.backend.execute(call, scope, policy, timeout_ms=timeout_ms)
 
 
