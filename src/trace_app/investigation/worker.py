@@ -59,6 +59,7 @@ class InvestigationWorker:
                 failure,
                 type(error).__name__,
                 safe_traceback(error),
+                extra={"event": "worker.job.failed"},
             )
         else:
             failure = "executor_incomplete"

@@ -590,6 +590,7 @@ class BoundedInvestigation:
                 self.scope.investigation_id,
                 failure,
                 safe_traceback(failure_error),
+                extra={"event": "workflow.failed"},
             )
         if failure is not None:
             publication = None
@@ -674,6 +675,7 @@ class BoundedInvestigation:
                 detail.get("tool"),
                 detail.get("status"),
                 detail.get("reason"),
+                extra={"event": "workflow.evidence.failed"},
             )
             raise AssessmentBoundaryError("execution_failure")
         return package

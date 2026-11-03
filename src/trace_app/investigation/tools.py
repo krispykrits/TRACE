@@ -356,6 +356,7 @@ class ToolSession:
                     self._scope.investigation_id,
                     result.audit.tool,
                     payload.status,
+                    extra={"event": "tools.final_outcome"},
                 )
                 return ToolResult(
                     replace(result.audit, outcome=payload.status), payload
@@ -478,6 +479,7 @@ class ToolSession:
                                 self._scope.investigation_id,
                                 safe_name,
                                 safe_traceback(error),
+                                extra={"event": "tools.failed"},
                             )
                             payload = ToolPayload(
                                 "dependency_failure", {}, "backend_unavailable"
