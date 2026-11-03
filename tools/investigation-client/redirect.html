@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Completing sign-in</title></head>
+<body><p>Completing sign-in…</p>
+<script src="/msal-redirect-bridge.js"></script>
+<script>msalRedirectBridge.broadcastResponseToMainFrame().catch(() => { document.body.textContent = 'Sign-in response could not be returned to the client.'; });</script>
+</body></html>
