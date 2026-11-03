@@ -129,7 +129,10 @@ def load_azure_settings(setup: Path, secrets: Path) -> tuple[AzureModelSettings,
 
 
 def load_entra_settings(setup: Path) -> AzureModelSettings:
-    values = _private_values(setup)
+    return entra_settings(_private_values(setup))
+
+
+def entra_settings(values: dict[str, str]) -> AzureModelSettings:
     try:
         if values["AZURE_OPENAI_AUTH_METHOD"] != "entra":
             raise ValueError("Entra authentication is required.")

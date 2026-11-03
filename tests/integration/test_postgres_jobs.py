@@ -76,7 +76,7 @@ class PostgresJobsTests(unittest.TestCase):
                     "Queue tests require a disposable trace_test database."
                 )
             connection.execute(
-                "DROP TABLE IF EXISTS trace_workflow_artifacts, trace_workflow_runs, trace_snapshots, trace_model_redactions, trace_model_attempts, trace_model_months, trace_model_budget, trace_execution_calls, trace_execution_runs, trace_job_attempts, trace_jobs, trace_principal_grants CASCADE"
+                "DROP TABLE IF EXISTS trace_source_packages, trace_workflow_artifacts, trace_workflow_runs, trace_snapshots, trace_model_redactions, trace_model_attempts, trace_model_months, trace_model_budget, trace_execution_calls, trace_execution_runs, trace_job_attempts, trace_jobs, trace_principal_grants CASCADE"
             )
             schema = Path(
                 "src/trace_app/adapters/storage/postgres/schema.sql"
@@ -95,23 +95,64 @@ class PostgresJobsTests(unittest.TestCase):
         self.store = PostgresJobs(self.dsn, principal=PRINCIPAL)
         self.now = datetime.now(UTC)
 
+    def test_principal_grants_can_be_locked_but_not_changed(self) -> None:
+        with psycopg.connect(self.dsn, autocommit=True) as connection:
+            connection.execute("CREATE ROLE trace_lock_test")
+            connection.execute(
+                "GRANT SELECT, UPDATE (lock_marker) ON trace_principal_grants TO trace_lock_test"
+            )
+        try:
+            with psycopg.connect(self.dsn) as connection:
+                connection.execute("SET LOCAL ROLE trace_lock_test")
+                self.assertIsNotNone(
+                    connection.execute(
+                        "SELECT * FROM trace_principal_grants FOR SHARE"
+                    ).fetchone()
+                )
+            with psycopg.connect(self.dsn) as connection:
+                connection.execute("SET LOCAL ROLE trace_lock_test")
+                with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                    connection.execute(
+                        "UPDATE trace_principal_grants SET actions=ARRAY['admin']"
+                    )
+        finally:
+            with psycopg.connect(self.dsn, autocommit=True) as connection:
+                connection.execute(
+                    "REVOKE UPDATE (lock_marker) ON trace_principal_grants FROM trace_lock_test"
+                )
+                connection.execute(
+                    "REVOKE ALL ON trace_principal_grants FROM trace_lock_test"
+                )
+                connection.execute("DROP ROLE trace_lock_test")
+
     def test_hosted_worker_and_protected_report(self) -> None:
         from scripts.demo_investigator import Clock
         from scripts.investigator_fixture import prepare
+        from tests.unit.test_postgres_source import synthetic_package
         from trace_app.adapters.hosted import HostedProcessor, report_access
-        from trace_app.adapters.sources.local_investigator import (
-            LocalInvestigatorProfile,
+        from trace_app.adapters.sources.postgres_investigator import (
+            PostgresInvestigatorProfile,
         )
 
         with tempfile.TemporaryDirectory() as directory:
             path = prepare(Path(directory) / "source")
-            config = json.loads(path.read_text())
+            _, package, _, _ = synthetic_package(path)
+            config = package["profile"]
             config["principal_id"] = f"entra:{PRINCIPAL[0]}:{PRINCIPAL[1]}"
             config["expires_at"] = "2099-01-01T00:00:00Z"
             for grant in config["grants"].values():
                 grant["expires_at"] = config["expires_at"]
-            path.write_text(json.dumps(config))
-            profile = LocalInvestigatorProfile(path, clock=Clock())
+            with psycopg.connect(self.dsn) as connection:
+                connection.execute(
+                    "INSERT INTO trace_source_packages VALUES (%s,%s::jsonb,%s::jsonb,%s::jsonb)",
+                    (
+                        "synthetic",
+                        json.dumps(config),
+                        json.dumps(package["capture"]),
+                        json.dumps(package["knowledge"]),
+                    ),
+                )
+            profile = PostgresInvestigatorProfile(self.dsn, "synthetic", clock=Clock())
             with psycopg.connect(self.dsn) as connection:
                 connection.execute(
                     "UPDATE trace_principal_grants SET access_scope=%s,services=%s WHERE tenant_id=%s AND object_id=%s",
@@ -153,7 +194,11 @@ class PostgresJobsTests(unittest.TestCase):
             self.assertEqual(report["investigation_id"], job.investigation_id)
             self.assertTrue(report["timeline"])
             config["grants"] = {}
-            path.write_text(json.dumps(config))
+            with psycopg.connect(self.dsn) as connection:
+                connection.execute(
+                    "UPDATE trace_source_packages SET profile=%s::jsonb WHERE source_id=%s",
+                    (json.dumps(config), "synthetic"),
+                )
             with self.assertRaises(ModelProviderError) as denied:
                 report_access(
                     self.dsn,

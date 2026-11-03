@@ -13,6 +13,7 @@ from typing import Any, Iterator
 import psycopg
 from psycopg.rows import dict_row
 
+from trace_app.adapters.storage.postgres.connection import connect
 from trace_app.evidence.models import format_utc
 from trace_app.investigation.models import (
     Investigation,
@@ -68,7 +69,7 @@ class PostgresJobs:
     @contextmanager
     def _connection(self) -> Iterator[Any]:
         try:
-            with psycopg.connect(
+            with connect(
                 self._dsn, row_factory=dict_row, connect_timeout=5
             ) as connection:
                 yield connection

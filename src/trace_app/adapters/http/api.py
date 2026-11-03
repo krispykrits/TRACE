@@ -180,17 +180,19 @@ def create_app(
 
 def app_factory() -> FastAPI:
     """Compose the service with operator-provided Entra and PostgreSQL settings."""
-    from pathlib import Path
-
     from trace_app.adapters.hosted import report_access
-    from trace_app.adapters.sources.local_investigator import LocalInvestigatorProfile
+    from trace_app.adapters.sources.postgres_investigator import (
+        PostgresInvestigatorProfile,
+    )
 
+    if os.environ.get("TRACE_POSTGRES_AUTH") != "entra":
+        raise ValueError("Hosted PostgreSQL requires Entra authentication.")
     dsn = os.environ["TRACE_POSTGRES_DSN"]
     settings = conninfo_to_dict(dsn)
     if settings.get("sslmode") != "verify-full" or not settings.get("host"):
         raise ValueError("PostgreSQL must use a hostname and sslmode=verify-full.")
     store = PostgresJobs(dsn)
-    profile = LocalInvestigatorProfile(Path(os.environ["TRACE_SOURCE_PROFILE"]))
+    profile = PostgresInvestigatorProfile(dsn, os.environ["TRACE_SOURCE_ID"])
     auth = EntraAuthenticator(
         os.environ["TRACE_ENTRA_TENANT_ID"],
         os.environ["TRACE_ENTRA_API_CLIENT_ID"],

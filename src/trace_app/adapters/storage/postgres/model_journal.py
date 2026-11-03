@@ -8,6 +8,7 @@ from typing import Any
 import psycopg
 from psycopg.rows import dict_row
 
+from trace_app.adapters.storage.postgres.connection import connect
 from trace_app.investigation.provider import (
     ModelErrorCode,
     ModelPricing,
@@ -76,7 +77,7 @@ class PostgresModelJournal:
     ) -> None:
         try:
             reservation = self._pricing.estimate(input_allowance, output_allowance)
-            with psycopg.connect(
+            with connect(
                 self._dsn, row_factory=dict_row, connect_timeout=5
             ) as connection:
                 month = self._budget(connection)
@@ -169,7 +170,7 @@ class PostgresModelJournal:
         now: float,
     ) -> None:
         try:
-            with psycopg.connect(
+            with connect(
                 self._dsn, row_factory=dict_row, connect_timeout=5
             ) as connection:
                 month = self._budget(connection)

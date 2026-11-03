@@ -7,10 +7,11 @@ import logging
 import os
 import subprocess
 import sys
+from contextlib import nullcontext
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 from trace_app.evidence.models import _parse_utc, format_utc
 from trace_app.evidence.queries import EvidenceQueryService, TrustedQueryContext
@@ -58,7 +59,12 @@ class LoggingToolAudit:
 
 
 def _run_process(
-    command: list[str], request: bytes, *, timeout_ms: int, max_bytes: int
+    command: list[str],
+    request: bytes,
+    *,
+    timeout_ms: int,
+    max_bytes: int,
+    extra_environment: dict[str, str] | None = None,
 ) -> bytes:
     # This helper is internal. Neither the command nor environment is tool input.
     environment = {
@@ -66,6 +72,8 @@ def _run_process(
         "OPENBLAS_NUM_THREADS": "1",
         "OMP_NUM_THREADS": "1",
     }
+    if extra_environment:
+        environment.update(extra_environment)
     with subprocess.Popen(
         command,
         stdin=subprocess.PIPE,
@@ -146,23 +154,31 @@ def _entry_data(entry: EvidenceEntry) -> dict[str, object]:
 def _read(
     call: ToolCall,
     scope: ToolScope,
-    sources: LocalToolSources,
+    sources: LocalToolSources | None,
     policy: ToolPolicy,
     *,
     at: datetime | None = None,
+    reader: Any = None,
+    corpus_reader: Any = None,
+    index_generation: Any = None,
 ) -> ToolPayload:
     if isinstance(call.arguments, EvidenceArguments):
-        from trace_app.adapters.storage.sqlite.investigations import (
-            SQLiteInvestigationStore,
-        )
+        if reader is None:
+            assert sources is not None
+            from trace_app.adapters.storage.sqlite.investigations import (
+                SQLiteInvestigationStore,
+            )
 
-        try:
-            reader = SQLiteInvestigationStore(sources.evidence_db, read_only=True)
-        except StoreInputError as error:
-            raise StoreDependencyError(
-                "Configured evidence source is unavailable."
-            ) from error
-        with reader as store:
+            try:
+                reader = SQLiteInvestigationStore(sources.evidence_db, read_only=True)
+            except StoreInputError as error:
+                raise StoreDependencyError(
+                    "Configured evidence source is unavailable."
+                ) from error
+            reader_context: Any = reader
+        else:
+            reader_context = nullcontext(reader)
+        with reader_context as store:
             service = EvidenceQueryService(store, max_limit=policy.max_results)
             args = call.arguments
             if args.evidence_id is not None:
@@ -218,14 +234,24 @@ def _read(
 
     from trace_app.adapters.retrieval.exact_scoring import LocalExactScorer
     from trace_app.adapters.retrieval.local_index import load_index
-    from trace_app.adapters.storage.sqlite.corpus import SQLiteCorpusStore
     from trace_app.knowledge.context import ContextAssembler, ContextBudget
     from trace_app.knowledge.index import chunk_fingerprint
     from trace_app.knowledge.search import SearchService
 
     at = at or datetime.now(UTC)
-    with SQLiteCorpusStore(sources.corpus_db, read_only=True) as corpus:
-        index = load_index(sources.index_root)
+    if corpus_reader is None:
+        assert sources is not None
+        from trace_app.adapters.storage.sqlite.corpus import SQLiteCorpusStore
+
+        corpus_context: Any = SQLiteCorpusStore(sources.corpus_db, read_only=True)
+    else:
+        corpus_context = nullcontext(corpus_reader)
+    with corpus_context as corpus:
+        if index_generation is None:
+            assert sources is not None
+            index = load_index(sources.index_root)
+        else:
+            index = index_generation
         if isinstance(call.arguments, CitationArguments):
             citation = call.arguments
             if (
