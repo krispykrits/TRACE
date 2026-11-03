@@ -1,24 +1,34 @@
 name: Publish TRACE image
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: [Quality checks]
+    types: [completed]
+    branches: [main]
 permissions:
   contents: read
   id-token: write
 jobs:
   publish:
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'))
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: azure/login@v2
         with:
           client-id: ${{ vars.AZURE_PUBLISHER_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       - name: Build and publish
+        id: image
         env:
           ACR_NAME: ${{ vars.ACR_NAME }}
-          SOURCE_SHA: ${{ github.sha }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
         run: |
           set -euo pipefail
           [[ "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]]
@@ -31,4 +41,22 @@ jobs:
           docker push "$image"
           digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$image")
           [[ "$digest" =~ @sha256:[a-f0-9]{64}$ ]]
+          printf 'image=%s\n' "$digest" >> "$GITHUB_OUTPUT"
           printf 'Image: `%s`\nSource: `%s`\n' "$digest" "$SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+      - name: Request deployment approval
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ secrets.TRACE_PLATFORM_DISPATCH_TOKEN }}
+          IMAGE: ${{ steps.image.outputs.image }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          [[ -n "$GH_TOKEN" ]] || { echo 'Missing TRACE_PLATFORM_DISPATCH_TOKEN' >&2; exit 1; }
+          current=$(curl --fail --silent --show-error --retry 3 https://api.github.com/repos/krispykrits/TRACE/commits/main | jq -er .sha)
+          if [[ "$SOURCE_SHA" != "$current" ]]; then
+            echo 'A newer TRACE commit exists; skipping this deployment request.'
+            exit 0
+          fi
+          jq -n --arg image "$IMAGE" --arg source "$SOURCE_SHA" \
+            '{ref:"main", inputs:{image:$image, source_sha:$source}}' |
+            gh api --method POST repos/krispykrits/trace-platform/actions/workflows/deploy.yml/dispatches --input -
