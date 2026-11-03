@@ -13,6 +13,7 @@ from threading import Lock
 from typing import Callable, Literal, Protocol, cast
 
 from trace_app.evidence.queries import EvidenceQuery, TrustedQueryContext
+from trace_app.investigation.diagnostics import safe_traceback
 from trace_app.investigation.execution import (
     CallPurpose,
     CallTicket,
@@ -355,6 +356,7 @@ class ToolSession:
                     self._scope.investigation_id,
                     result.audit.tool,
                     payload.status,
+                    extra={"event": "tools.final_outcome"},
                 )
                 return ToolResult(
                     replace(result.audit, outcome=payload.status), payload
@@ -470,8 +472,15 @@ class ToolSession:
                             )
                         except ExecutionRejected as error:
                             payload = _execution_failure(error.outcome)
-                        except Exception:
+                        except Exception as error:
                             # No exception text, arguments or retrieved content in audit/errors.
+                            logging.getLogger("trace_app.tools").error(
+                                "tool_failed investigation_id=%s tool=%s\n%s",
+                                self._scope.investigation_id,
+                                safe_name,
+                                safe_traceback(error),
+                                extra={"event": "tools.failed"},
+                            )
                             payload = ToolPayload(
                                 "dependency_failure", {}, "backend_unavailable"
                             )

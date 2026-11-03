@@ -1,34 +1,52 @@
 name: Publish TRACE image
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: [Quality checks]
-    types: [completed]
+  push:
     branches: [main]
 permissions:
   contents: read
+  actions: read
+  pull-requests: read
   id-token: write
 jobs:
   publish:
-    if: >-
-      github.ref == 'refs/heads/main' &&
-      (github.event_name == 'workflow_dispatch' ||
-       (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'))
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     steps:
+      - name: Verify merged pull request checks
+        id: verify
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          pr=$(gh api "repos/$GITHUB_REPOSITORY/commits/$SOURCE_SHA/pulls" | jq -c --arg sha "$SOURCE_SHA" '[.[] | select(.merged_at != null and .base.ref == "main" and .merge_commit_sha == $sha)] | first // empty')
+          if [[ -z "$pr" ]]; then
+            echo 'No merged pull request for this commit; skipping publication.'
+            echo 'publish=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          head=$(jq -er '.head.sha' <<< "$pr")
+          [[ "$head" =~ ^[a-f0-9]{40}$ ]]
+          result=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/quality.yml/runs?event=pull_request&head_sha=$head&per_page=100" | jq -r --arg head "$head" '[.workflow_runs[] | select(.head_sha == $head)] | sort_by(.created_at) | last | if . == null then "missing" else (.status + ":" + (.conclusion // "pending")) end')
+          [[ "$result" == 'completed:success' ]] || { echo "Pull request quality checks are not successful: $result" >&2; exit 1; }
+          echo 'publish=true' >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+        if: github.event_name == 'workflow_dispatch' || steps.verify.outputs.publish == 'true'
       - uses: azure/login@v2
+        if: github.event_name == 'workflow_dispatch' || steps.verify.outputs.publish == 'true'
         with:
           client-id: ${{ vars.AZURE_PUBLISHER_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       - name: Build and publish
         id: image
+        if: github.event_name == 'workflow_dispatch' || steps.verify.outputs.publish == 'true'
         env:
           ACR_NAME: ${{ vars.ACR_NAME }}
-          SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+          SOURCE_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           [[ "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]]
@@ -44,11 +62,11 @@ jobs:
           printf 'image=%s\n' "$digest" >> "$GITHUB_OUTPUT"
           printf 'Image: `%s`\nSource: `%s`\n' "$digest" "$SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
       - name: Request deployment approval
-        if: github.event_name == 'workflow_run'
+        if: github.event_name == 'push' && steps.verify.outputs.publish == 'true'
         env:
           GH_TOKEN: ${{ secrets.TRACE_PLATFORM_DISPATCH_TOKEN }}
           IMAGE: ${{ steps.image.outputs.image }}
-          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+          SOURCE_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           [[ -n "$GH_TOKEN" ]] || { echo 'Missing TRACE_PLATFORM_DISPATCH_TOKEN' >&2; exit 1; }

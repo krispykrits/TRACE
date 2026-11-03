@@ -7,6 +7,7 @@ import threading
 from collections.abc import Callable
 from typing import Protocol
 
+from trace_app.investigation.diagnostics import safe_traceback
 from trace_app.investigation.models import Investigation, StoreStateError
 
 _LOG = logging.getLogger("trace_app.worker")
@@ -53,10 +54,12 @@ class InvestigationWorker:
         except Exception as error:
             failure = "executor_failed"
             _LOG.error(
-                "job_failed investigation_id=%s failure_code=%s error_type=%s",
+                "job_failed investigation_id=%s failure_code=%s error_type=%s\n%s",
                 job.investigation_id,
                 failure,
                 type(error).__name__,
+                safe_traceback(error),
+                extra={"event": "worker.job.failed"},
             )
         else:
             failure = "executor_incomplete"
