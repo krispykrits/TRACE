@@ -95,6 +95,36 @@ class PostgresJobsTests(unittest.TestCase):
         self.store = PostgresJobs(self.dsn, principal=PRINCIPAL)
         self.now = datetime.now(UTC)
 
+    def test_principal_grants_can_be_locked_but_not_changed(self) -> None:
+        with psycopg.connect(self.dsn, autocommit=True) as connection:
+            connection.execute("CREATE ROLE trace_lock_test")
+            connection.execute(
+                "GRANT SELECT, UPDATE (lock_marker) ON trace_principal_grants TO trace_lock_test"
+            )
+        try:
+            with psycopg.connect(self.dsn) as connection:
+                connection.execute("SET LOCAL ROLE trace_lock_test")
+                self.assertIsNotNone(
+                    connection.execute(
+                        "SELECT * FROM trace_principal_grants FOR SHARE"
+                    ).fetchone()
+                )
+            with psycopg.connect(self.dsn) as connection:
+                connection.execute("SET LOCAL ROLE trace_lock_test")
+                with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                    connection.execute(
+                        "UPDATE trace_principal_grants SET actions=ARRAY['admin']"
+                    )
+        finally:
+            with psycopg.connect(self.dsn, autocommit=True) as connection:
+                connection.execute(
+                    "REVOKE UPDATE (lock_marker) ON trace_principal_grants FROM trace_lock_test"
+                )
+                connection.execute(
+                    "REVOKE ALL ON trace_principal_grants FROM trace_lock_test"
+                )
+                connection.execute("DROP ROLE trace_lock_test")
+
     def test_hosted_worker_and_protected_report(self) -> None:
         from scripts.demo_investigator import Clock
         from scripts.investigator_fixture import prepare

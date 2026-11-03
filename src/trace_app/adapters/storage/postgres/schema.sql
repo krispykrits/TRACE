@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS trace_principal_grants (
     environment TEXT NOT NULL,
     services TEXT[] NOT NULL,
     actions TEXT[] NOT NULL,
+    lock_marker BOOLEAN NOT NULL DEFAULT FALSE CHECK (NOT lock_marker),
     PRIMARY KEY (tenant_id, object_id)
 );
 
@@ -88,7 +89,8 @@ CREATE TABLE IF NOT EXISTS trace_model_budget (
     limit_nusd BIGINT NOT NULL CHECK (limit_nusd > 0 AND limit_nusd <= 20000000000),
     pricing TEXT NOT NULL,
     input_rate BIGINT NOT NULL,
-    output_rate BIGINT NOT NULL
+    output_rate BIGINT NOT NULL,
+    lock_marker BOOLEAN NOT NULL DEFAULT FALSE CHECK (NOT lock_marker)
 );
 
 CREATE TABLE IF NOT EXISTS trace_model_months (

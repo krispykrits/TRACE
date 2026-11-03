@@ -12,9 +12,9 @@ POSTGRES_SCOPE = "https://ossrdbms-aad.database.windows.net/.default"
 
 @lru_cache(maxsize=1)
 def _credential() -> Any:
-    from azure.identity import DefaultAzureCredential
+    from azure.identity import WorkloadIdentityCredential
 
-    return DefaultAzureCredential()
+    return WorkloadIdentityCredential()
 
 
 def connect(dsn: str, **kwargs: Any) -> Any:
