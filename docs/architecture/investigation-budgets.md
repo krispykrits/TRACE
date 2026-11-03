@@ -55,7 +55,7 @@ No prompt, response, tool argument/result body, evidence excerpt, evaluator answ
 Run the fake-adapter/injected-clock demonstration and actual SQLite state/journal cases:
 
 ```sh
-uv run --locked python -m unittest tests.unit.test_execution_policy tests.contracts.test_execution tests.integration.test_execution -v
+uv run --locked python -m unittest tests.unit.test_execution_policy tests.contracts.test_execution -v
 make check lint format-check type-check architecture-check test integration package-check
 ```
 

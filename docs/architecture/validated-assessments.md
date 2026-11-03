@@ -58,7 +58,7 @@ No read/check/review executes a recommended tool or production mutation. `next_c
 Run the hand-authored answerable, competing/unrelated-deployment and insufficient-evidence examples and negative cases:
 
 ```sh
-uv run --locked python -m unittest tests.unit.test_assessment_schema tests.contracts.test_assessment_validation tests.integration.test_assessments -v
+uv run --locked python -m unittest tests.unit.test_assessment_schema tests.contracts.test_assessment_validation -v
 make check lint format-check type-check architecture-check test integration package-check
 ```
 

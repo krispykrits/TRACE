@@ -61,7 +61,7 @@ jobs:
         run: make architecture-check
       - name: Unit and contract tests
         run: make test
-      - name: Storage and evaluation integration tests
+      - name: Integration tests
         run: make integration
       - name: Installed runtime wheel
         run: make package-check
@@ -97,7 +97,7 @@ jobs:
       - name: Exercise concurrent queue operations
         env:
           TRACE_TEST_POSTGRES_DSN: postgresql://trace_test:trace_test@localhost:5432/trace_test
-        run: uv run --locked python -m unittest tests.integration.test_postgres_jobs -v
+        run: uv run --locked python -m unittest tests.integration.test_postgres_jobs -b
 
   live-provider-integration:
     name: Opt-in live provider integration

@@ -115,10 +115,9 @@ Demonstrates six synthetic tools and rejection of unauthorized, over-limit and s
 uv run --locked python scripts/demo_integration.py \
   --output /tmp/trace-s4-package.json
 
-make integration-s4
 ```
 
-Produces the scripted cited timeline/context package and verifies the assembled boundary with independent evaluator fixtures. See the [integration contract](docs/architecture/scripted-evidence-package.md).
+Produces the scripted cited timeline/context package. See the [integration contract](docs/architecture/scripted-evidence-package.md).
 
 ### Offline investigation demonstration
 
