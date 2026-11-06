@@ -390,6 +390,16 @@ class PostgresJobsTests(unittest.TestCase):
                 "SELECT state FROM trace_execution_runs WHERE investigation_id=%s",
                 (job.investigation_id,),
             ).fetchone()
+            lease = connection.execute(
+                """SELECT extract(epoch FROM (a.lease_until - clock_timestamp())),
+                          a.lease_until = j.lease_until
+                   FROM trace_job_attempts a JOIN trace_jobs j USING (investigation_id)
+                   WHERE a.attempt_id=%s""",
+                (job.active_attempt_id,),
+            ).fetchone()
+        assert lease is not None
+        self.assertGreater(lease[0], 120)
+        self.assertTrue(lease[1])
         assert row is not None
         import json
 

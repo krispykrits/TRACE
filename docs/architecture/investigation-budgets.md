@@ -22,6 +22,8 @@ The database must exist privately and hold a current running job under the suppl
 
 These defaults are implementation safety controls, not owner latency/quality targets or an additional financial commitment. Tool results require at least 512 bytes. Caller-supplied per-call model bounds and the existing tool policy can narrow the shared ceilings. Native response bytes/output tokens and tool worker timeouts are clipped outside the prompt, including remaining investigation and lease time. The original shared deadline starts at the first composed session; per-call and execution durations include preparation/idle time, and end-to-end duration also includes queue wait from the durable submission time.
 
+For hosted PostgreSQL jobs, the worker renews an active lease when the execution session starts so setup does not consume the execution deadline. An expired attempt is never renewed.
+
 Use the existing monthly journal with the owner's explicit spending allowance (at most $20/month), known prior-spending seed and shared journal path. The Azure factory requires its existing versioned ceiling-price snapshot to match the execution session; no new monetary limit or zero prior-spend assumption is inferred. Standalone explicitly authorized connector diagnostics continue to use their existing per-call/monthly bounds; they do not start an investigator workflow. #37 must use the composed session for every investigation step.
 
 ## Admission, cancellation and failure

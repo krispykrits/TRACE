@@ -144,6 +144,7 @@ def _execute(
         os.environ["TRACE_POSTGRES_DSN"],
         os.environ["TRACE_SOURCE_ID"],
         connection=connection,
+        cache_package=True,
     )
     allowed = set(profile.allowed_for_job(value["job_id"]))
     # The database profile, rather than tool arguments, supplies authority.

@@ -94,8 +94,28 @@ class PostgresExecutionLedger:
                     (identity.investigation_id,),
                 ).fetchone()
                 if row is None:
-                    if job["status"] != "running":
+                    if (
+                        job["status"] != "running"
+                        or job["lease_until"] is None
+                        or job["lease_until"] <= job["database_now"]
+                    ):
                         raise ExecutionRejected("attempt_not_active")
+                    # Setup runs under the original lease. Once it is complete,
+                    # give execution its full deadline without reviving a stale job.
+                    renewed = connection.execute(
+                        """UPDATE trace_jobs SET lease_until=GREATEST(
+                            lease_until, clock_timestamp() + (%s * interval '1 millisecond')
+                        ) WHERE investigation_id=%s AND lease_until > clock_timestamp()
+                        RETURNING lease_until""",
+                        (policy.deadline_ms + 10_000, identity.investigation_id),
+                    ).fetchone()
+                    if renewed is None:
+                        raise ExecutionRejected("attempt_not_active")
+                    job["lease_until"] = renewed["lease_until"]
+                    connection.execute(
+                        "UPDATE trace_job_attempts SET lease_until=%s WHERE attempt_id=%s",
+                        (job["lease_until"], identity.attempt_id),
+                    )
                     state = ExecutionState(now, job["created_at"].timestamp(), now)
                 else:
                     if row["policy"] != policy_json:
