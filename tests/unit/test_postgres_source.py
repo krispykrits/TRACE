@@ -11,6 +11,7 @@ from unittest.mock import MagicMock, patch
 
 from scripts.demo_investigator import Clock
 from scripts.investigator_fixture import prepare
+from trace_app.adapters.hosted import SourceTools
 from trace_app.adapters.sources.authority import LocalEvidenceAuthority
 from trace_app.adapters.sources.local_investigator import LocalInvestigatorProfile
 from trace_app.adapters.sources.postgres_investigator import PostgresInvestigatorProfile
@@ -18,6 +19,7 @@ from trace_app.adapters.storage.postgres.evidence import PostgresEvidenceStore
 from trace_app.adapters.storage.sqlite.corpus import SQLiteCorpusStore
 from trace_app.adapters.storage.sqlite.investigations import SQLiteInvestigationStore
 from trace_app.adapters.tools.local import _read
+from trace_app.investigation.assessment_context import AssessmentBoundaryError
 from trace_app.investigation.models import StoreAccessError
 from trace_app.investigation.provider import ModelProviderError
 from trace_app.investigation.provider_policy import (
@@ -78,6 +80,25 @@ def synthetic_package(path):
 
 
 class PostgresSourceTest(unittest.TestCase):
+    def test_scope_recheck_rejects_revoked_service(self):
+        with TemporaryDirectory() as temp:
+            path = prepare(Path(temp) / "source")
+            _, package, _, _ = synthetic_package(path)
+            profile = PostgresInvestigatorProfile(
+                "unused", "synthetic", clock=Clock(), source_loader=lambda: package
+            )
+            services = set(profile.evidence.allowed_services) | set(
+                profile.knowledge.allowed_services
+            )
+            scope = ToolScope("job", "correlation", profile.evidence, profile.knowledge)
+            with patch.object(
+                profile, "allowed_for_job", return_value=tuple(services)
+            ) as allowed:
+                SourceTools(profile).revalidate_scope(scope)
+                allowed.return_value = tuple(services - {next(iter(services))})
+                with self.assertRaises(AssessmentBoundaryError):
+                    SourceTools(profile).revalidate_scope(scope)
+
     def test_authority_checks_use_one_fresh_source_read(self):
         with TemporaryDirectory() as temp:
             path = prepare(Path(temp) / "source")
