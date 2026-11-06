@@ -472,10 +472,59 @@ class PostgresJobsTests(unittest.TestCase):
         )
         with psycopg.connect(self.dsn) as connection:
             row = connection.execute(
-                "SELECT charged_nusd, dispatched FROM trace_model_attempts WHERE request_id=%s",
+                "SELECT budgeted_nusd, dispatched FROM trace_model_attempts WHERE request_id=%s",
+                (metadata["request_id"],),
+            ).fetchone()
+            accounting = connection.execute(
+                """SELECT budgeted_nusd, reserved_nusd, estimated_cost_nusd,
+                          actual_billed_nusd, worker_started, request_sent
+                   FROM trace_model_accounting WHERE request_id=%s""",
                 (metadata["request_id"],),
             ).fetchone()
         self.assertEqual(row, (20, True))
+        self.assertEqual(accounting, (20, 20, None, None, None, None))
+
+        # A rolling deployment can use the old name until the migration runs.
+        with psycopg.connect(self.dsn) as connection:
+            connection.execute(
+                "ALTER TABLE trace_model_attempts RENAME COLUMN budgeted_nusd TO charged_nusd"
+            )
+        journal.finish(
+            metadata | {"outcome": "timeout"}, ModelUsage(), True, time.time()
+        )
+        migration = Path(
+            "src/trace_app/adapters/storage/postgres/migrations/001_model_budget_accounting.sql"
+        ).read_text()
+        with psycopg.connect(self.dsn) as connection:
+            connection.execute(migration)
+            self.assertEqual(
+                connection.execute(
+                    "SELECT budgeted_nusd FROM trace_model_attempts WHERE request_id=%s",
+                    (metadata["request_id"],),
+                ).fetchone(),
+                (20,),
+            )
+        journal.finish(
+            metadata
+            | {
+                "outcome": "structured_response_received",
+                "worker_started": True,
+                "request_sent": True,
+            },
+            ModelUsage(5, 5),
+            True,
+            time.time(),
+        )
+        with psycopg.connect(self.dsn) as connection:
+            self.assertEqual(
+                connection.execute(
+                    """SELECT budgeted_nusd, reserved_nusd, estimated_cost_nusd,
+                          actual_billed_nusd, worker_started, request_sent
+                   FROM trace_model_accounting WHERE request_id=%s""",
+                    (metadata["request_id"],),
+                ).fetchone(),
+                (20, 10, 10, None, True, True),
+            )
 
     def test_worker_fails_unpublished_attempt_without_replay(self) -> None:
         request = InvestigationRequest(

@@ -205,6 +205,7 @@ class AzureResponsesTransport:
             raise ModelProviderError(ModelErrorCode.POLICY)
         endpoint = urlsplit(self._settings.base_url)
         connection = None
+        response = None
         try:
             connection = self._connection_factory(
                 endpoint.hostname,
@@ -325,10 +326,20 @@ class AzureResponsesTransport:
             ):
                 raise ModelProviderError(ModelErrorCode.MALFORMED_RESPONSE, usage=usage)
             return ModelReply(
-                texts[0], operation_id, usage, reported_model=reported_model
+                texts[0],
+                operation_id,
+                usage,
+                reported_model=reported_model,
+                request_sent=True,
             )
-        except ModelProviderError:
-            raise
+        except ModelProviderError as error:
+            if response is None:
+                raise
+            raise ModelProviderError(
+                error.code,
+                usage=error.usage,
+                diagnostics={**error.diagnostics, "http_status": response.status},
+            ) from None
         except TimeoutError:
             raise ModelProviderError(ModelErrorCode.TIMEOUT) from None
         except (OSError, http.client.HTTPException):

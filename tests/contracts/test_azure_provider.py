@@ -69,6 +69,32 @@ class AzureContractTests(unittest.TestCase):
             with self.assertRaises(ModelProviderError) as failure:
                 process.generate(self.request)
         self.assertEqual(failure.exception.code, ModelErrorCode.AUTHENTICATION)
+        self.assertEqual(failure.exception.diagnostics.get("worker_started"), True)
+        self.assertNotIn("request_sent", failure.exception.diagnostics)
+
+    def test_worker_start_failure_is_not_reported_as_sent(self) -> None:
+        transport = AzureResponsesTransport(
+            SETTINGS, "", self.guard, token_provider=entra_token
+        )
+        process = ProcessModelProvider(
+            SETTINGS.configuration(),
+            SETTINGS.capabilities(),
+            transport,
+            credential_present=True,
+            admission_guard=self.guard,
+        )
+        with patch(
+            "trace_app.adapters.models.process.pickle.dumps",
+            side_effect=RuntimeError("secret"),
+        ):
+            with self.assertLogs("trace_app.worker", "ERROR") as logs:
+                with self.assertRaises(ModelProviderError) as failure:
+                    process.generate(self.request)
+        self.assertEqual(
+            failure.exception.diagnostics,
+            {"worker_started": False, "request_sent": False},
+        )
+        self.assertNotIn("secret", str(logs.output))
 
     def test_entra_token_is_sent_as_bearer_and_auth_failure_stops_dispatch(
         self,
@@ -171,6 +197,7 @@ class AzureContractTests(unittest.TestCase):
         self,
     ) -> None:
         reply = self.transport.generate(self.request)
+        self.assertIs(reply.request_sent, True)
         result = validate_model_reply(self.request, reply)
         self.assertEqual(result.structured_response(), {"status": "ok"})
         self.assertEqual(reply.usage, ModelUsage(23, 24))
