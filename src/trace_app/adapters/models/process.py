@@ -9,6 +9,7 @@ import os
 import sys
 import threading
 import time
+import traceback
 from multiprocessing.connection import Connection
 
 from trace_app.investigation.provider import (
@@ -153,10 +154,19 @@ class ProcessModelProvider:
         except ModelProviderError as error:
             status = error.code.value
             raise
-        except Exception:
+        except Exception as error:
             if expired.is_set() or time.monotonic() >= deadline:
                 status = ModelErrorCode.TIMEOUT.value
                 raise ModelProviderError(ModelErrorCode.TIMEOUT) from None
+            logging.getLogger("trace_app.worker").error(
+                "model_process_failed request_id=%s exception_type=%s locations=%s",
+                request.request_id,
+                type(error).__name__,
+                [
+                    (os.path.basename(f.filename), f.lineno, f.name)
+                    for f in traceback.extract_tb(error.__traceback__)
+                ],
+            )
             raise ModelProviderError(ModelErrorCode.DEPENDENCY) from None
         finally:
             if watchdog is not None:

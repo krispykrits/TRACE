@@ -26,6 +26,14 @@ AZURE_ADAPTER_VERSION = "azure-responses.v1"
 AZURE_PROVIDER_ID = "azure_foundry"
 
 
+def entra_token() -> str:
+    """Create credentials inside the spawned worker, not in its parent."""
+    from azure.identity import DefaultAzureCredential
+
+    with DefaultAzureCredential() as credential:
+        return credential.get_token("https://ai.azure.com/.default").token
+
+
 @dataclass(frozen=True, slots=True)
 class AzureModelSettings:
     base_url: str = field(repr=False)

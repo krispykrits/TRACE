@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import json
+import pickle
 import tempfile
 import unittest
 from dataclasses import replace
 from pathlib import Path
 from typing import Any, cast
+from unittest.mock import MagicMock, patch
 
 from tests.fixtures.provider_policy import (
     SETTINGS,
@@ -19,9 +21,11 @@ from tests.fixtures.provider_policy import (
 )
 from trace_app.adapters.models.azure import (
     AzureResponsesTransport,
+    entra_token,
     load_azure_settings,
     load_entra_settings,
 )
+from trace_app.adapters.models.process import ProcessModelProvider
 from trace_app.investigation.provider import (
     AdmissionGuard,
     ModelCallBounds,
@@ -34,6 +38,38 @@ from trace_app.investigation.provider import (
 
 
 class AzureContractTests(unittest.TestCase):
+    def test_entra_token_provider_is_spawn_safe_and_requests_ai_scope(self) -> None:
+        transport = AzureResponsesTransport(
+            SETTINGS, "", self.guard, token_provider=entra_token
+        )
+        pickle.dumps(transport)
+        credential = MagicMock()
+        credential.__enter__.return_value = credential
+        credential.get_token.return_value.token = "test-token"
+        with patch("azure.identity.DefaultAzureCredential", return_value=credential):
+            self.assertEqual(entra_token(), "test-token")
+        credential.get_token.assert_called_once_with("https://ai.azure.com/.default")
+
+    def test_spawned_entra_worker_reports_missing_identity(self) -> None:
+        transport = AzureResponsesTransport(
+            SETTINGS, "", self.guard, token_provider=entra_token
+        )
+        process = ProcessModelProvider(
+            SETTINGS.configuration(),
+            SETTINGS.capabilities(),
+            transport,
+            credential_present=True,
+            admission_guard=self.guard,
+        )
+        with patch.dict(
+            "os.environ",
+            {"AZURE_TOKEN_CREDENTIALS": "WorkloadIdentityCredential"},
+            clear=True,
+        ):
+            with self.assertRaises(ModelProviderError) as failure:
+                process.generate(self.request)
+        self.assertEqual(failure.exception.code, ModelErrorCode.AUTHENTICATION)
+
     def test_entra_token_is_sent_as_bearer_and_auth_failure_stops_dispatch(
         self,
     ) -> None:
