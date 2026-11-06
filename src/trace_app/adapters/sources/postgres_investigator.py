@@ -55,11 +55,14 @@ class PostgresInvestigatorProfile:
         clock: Callable[[], float] = time.time,
         source_loader: Callable[[], dict[str, Any]] | None = None,
         connection: Any = None,
+        cache_package: bool = False,
     ):
         _identifier("source_id", source_id)
         self.dsn, self.source_id, self.clock = dsn, source_id, clock
         self._source_loader = source_loader
         self._connection = connection
+        self._cache_package = cache_package
+        self._cached_package: dict[str, Any] | None = None
         data = self._package()["profile"]
         if data.get("schema_version") != "postgres-investigator.v1":
             raise AssessmentBoundaryError("access_denied")
@@ -98,21 +101,27 @@ class PostgresInvestigatorProfile:
         self.current()
 
     def _package(self) -> dict[str, Any]:
+        if getattr(self, "_cache_package", False) and self._cached_package is not None:
+            return self._cached_package
         if self._source_loader is not None:
-            return self._source_loader()
-        manager = (
-            nullcontext(self._connection)
-            if self._connection is not None
-            else connect(self.dsn, row_factory=dict_row, connect_timeout=5)
-        )
-        with manager as connection:
-            row = connection.execute(
-                "SELECT profile, capture, knowledge FROM trace_source_packages WHERE source_id=%s",
-                (self.source_id,),
-            ).fetchone()
+            row = self._source_loader()
+        else:
+            manager = (
+                nullcontext(self._connection)
+                if self._connection is not None
+                else connect(self.dsn, row_factory=dict_row, connect_timeout=5)
+            )
+            with manager as connection:
+                row = connection.execute(
+                    "SELECT profile, capture, knowledge FROM trace_source_packages WHERE source_id=%s",
+                    (self.source_id,),
+                ).fetchone()
         if row is None or len(json.dumps(row).encode()) > 20_000_000:
             raise AssessmentBoundaryError("access_denied")
-        return dict(row)
+        result = dict(row)
+        if getattr(self, "_cache_package", False):
+            self._cached_package = result
+        return result
 
     def current(self) -> dict[str, Any]:
         data = self._package()["profile"]

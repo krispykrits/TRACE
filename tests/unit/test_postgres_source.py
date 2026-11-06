@@ -118,6 +118,26 @@ class PostgresSourceTest(unittest.TestCase):
             connect.assert_not_called()
             self.assertEqual(connection.execute.call_count, 2)
 
+    def test_tool_package_is_loaded_once_per_call(self):
+        connection = MagicMock()
+        connection.execute.return_value.fetchone.side_effect = [
+            {"profile": {"version": 1}, "capture": {}, "knowledge": {}},
+            {"profile": {"version": 2}, "capture": {}, "knowledge": {}},
+        ]
+        profiles = []
+        for _ in range(2):
+            profile = object.__new__(PostgresInvestigatorProfile)
+            profile.source_id = "synthetic"
+            profile._source_loader = None
+            profile._connection = connection
+            profile._cache_package = True
+            profile._cached_package = None
+            profiles.append(profile)
+        self.assertEqual(profiles[0]._package()["profile"]["version"], 1)
+        self.assertEqual(profiles[0]._package()["profile"]["version"], 1)
+        self.assertEqual(profiles[1]._package()["profile"]["version"], 2)
+        self.assertEqual(connection.execute.call_count, 2)
+
     def test_evidence_and_knowledge_are_read_and_rechecked(self):
         with TemporaryDirectory() as temp:
             path = prepare(Path(temp) / "source")
