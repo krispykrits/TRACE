@@ -374,6 +374,40 @@ class SourceAccessPolicy:
         self, selection: EvidenceSelection, *, transmission: bool
     ) -> AuthorizedEvidence:
         record = self._authority.resolve(self._scope, selection.evidence_id)
+        return self._validate_record(selection, record, transmission=transmission)
+
+    def _records(
+        self, selections: tuple[EvidenceSelection, ...], *, transmission: bool
+    ) -> list[AuthorizedEvidence]:
+        if not selections:
+            return []
+        if any(
+            not isinstance(selection, EvidenceSelection) for selection in selections
+        ):
+            _deny()
+        resolve_many = getattr(self._authority, "resolve_many", None)
+        if not callable(resolve_many):
+            return [
+                self._record(selection, transmission=transmission)
+                for selection in selections
+            ]
+        records = resolve_many(self._scope, tuple(s.evidence_id for s in selections))
+        if not isinstance(records, dict):
+            _deny()
+        return [
+            self._validate_record(
+                selection, records.get(selection.evidence_id), transmission=transmission
+            )
+            for selection in selections
+        ]
+
+    def _validate_record(
+        self,
+        selection: EvidenceSelection,
+        record: AuthorizedEvidence | None,
+        *,
+        transmission: bool,
+    ) -> AuthorizedEvidence:
         if (
             not isinstance(record, AuthorizedEvidence)
             or record.evidence_id != selection.evidence_id
@@ -438,8 +472,10 @@ class SourceAccessPolicy:
         *,
         transmission: bool,
     ) -> None:
-        for dependency in dependencies:
-            record = self._record(dependency.selection, transmission=transmission)
+        records = self._records(
+            tuple(d.selection for d in dependencies), transmission=transmission
+        )
+        for dependency, record in zip(dependencies, records, strict=True):
             if self._fingerprint(record) != dependency.fingerprint:
                 _deny()
 
@@ -449,9 +485,7 @@ class SourceAccessPolicy:
         *,
         expected_content: Mapping[str, str] | None = None,
     ) -> dict[str, object]:
-        records = [
-            self._record(selection, transmission=False) for selection in selections
-        ]
+        records = self._records(selections, transmission=False)
         if expected_content is not None and (
             set(expected_content) != {selection.evidence_id for selection in selections}
             or any(
@@ -524,8 +558,10 @@ class SourceAccessPolicy:
             or len(dependencies) > 256
         ):
             _deny()
-        for dependency in dependencies:
-            record = self._record(dependency.selection, transmission=transmission)
+        records = self._records(
+            tuple(d.selection for d in dependencies), transmission=transmission
+        )
+        for dependency, record in zip(dependencies, records, strict=True):
             actual = max(
                 (
                     item.sensitivity
@@ -723,13 +759,13 @@ class PolicyModelProvider(SourceAccessPolicy):
             views: dict[str, ProviderCitationView] = {}
             sensitivity = Sensitivity.PUBLIC
             expiry = self._clock() + call.bounds.timeout_ms / 1000
-            for selection in call.evidence:
+            selected_records = self._records(call.evidence, transmission=True)
+            for selection, record in zip(call.evidence, selected_records, strict=True):
                 if (
                     not isinstance(selection, EvidenceSelection)
                     or selection.evidence_id in dependencies
                 ):
                     _deny()
-                record = self._record(selection, transmission=True)
                 selected: dict[str, object] = {}
                 for item in record.fields:
                     if item.name not in selection.fields:
@@ -826,17 +862,17 @@ class PolicyModelProvider(SourceAccessPolicy):
                         _deny()
                     views[view.citation_id] = view
                 self._output_safe(content)
-                for dependency in prior._dependencies:
+                prior_records = self._records(
+                    tuple(d.selection for d in prior._dependencies), transmission=True
+                )
+                for dependency, prior_record in zip(
+                    prior._dependencies, prior_records, strict=True
+                ):
                     previous = dependencies.get(dependency.selection.evidence_id)
                     if previous is not None and previous != dependency:
                         _deny()
                     dependencies[dependency.selection.evidence_id] = dependency
-                    expiry = min(
-                        expiry,
-                        self._record(
-                            dependency.selection, transmission=True
-                        ).expires_at,
-                    )
+                    expiry = min(expiry, prior_record.expires_at)
                 sensitivity = max(sensitivity, prior.sensitivity)
                 history.append({"kind": "untrusted_prior_response", "content": content})
             if len(dependencies) > self._max_evidence:
