@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from decimal import Decimal
 from typing import Any
 
 import psycopg
@@ -40,12 +41,27 @@ class PostgresModelJournal:
     def _budget_column(connection: Any) -> str:
         # Accept the old name during rollout; the migration renames it without
         # changing the values used for spending admission.
-        row = connection.execute(
-            """SELECT EXISTS (SELECT 1 FROM pg_attribute
-                WHERE attrelid='trace_model_attempts'::regclass
-                  AND attname='budgeted_nusd' AND NOT attisdropped) AS migrated"""
-        ).fetchone()
-        return "budgeted_nusd" if row["migrated"] else "charged_nusd"
+        rows = connection.execute(
+            """SELECT attname FROM pg_attribute
+                WHERE attrelid='trace_model_attempts'::regclass AND NOT attisdropped
+                  AND attname IN ('budgeted_usd','budgeted_nusd','charged_nusd')"""
+        ).fetchall()
+        columns = {row["attname"] for row in rows}
+        if "budgeted_usd" in columns:
+            return "budgeted_usd"
+        return "budgeted_nusd" if "budgeted_nusd" in columns else "charged_nusd"
+
+    @staticmethod
+    def _amount(value: int, column: str) -> int | Decimal:
+        return (
+            Decimal(value) / Decimal(1_000_000_000)
+            if column.endswith("_usd")
+            else value
+        )
+
+    @staticmethod
+    def _nano(value: int | Decimal, column: str) -> int:
+        return int(value * 1_000_000_000) if column.endswith("_usd") else int(value)
 
     def _budget(self, connection: Any) -> str:
         config = connection.execute(
@@ -128,7 +144,8 @@ class PostgresModelJournal:
                 ).fetchone()
                 if initial_row is None or used_row is None:
                     raise ModelProviderError(ModelErrorCode.AUDIT)
-                initial, used = initial_row["initial_nusd"], used_row["used"]
+                initial = initial_row["initial_nusd"]
+                used = self._nano(used_row["used"], budget_column)
                 uncertain = connection.execute(
                     """SELECT 1 FROM trace_model_attempts WHERE scope_id=%s AND
                     (outcome='reserved' OR (dispatched AND outcome IN (%s,%s,%s,%s,%s))) LIMIT 1""",
@@ -149,8 +166,8 @@ class PostgresModelJournal:
                         metadata["request_id"],
                         metadata["scope_id"],
                         month,
-                        reservation,
-                        reservation,
+                        self._amount(reservation, budget_column),
+                        self._amount(reservation, budget_column),
                         json.dumps(
                             {
                                 **metadata,
@@ -229,30 +246,49 @@ class PostgresModelJournal:
                             else previous_metadata["output_allowance"],
                         )
                         charge = max(
-                            previous[budget_column],
-                            previous["allowance_nusd"],
+                            self._nano(previous[budget_column], budget_column),
+                            self._nano(
+                                previous[
+                                    "allowance_usd"
+                                    if budget_column.endswith("_usd")
+                                    else "allowance_nusd"
+                                ],
+                                budget_column,
+                            ),
                             partial,
                         )
                 else:
                     charge = 0
                 if previous["outcome"] != "reserved" and previous["dispatched"]:
-                    charge = max(charge, previous[budget_column])
+                    charge = max(
+                        charge, self._nano(previous[budget_column], budget_column)
+                    )
                 enriched = {
                     **previous_metadata,
                     **metadata,
                     "cost_kind": "estimate",
                     "pricing_version": self._pricing.version,
                     "currency": "USD",
-                    "estimated_cost_nusd": estimate,
-                    "actual_billed_nusd": None,
-                    "budgeted_nusd": charge,
+                    "actual_billed_usd": None,
+                    "estimated_cost_usd": None
+                    if estimate is None
+                    else f"{Decimal(estimate) / Decimal(1_000_000_000):.9f}",
+                    "budgeted_usd": f"{Decimal(charge) / Decimal(1_000_000_000):.9f}",
                 }
+                for old_key in (
+                    "estimated_cost_nusd",
+                    "actual_billed_nusd",
+                    "budgeted_nusd",
+                ):
+                    enriched.pop(old_key, None)
+                if not budget_column.endswith("_usd"):
+                    enriched["estimated_cost_nusd"] = estimate
                 enriched.pop("reserved_or_estimated_charge_nusd", None)
                 connection.execute(
                     f"""UPDATE trace_model_attempts SET {budget_column}=%s, outcome=%s, metadata=%s, dispatched=%s
                     WHERE request_id=%s""",
                     (
-                        charge,
+                        self._amount(charge, budget_column),
                         metadata["outcome"],
                         json.dumps(enriched, allow_nan=False),
                         was_dispatched,

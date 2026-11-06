@@ -102,8 +102,8 @@ CREATE TABLE IF NOT EXISTS trace_model_attempts (
     request_id TEXT PRIMARY KEY,
     scope_id TEXT NOT NULL,
     month TEXT NOT NULL REFERENCES trace_model_months(month),
-    allowance_nusd BIGINT NOT NULL CHECK (allowance_nusd >= 0),
-    budgeted_nusd BIGINT NOT NULL CHECK (budgeted_nusd >= 0),
+    allowance_usd NUMERIC(29, 9) NOT NULL CHECK (allowance_usd >= 0),
+    budgeted_usd NUMERIC(29, 9) NOT NULL CHECK (budgeted_usd >= 0),
     outcome TEXT NOT NULL,
     metadata TEXT NOT NULL,
     dispatched BOOLEAN NOT NULL
@@ -116,12 +116,15 @@ CREATE TABLE IF NOT EXISTS trace_model_redactions (
 
 CREATE OR REPLACE VIEW trace_model_accounting AS
 SELECT request_id, scope_id, month, outcome,
-       budgeted_nusd,
-       CASE WHEN metadata::jsonb ->> 'estimated_cost_nusd' IS NULL THEN budgeted_nusd
-            ELSE GREATEST(budgeted_nusd - (metadata::jsonb ->> 'estimated_cost_nusd')::bigint, 0)
-       END AS reserved_nusd,
-       (metadata::jsonb ->> 'estimated_cost_nusd')::bigint AS estimated_cost_nusd,
-       NULL::bigint AS actual_billed_nusd,
+       budgeted_usd,
+       CASE WHEN metadata::jsonb ->> 'estimated_cost_usd' IS NULL
+                  AND metadata::jsonb ->> 'estimated_cost_nusd' IS NULL THEN budgeted_usd
+            ELSE GREATEST(budgeted_usd - COALESCE((metadata::jsonb ->> 'estimated_cost_usd')::numeric,
+                         (metadata::jsonb ->> 'estimated_cost_nusd')::numeric / 1000000000), 0)
+       END AS reserved_usd,
+       COALESCE((metadata::jsonb ->> 'estimated_cost_usd')::numeric,
+                (metadata::jsonb ->> 'estimated_cost_nusd')::numeric / 1000000000) AS estimated_cost_usd,
+       NULL::numeric AS actual_billed_usd,
        (metadata::jsonb ->> 'worker_started')::boolean AS worker_started,
        (metadata::jsonb ->> 'request_sent')::boolean AS request_sent
 FROM trace_model_attempts;
