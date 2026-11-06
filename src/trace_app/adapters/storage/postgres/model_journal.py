@@ -36,6 +36,17 @@ class PostgresModelJournal:
     def pricing(self) -> ModelPricing:
         return self._pricing
 
+    @staticmethod
+    def _budget_column(connection: Any) -> str:
+        # Accept the old name during rollout; the migration renames it without
+        # changing the values used for spending admission.
+        row = connection.execute(
+            """SELECT EXISTS (SELECT 1 FROM pg_attribute
+                WHERE attrelid='trace_model_attempts'::regclass
+                  AND attname='budgeted_nusd' AND NOT attisdropped) AS migrated"""
+        ).fetchone()
+        return "budgeted_nusd" if row["migrated"] else "charged_nusd"
+
     def _budget(self, connection: Any) -> str:
         config = connection.execute(
             "SELECT * FROM trace_model_budget WHERE id=1 FOR UPDATE"
@@ -81,6 +92,7 @@ class PostgresModelJournal:
                 self._dsn, row_factory=dict_row, connect_timeout=5
             ) as connection:
                 month = self._budget(connection)
+                budget_column = self._budget_column(connection)
                 job = connection.execute(
                     """SELECT j.*, clock_timestamp() AS database_now FROM trace_jobs j
                     WHERE investigation_id=%s FOR UPDATE""",
@@ -111,7 +123,7 @@ class PostgresModelJournal:
                     (month,),
                 ).fetchone()
                 used_row = connection.execute(
-                    "SELECT COALESCE(SUM(charged_nusd),0) AS used FROM trace_model_attempts WHERE month=%s",
+                    f"SELECT COALESCE(SUM({budget_column}),0) AS used FROM trace_model_attempts WHERE month=%s",
                     (month,),
                 ).fetchone()
                 if initial_row is None or used_row is None:
@@ -174,6 +186,7 @@ class PostgresModelJournal:
                 self._dsn, row_factory=dict_row, connect_timeout=5
             ) as connection:
                 month = self._budget(connection)
+                budget_column = self._budget_column(connection)
                 previous = connection.execute(
                     "SELECT * FROM trace_model_attempts WHERE request_id=%s FOR UPDATE",
                     (metadata["request_id"],),
@@ -216,14 +229,14 @@ class PostgresModelJournal:
                             else previous_metadata["output_allowance"],
                         )
                         charge = max(
-                            previous["charged_nusd"],
+                            previous[budget_column],
                             previous["allowance_nusd"],
                             partial,
                         )
                 else:
                     charge = 0
                 if previous["outcome"] != "reserved" and previous["dispatched"]:
-                    charge = max(charge, previous["charged_nusd"])
+                    charge = max(charge, previous[budget_column])
                 enriched = {
                     **previous_metadata,
                     **metadata,
@@ -231,10 +244,12 @@ class PostgresModelJournal:
                     "pricing_version": self._pricing.version,
                     "currency": "USD",
                     "estimated_cost_nusd": estimate,
-                    "reserved_or_estimated_charge_nusd": charge,
+                    "actual_billed_nusd": None,
+                    "budgeted_nusd": charge,
                 }
+                enriched.pop("reserved_or_estimated_charge_nusd", None)
                 connection.execute(
-                    """UPDATE trace_model_attempts SET charged_nusd=%s, outcome=%s, metadata=%s, dispatched=%s
+                    f"""UPDATE trace_model_attempts SET {budget_column}=%s, outcome=%s, metadata=%s, dispatched=%s
                     WHERE request_id=%s""",
                     (
                         charge,

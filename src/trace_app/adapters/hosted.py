@@ -10,9 +10,11 @@ import threading
 from collections.abc import Callable
 from dataclasses import replace
 
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
-
-from trace_app.adapters.models.azure import AzureResponsesTransport, entra_settings
+from trace_app.adapters.models.azure import (
+    AzureResponsesTransport,
+    entra_settings,
+    entra_token,
+)
 from trace_app.adapters.models.journal import ModelPricing
 from trace_app.adapters.models.process import ProcessModelProvider
 from trace_app.adapters.sources.authority import (
@@ -255,12 +257,8 @@ def main() -> None:
             execution: ExecutionSession,
         ) -> PolicyModelProvider:
             guard = AdmissionGuard(secrets.token_bytes(32))
-            credential = DefaultAzureCredential()
-            token_provider = get_bearer_token_provider(
-                credential, "https://ai.azure.com/.default"
-            )
             transport = AzureResponsesTransport(
-                azure_settings, "", guard, token_provider=token_provider
+                azure_settings, "", guard, token_provider=entra_token
             )
             model = ProcessModelProvider(
                 azure_settings.configuration(),

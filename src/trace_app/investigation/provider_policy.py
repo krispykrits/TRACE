@@ -945,6 +945,8 @@ class PolicyModelProvider(SourceAccessPolicy):
             )
             dispatched = True
             result = self._provider.generate(prepared)
+            metadata["worker_started"] = result.worker_started
+            metadata["request_sent"] = result.reply.request_sent
             usage = result.reply.usage
             for value in (result.reply.reported_model, result.reply.operation_id):
                 if value is not None and self._sensitive_text(value):

@@ -72,7 +72,9 @@ class ModelProviderError(Exception):
         self.diagnostics: dict[str, object] = {}
         for name, value in (diagnostics or {}).items():
             if (
-                name == "http_status"
+                name in ("worker_started", "request_sent")
+                and type(value) is bool
+                or name == "http_status"
                 and type(value) is int
                 and 100 <= value <= 599
                 or name == "provider_error_code"
@@ -458,12 +460,14 @@ class ModelReply:
     usage: ModelUsage = ModelUsage()
     finish_reason: str = "completed"
     reported_model: str | None = None
+    request_sent: bool | None = None
 
 
 @dataclass(frozen=True, slots=True)
 class ModelResult:
     request: ModelRequest = field(repr=False)
     reply: ModelReply = field(repr=False)
+    worker_started: bool | None = None
 
     def metadata(self) -> dict[str, object]:
         return {
@@ -512,6 +516,8 @@ def _validate_json_tree(value: dict[str, object]) -> None:
 def validate_model_reply(request: ModelRequest, reply: ModelReply) -> ModelResult:
     """JSON validity precedes #35's separate assessment/citation validation."""
     if not isinstance(reply, ModelReply) or not isinstance(reply.usage, ModelUsage):
+        raise ModelProviderError(ModelErrorCode.MALFORMED_RESPONSE)
+    if reply.request_sent is not None and type(reply.request_sent) is not bool:
         raise ModelProviderError(ModelErrorCode.MALFORMED_RESPONSE)
     if reply.operation_id is not None:
         if not isinstance(reply.operation_id, str) or not _IDENTIFIER.fullmatch(

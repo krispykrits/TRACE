@@ -6,9 +6,12 @@ import json
 import logging
 import multiprocessing
 import os
+import pickle
 import sys
 import threading
 import time
+import traceback
+from dataclasses import replace
 from multiprocessing.connection import Connection
 
 from trace_app.investigation.provider import (
@@ -44,6 +47,7 @@ def _worker(
                 "operation_id": reply.operation_id,
                 "usage": reply.usage.to_dict(),
                 "reported_model": reply.reported_model,
+                "request_sent": reply.request_sent,
             }
         except ModelProviderError as error:
             envelope = {
@@ -109,7 +113,12 @@ class ProcessModelProvider:
                 pass
 
         status = ModelErrorCode.DEPENDENCY.value
+        start_attempted = False
         try:
+            pickle.dumps((self._transport, request))
+            if time.monotonic() >= deadline:
+                raise ModelProviderError(ModelErrorCode.TIMEOUT)
+            start_attempted = True
             worker.start()
             sender.close()
             remaining = deadline - time.monotonic()
@@ -144,20 +153,53 @@ class ProcessModelProvider:
                 envelope["operation_id"],
                 ModelUsage(usage["input_tokens"], usage["output_tokens"]),
                 reported_model=envelope.get("reported_model"),
+                request_sent=envelope.get("request_sent"),
             )
             result = validate_model_reply(request, reply)
             if time.monotonic() >= deadline:
                 raise ModelProviderError(ModelErrorCode.TIMEOUT)
             status = "structured_response_received"
-            return result
+            return replace(result, worker_started=True)
         except ModelProviderError as error:
             status = error.code.value
-            raise
-        except Exception:
+            diagnostics = dict(error.diagnostics)
+            if worker.pid is not None:
+                diagnostics["worker_started"] = True
+            elif not start_attempted:
+                diagnostics["worker_started"] = False
+                diagnostics["request_sent"] = False
+            if "http_status" in diagnostics:
+                diagnostics["request_sent"] = True
+            raise ModelProviderError(
+                error.code, usage=error.usage, diagnostics=diagnostics
+            ) from None
+        except Exception as error:
             if expired.is_set() or time.monotonic() >= deadline:
                 status = ModelErrorCode.TIMEOUT.value
-                raise ModelProviderError(ModelErrorCode.TIMEOUT) from None
-            raise ModelProviderError(ModelErrorCode.DEPENDENCY) from None
+                raise ModelProviderError(
+                    ModelErrorCode.TIMEOUT,
+                    diagnostics={"worker_started": True}
+                    if worker.pid is not None
+                    else {},
+                ) from None
+            logging.getLogger("trace_app.worker").error(
+                "model_process_failed request_id=%s exception_type=%s locations=%s",
+                request.request_id,
+                type(error).__name__,
+                [
+                    (os.path.basename(f.filename), f.lineno, f.name)
+                    for f in traceback.extract_tb(error.__traceback__)
+                ],
+            )
+            diagnostics = {}
+            if worker.pid is not None:
+                diagnostics["worker_started"] = True
+            elif not start_attempted:
+                diagnostics["worker_started"] = False
+                diagnostics["request_sent"] = False
+            raise ModelProviderError(
+                ModelErrorCode.DEPENDENCY, diagnostics=diagnostics
+            ) from None
         finally:
             if watchdog is not None:
                 watchdog.cancel()
