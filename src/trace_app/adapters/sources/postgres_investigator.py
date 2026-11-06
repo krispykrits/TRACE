@@ -296,6 +296,20 @@ class PostgresInvestigatorProfile:
                 return chunk
         raise CorpusAccessError("Chunk is not accessible.")
 
+    def authority_snapshot(self) -> tuple[dict[str, Any], dict]:
+        """Read grants and source content together for one authorization check."""
+        package = self._package()
+        snapshot = PostgresInvestigatorProfile(
+            self.dsn,
+            self.source_id,
+            clock=self.clock,
+            source_loader=lambda: package,
+            cache_package=True,
+        )
+        if snapshot._identity != self._identity:
+            raise AssessmentBoundaryError("access_denied")
+        return snapshot.current(), snapshot.source_content()
+
     def source_content(self) -> dict[str, tuple[str, str, SourceKind]]:
         snapshot = self.get_snapshot(
             self.source_investigation_id, access_scope=self.evidence.access_scope

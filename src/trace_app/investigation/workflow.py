@@ -363,11 +363,21 @@ class BoundedInvestigation:
         self.store.close()
 
     def check_source_access(self, package: EvidencePackage) -> None:
-        for identity, (revision, content) in source_content(package).items():
-            try:
-                record = self.authority.resolve(self.scope, identity)
-            except Exception:
-                raise AssessmentBoundaryError("execution_failure") from None
+        sources = source_content(package)
+        try:
+            resolve_many = getattr(self.authority, "resolve_many", None)
+            records = (
+                resolve_many(self.scope, tuple(sources))
+                if callable(resolve_many)
+                else {
+                    identity: self.authority.resolve(self.scope, identity)
+                    for identity in sources
+                }
+            )
+        except Exception:
+            raise AssessmentBoundaryError("execution_failure") from None
+        for identity, (revision, content) in sources.items():
+            record = records.get(identity)
             if (
                 not isinstance(record, AuthorizedEvidence)
                 or record.evidence_id != identity

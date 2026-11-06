@@ -1,5 +1,6 @@
 """Check hosted PostgreSQL sources preserve the existing evidence boundaries."""
 
+import copy
 import json
 import unittest
 from dataclasses import asdict
@@ -18,6 +19,11 @@ from trace_app.adapters.storage.sqlite.corpus import SQLiteCorpusStore
 from trace_app.adapters.storage.sqlite.investigations import SQLiteInvestigationStore
 from trace_app.adapters.tools.local import _read
 from trace_app.investigation.models import StoreAccessError
+from trace_app.investigation.provider import ModelProviderError
+from trace_app.investigation.provider_policy import (
+    EvidenceSelection,
+    SourceAccessPolicy,
+)
 from trace_app.investigation.tools import ToolCall, ToolPolicy, ToolScope
 
 
@@ -72,6 +78,38 @@ def synthetic_package(path):
 
 
 class PostgresSourceTest(unittest.TestCase):
+    def test_authority_checks_use_one_fresh_source_read(self):
+        with TemporaryDirectory() as temp:
+            path = prepare(Path(temp) / "source")
+            _, package, _, _ = synthetic_package(path)
+            loader = MagicMock(side_effect=lambda: copy.deepcopy(package))
+            profile = PostgresInvestigatorProfile(
+                "unused", "synthetic", clock=Clock(), source_loader=loader
+            )
+            scope = profile.scope("job-1")
+            authority = LocalEvidenceAuthority(profile, scope)
+            identities = tuple(profile.source_content())[:2]
+            loader.reset_mock()
+            records = authority.resolve_many(scope, identities)
+            self.assertTrue(all(records.values()))
+            self.assertEqual(loader.call_count, 1)
+            selections = []
+            for identity in identities:
+                record = records[identity]
+                assert record is not None
+                selections.append(
+                    EvidenceSelection(identity, record.revision, ("content",))
+                )
+            SourceAccessPolicy(authority, scope, clock=Clock()).bind(tuple(selections))
+            self.assertEqual(loader.call_count, 2)
+            package["profile"]["grants"].pop(identities[0])
+            self.assertIsNone(authority.resolve(scope, identities[0]))
+            self.assertEqual(loader.call_count, 3)
+            with self.assertRaises(ModelProviderError):
+                SourceAccessPolicy(authority, scope, clock=Clock()).bind(
+                    tuple(selections)
+                )
+
     def test_active_job_service_grants_are_rechecked(self):
         profile = object.__new__(PostgresInvestigatorProfile)
         profile.dsn = "unused"

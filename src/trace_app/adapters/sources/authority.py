@@ -21,11 +21,36 @@ class LocalEvidenceAuthority:
     ) -> AuthorizedEvidence | None:
         if scope != self.scope:
             return None
-        data = self.profile.current()
+        if hasattr(self.profile, "authority_snapshot"):
+            data, contents = self.profile.authority_snapshot()
+        else:
+            data = self.profile.current()
+            if not data["grants"].get(evidence_id):
+                return None
+            contents = self.profile.source_content()
+        return self._resolve(evidence_id, data, contents)
+
+    def resolve_many(
+        self, scope: ProviderScope, evidence_ids: tuple[str, ...]
+    ) -> dict[str, AuthorizedEvidence | None]:
+        if scope != self.scope:
+            return {identity: None for identity in evidence_ids}
+        if not hasattr(self.profile, "authority_snapshot"):
+            return {
+                identity: self.resolve(scope, identity) for identity in evidence_ids
+            }
+        data, contents = self.profile.authority_snapshot()
+        return {
+            identity: self._resolve(identity, data, contents)
+            for identity in evidence_ids
+        }
+
+    @staticmethod
+    def _resolve(evidence_id, data, contents) -> AuthorizedEvidence | None:
         grant = data["grants"].get(evidence_id)
         if not grant:
             return None
-        current = self.profile.source_content().get(evidence_id)
+        current = contents.get(evidence_id)
         if current is None:
             return None
         revision, content, kind = current
