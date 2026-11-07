@@ -221,6 +221,7 @@ class HostedProcessor:
                 LoggingToolAudit(),
                 ToolPolicy(
                     max_attempts=self.profile.policy.max_tool_calls,
+                    max_duration_ms=self.profile.policy.deadline_ms,
                     call_timeout_ms=self.profile.policy.tool_timeout_ms,
                 ),
                 execution=execution,
