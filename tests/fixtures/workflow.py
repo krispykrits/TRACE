@@ -18,6 +18,7 @@ from tests.fixtures.execution import Audit, MemoryLedger
 from tests.fixtures.provider_policy import MemoryJournal
 from trace_app.demo.scenarios import ScenarioConfig, ScenarioSession
 from trace_app.evidence.queries import TrustedQueryContext
+from trace_app.investigation.assessment_context import AssessmentBoundaryError
 from trace_app.investigation.execution import (
     ExecutionIdentity,
     ExecutionSession,
@@ -142,6 +143,11 @@ class Backend:
     after_call: Any = None
     failure: str | None = None
     transform: Any = None
+    scope_valid: bool = True
+
+    def revalidate_scope(self, scope):
+        if not self.scope_valid:
+            raise AssessmentBoundaryError("access_denied")
 
     def execute(self, call, scope, policy, *, timeout_ms):
         self.calls.append(call.name)

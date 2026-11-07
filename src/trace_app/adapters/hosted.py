@@ -31,6 +31,7 @@ from trace_app.adapters.storage.postgres.workflow import PostgresWorkflowStore
 from trace_app.adapters.tools.local import LoggingToolAudit
 from trace_app.adapters.tools.postgres import PostgresToolBackend
 from trace_app.evidence.models import _parse_utc
+from trace_app.investigation.assessment_context import AssessmentBoundaryError
 from trace_app.investigation.execution import ExecutionIdentity, ExecutionSession
 from trace_app.investigation.models import (
     EvidenceSnapshot,
@@ -72,6 +73,26 @@ class SourceTools:
         self, call: ToolCall, scope: ToolScope, policy: ToolPolicy, *, timeout_ms: int
     ) -> ToolPayload:
         return self.backend.execute(call, scope, policy, timeout_ms=timeout_ms)
+
+    def revalidate_scope(self, scope: ToolScope) -> None:
+        self.profile.current()
+        allowed = set(self.profile.allowed_for_job(scope.investigation_id))
+        if (
+            replace(
+                scope.evidence, allowed_services=self.profile.evidence.allowed_services
+            )
+            != self.profile.evidence
+            or replace(
+                scope.knowledge,
+                allowed_services=self.profile.knowledge.allowed_services,
+            )
+            != self.profile.knowledge
+            or not set(scope.evidence.allowed_services)
+            <= allowed.intersection(self.profile.evidence.allowed_services)
+            or not set(scope.knowledge.allowed_services)
+            <= allowed.intersection(self.profile.knowledge.allowed_services)
+        ):
+            raise AssessmentBoundaryError("access_denied")
 
 
 def _scope(

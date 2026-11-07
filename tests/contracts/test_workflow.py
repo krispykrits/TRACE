@@ -7,7 +7,7 @@ import json
 import unittest
 from dataclasses import replace
 
-from tests.fixtures.workflow import fixture
+from tests.fixtures.workflow import DEMO_POLICY, fixture
 from trace_app.investigation.assessment_context import AssessmentBoundaryError
 from trace_app.investigation.provider import ModelErrorCode
 from trace_app.investigation.provider_policy import Sensitivity
@@ -16,6 +16,36 @@ from trace_app.runtime.logging import configure_logging
 
 
 class WorkflowContracts(unittest.TestCase):
+    def test_review_packet_avoids_duplicate_citation_lookups(self) -> None:
+        workflow, _, _, _, clock, _, backend, _, _ = fixture(
+            policy=replace(DEMO_POLICY, deadline_ms=75_000)
+        )
+        backend.after_call = lambda _: setattr(clock, "now", clock.now + 4)
+        result = workflow.run()
+        self.assertEqual(result.execution_status, "completed")
+        self.assertEqual(result.validation_outcome, "review_required")
+
+    def test_expired_citation_lookup_reports_expiry(self) -> None:
+        workflow, _, _, _, clock, _, backend, _, _ = fixture(
+            policy=replace(DEMO_POLICY, deadline_ms=60_000)
+        )
+        backend.after_call = lambda _: setattr(clock, "now", clock.now + 4)
+        result = workflow.run()
+        self.assertEqual(result.failure_code, "expired")
+
+    def test_review_packet_does_not_bypass_revoked_tool_scope(self) -> None:
+        workflow, _, _, reviews, _, _, backend, _, _ = fixture()
+        original = reviews.read
+
+        def read(scope, binding):
+            result = original(scope, binding)
+            backend.scope_valid = False
+            return result
+
+        reviews.read = read
+        result = workflow.run()
+        self.assertEqual(result.failure_code, "access_denied")
+
     def test_success_competing_proposal_and_abstention_are_separate_from_failures(
         self,
     ) -> None:

@@ -248,6 +248,22 @@ class AssessmentValidationTests(unittest.TestCase):
         reviews.read = read
         self.assertEqual(validator.validate(response, SCOPE).reason, "access_denied")
 
+    def test_unreviewed_packet_is_not_prepared_after_source_revocation(self) -> None:
+        validator, response, authority, reviews, _ = fixture()
+        original = reviews.read
+
+        def read(scope, binding):
+            decisions = original(scope, binding)
+            authority.records["evidence-1"] = replace(
+                authority.records["evidence-1"], access_allowed=False
+            )
+            return decisions
+
+        reviews.read = read
+        result = validator.validate(response, SCOPE, _prepare_packet=True)
+        self.assertEqual(result.reason, "access_denied")
+        self.assertIsNone(result._review_packet_json)
+
     def test_component_failure_is_not_a_source_gap_or_abstention(self) -> None:
         from trace_app.knowledge.models import canonical, digest
 

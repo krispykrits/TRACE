@@ -12,6 +12,7 @@ import unittest
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict
 from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 from unittest.mock import patch
 
@@ -472,37 +473,48 @@ class PostgresJobsTests(unittest.TestCase):
         )
         with psycopg.connect(self.dsn) as connection:
             row = connection.execute(
-                "SELECT budgeted_nusd, dispatched FROM trace_model_attempts WHERE request_id=%s",
+                "SELECT budgeted_usd, dispatched FROM trace_model_attempts WHERE request_id=%s",
                 (metadata["request_id"],),
             ).fetchone()
             accounting = connection.execute(
-                """SELECT budgeted_nusd, reserved_nusd, estimated_cost_nusd,
-                          actual_billed_nusd, worker_started, request_sent
+                """SELECT budgeted_usd, reserved_usd, estimated_cost_usd,
+                          actual_billed_usd, worker_started, request_sent
                    FROM trace_model_accounting WHERE request_id=%s""",
                 (metadata["request_id"],),
             ).fetchone()
-        self.assertEqual(row, (20, True))
-        self.assertEqual(accounting, (20, 20, None, None, None, None))
+        amount = Decimal("0.000000020")
+        self.assertEqual(row, (amount, True))
+        self.assertEqual(accounting, (amount, amount, None, None, None, None))
 
         # A rolling deployment can use the old name until the migration runs.
         with psycopg.connect(self.dsn) as connection:
+            connection.execute("DROP VIEW trace_model_accounting")
             connection.execute(
-                "ALTER TABLE trace_model_attempts RENAME COLUMN budgeted_nusd TO charged_nusd"
+                "ALTER TABLE trace_model_attempts ALTER COLUMN budgeted_usd TYPE bigint USING (budgeted_usd * 1000000000)::bigint"
+            )
+            connection.execute(
+                "ALTER TABLE trace_model_attempts ALTER COLUMN allowance_usd TYPE bigint USING (allowance_usd * 1000000000)::bigint"
+            )
+            connection.execute(
+                "ALTER TABLE trace_model_attempts RENAME COLUMN budgeted_usd TO budgeted_nusd"
+            )
+            connection.execute(
+                "ALTER TABLE trace_model_attempts RENAME COLUMN allowance_usd TO allowance_nusd"
             )
         journal.finish(
             metadata | {"outcome": "timeout"}, ModelUsage(), True, time.time()
         )
         migration = Path(
-            "src/trace_app/adapters/storage/postgres/migrations/001_model_budget_accounting.sql"
+            "src/trace_app/adapters/storage/postgres/migrations/002_model_amounts_usd.sql"
         ).read_text()
         with psycopg.connect(self.dsn) as connection:
             connection.execute(migration)
             self.assertEqual(
                 connection.execute(
-                    "SELECT budgeted_nusd FROM trace_model_attempts WHERE request_id=%s",
+                    "SELECT budgeted_usd FROM trace_model_attempts WHERE request_id=%s",
                     (metadata["request_id"],),
                 ).fetchone(),
-                (20,),
+                (amount,),
             )
         journal.finish(
             metadata
@@ -518,12 +530,19 @@ class PostgresJobsTests(unittest.TestCase):
         with psycopg.connect(self.dsn) as connection:
             self.assertEqual(
                 connection.execute(
-                    """SELECT budgeted_nusd, reserved_nusd, estimated_cost_nusd,
-                          actual_billed_nusd, worker_started, request_sent
+                    """SELECT budgeted_usd, reserved_usd, estimated_cost_usd,
+                          actual_billed_usd, worker_started, request_sent
                    FROM trace_model_accounting WHERE request_id=%s""",
                     (metadata["request_id"],),
                 ).fetchone(),
-                (20, 10, 10, None, True, True),
+                (
+                    amount,
+                    Decimal("0.000000010"),
+                    Decimal("0.000000010"),
+                    None,
+                    True,
+                    True,
+                ),
             )
 
     def test_worker_fails_unpublished_attempt_without_replay(self) -> None:

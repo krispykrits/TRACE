@@ -323,6 +323,16 @@ class ToolSession:
     def execution(self) -> ExecutionSession | None:
         return self._execution
 
+    def revalidate_scope(self) -> bool:
+        """Recheck current source scope if the backend supports it."""
+        revalidate = getattr(self._backend, "revalidate_scope", None)
+        if not callable(revalidate):
+            return False
+        if self._execution is not None:
+            self._execution.checkpoint()
+        revalidate(self._scope)
+        return True
+
     def invoke(
         self, name: object, arguments: object, *, purpose: CallPurpose = "initial"
     ) -> ToolResult:

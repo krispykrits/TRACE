@@ -484,7 +484,9 @@ class BoundedInvestigation:
                     ),
                     self.reviews,
                 )
-                validation = validator.validate(response, self.scope)
+                validation = validator.validate(
+                    response, self.scope, _prepare_packet=True
+                )
                 if (
                     validation.outcome == "rejected"
                     and self.options.correction
@@ -501,15 +503,31 @@ class BoundedInvestigation:
                         reason=validation.reason,
                     )
                     self._phase("validating")
-                    validation = validator.validate(response, self.scope)
+                    validation = validator.validate(
+                        response, self.scope, _prepare_packet=True
+                    )
                 if (
                     validation.outcome not in ("accepted", "review_required")
                     or validation.assessment is None
                 ):
+                    if validation.reason in (
+                        "expired",
+                        "cancelled",
+                        "budget_exhausted",
+                    ):
+                        raise ExecutionRejected(validation.reason)
                     raise AssessmentBoundaryError(
                         validation.reason or "execution_failure"
                     )
-                packet = validation.assessment.review_packet(self.scope)
+                if (
+                    validation.outcome == "review_required"
+                    and validation._review_packet_json is not None
+                    and self.tools.revalidate_scope()
+                ):
+                    self.check_source_access(package)
+                    packet = json.loads(validation._review_packet_json)
+                else:
+                    packet = validation.assessment.review_packet(self.scope)
                 tasks = packet["tasks"]
                 body = (
                     validation.assessment.read(self.scope)

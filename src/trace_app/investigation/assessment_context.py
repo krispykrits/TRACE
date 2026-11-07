@@ -8,6 +8,7 @@ from typing import Any
 
 from trace_app.evidence.models import _parse_utc
 from trace_app.investigation.bundle import EvidencePackage, ToolInvoker
+from trace_app.investigation.execution import ExecutionRejected
 from trace_app.investigation.provider_policy import ProviderScope
 from trace_app.knowledge.models import KnowledgeChunk, canonical, digest
 
@@ -181,7 +182,9 @@ class ToolCitationResolver:
             payload = self._invoker.invoke(name, arguments).payload
         except Exception:
             raise AssessmentBoundaryError("execution_failure") from None
-        if payload.status in ("timeout", "dependency_failure", "budget_exhausted"):
+        if payload.status in ("expired", "cancelled", "budget_exhausted"):
+            raise ExecutionRejected(payload.status)
+        if payload.status in ("timeout", "dependency_failure"):
             raise AssessmentBoundaryError("execution_failure")
         if payload.status != "ok":
             raise AssessmentBoundaryError("citation_denied")

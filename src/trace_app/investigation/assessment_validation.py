@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import re
 import weakref
@@ -18,6 +19,7 @@ from trace_app.investigation.assessment_schema import (
     ASSESSMENT_VERSION,
     AssessmentReport,
 )
+from trace_app.investigation.execution import ExecutionRejected
 from trace_app.investigation.provider import ModelProviderError
 from trace_app.investigation.provider_policy import (
     ProtectedModelResponse,
@@ -60,6 +62,7 @@ class AssessmentValidation:
     citation_validity: str
     claim_support: str
     assessment: ProtectedAssessment | None = field(default=None, repr=False)
+    _review_packet_json: str | None = field(default=None, repr=False)
 
     def metadata(self) -> dict[str, object]:
         return {
@@ -298,7 +301,11 @@ class AssessmentValidator:
         return self._support(scope, tasks)
 
     def validate(
-        self, response: ProtectedModelResponse, scope: ProviderScope
+        self,
+        response: ProtectedModelResponse,
+        scope: ProviderScope,
+        *,
+        _prepare_packet: bool = False,
     ) -> AssessmentValidation:
         result = AssessmentValidation(
             "rejected", "invalid_response", "unchecked", "unchecked"
@@ -309,11 +316,28 @@ class AssessmentValidator:
                 raise AssessmentBoundaryError("invalid_response")
             handle = ProtectedAssessment(response, self)
             self._issued.add(handle)
-            _, _, tasks = self._inspect(handle, scope)
+            report, citations, tasks = self._inspect(handle, scope)
             citation_validity = "valid"
             support = self._support(scope, tasks)
             if support == "supported":
                 self._inspect(handle, scope)
+            # The workflow can retain this just-validated review packet after
+            # independently rechecking current source authority before publish.
+            packet = None
+            if _prepare_packet and support not in ("supported", "unsupported"):
+                response.structured_response(scope)
+                packet = json.dumps(
+                    {
+                        **handle.metadata(),
+                        "artifact_role": "untrusted_support_review",
+                        "rubric_version": RUBRIC_VERSION,
+                        "report": report.to_dict(),
+                        "citations": citations,
+                        "tasks": tasks,
+                        "mutation_authority": False,
+                    },
+                    allow_nan=False,
+                )
             result = AssessmentValidation(
                 "accepted"
                 if support == "supported"
@@ -324,6 +348,7 @@ class AssessmentValidator:
                 "valid",
                 support,
                 handle,
+                packet,
             )
         except ReportInputError:
             result = AssessmentValidation(
@@ -332,6 +357,10 @@ class AssessmentValidator:
         except ModelProviderError:
             result = AssessmentValidation(
                 "rejected", "access_denied", "invalid", "unchecked"
+            )
+        except ExecutionRejected as error:
+            result = AssessmentValidation(
+                "execution_failed", error.outcome, "unchecked", "unchecked"
             )
         except AssessmentBoundaryError as error:
             result = AssessmentValidation(
